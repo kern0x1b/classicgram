@@ -14,7 +14,7 @@
 
 ## Interface changes
 
-<!-- Screenshots, before and after. Use the demo mode (TG_DEMO_MODE=1) rather than a real account. -->
+<!-- Screenshots, before and after. Take them on the test servers (TG_TEST_DC=1), not a real account. -->
 
 ## Checklist
 

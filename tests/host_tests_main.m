@@ -117,7 +117,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "owned_set_page_merge/tg_owned_set_page_merge_tests.h"
 #import "preference_flags/tg_preference_flags_tests.h"
 #import "internal_link_username/tg_internal_link_username_tests.h"
-#import "demo_mode/tg_demo_mode_tests.h"
+#import "test_dc/tg_test_dc_tests.h"
 #import "plain_emoji_text/tg_plain_emoji_text_tests.h"
 #import "single_line_preview/tg_single_line_preview_tests.h"
 #import "story_paging/tg_story_paging_tests.h"
@@ -1275,16 +1275,9 @@ int main(void) {
 				TGPreferenceFlagsTestStickerFlagsDefaultOn},
 			{"internal_link_username_reads_public_chat_links",
 				TGInternalLinkUsernameTestReadsPublicChatLinks},
-			{"demo_mode_reads_the_flag", TGDemoModeTestReadsTheFlag},
-			{"demo_mode_answers_the_requests_a_screen_needs",
-				TGDemoModeTestAnswersTheRequestsAScreenNeeds},
-			{"demo_mode_transport_keeps_the_request_extra",
-				TGDemoModeTestTransportKeepsTheRequestExtra},
-			{"demo_mode_carries_no_real_account_data",
-				TGDemoModeTestCarriesNoRealAccountData},
-			{"demo_mode_shows_every_kind_of_message",
-				TGDemoModeTestShowsEveryKindOfMessage},
-			{"demo_mode_serves_its_own_files", TGDemoModeTestServesItsOwnFiles},
+			{"test_dc_reads_the_flag", TGTestDCTestReadsTheFlag},
+			{"test_dc_keeps_the_real_account_separate",
+				TGTestDCTestKeepsTheRealAccountSeparate},
 			{"plain_emoji_text_drops_what_the_system_cannot_draw",
 				TGPlainEmojiTextTestDropsWhatTheSystemCannotDraw},
 			{"item_builders_search_result_splits_a_contact_name",

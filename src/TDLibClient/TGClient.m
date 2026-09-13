@@ -2,10 +2,6 @@
 #import "TGFloodWaitMessage.h"
 #import "TGRedactedRequestForLogging.h"
 #import "TGClient+Private.h"
-#import "TGDemoAssets.h"
-#import "TGDemoData.h"
-#import "TGDemoMode.h"
-#import "TGDemoTransport.h"
 #import "TGClientSessionRestart.h"
 #import "TGClient+UpdateHandling.h"
 #import "TGClient+ChatState.h"
@@ -181,16 +177,6 @@ static TGClient *gSharedInstanceOverride = nil;
 	if (self.handle)
 		return [self spawnClient];
 
-	if (TGDemoModeEnabled()) {
-		TGDemoPrepareAssets();
-		TGDemoSetAssetProvider(^NSString *(NSString *key) { return TGDemoAssetPathForKey(key); });
-		self.td_create = TGDemoTransportCreate;
-		self.td_send = TGDemoTransportSend;
-		self.td_recv = TGDemoTransportReceive;
-		self.td_destroy = TGDemoTransportDestroy;
-		return [self spawnClient];
-	}
-
 	NSString *path = [[NSBundle mainBundle].bundlePath
 		stringByAppendingPathComponent:@"libtdjson.dylib"];
 
@@ -235,7 +221,7 @@ static TGClient *gSharedInstanceOverride = nil;
 		return NO;
 	}
 
-	self.parametersSent = TGDemoModeEnabled();
+	self.parametersSent = NO;
 	self.suspending = NO;
 	self.suspended = NO;
 	self.available = YES;
@@ -995,8 +981,6 @@ static NSString *const TGFolderSnapshotName = @"folders";
 }
 
 - (void)loadCachedFolders {
-	if (TGDemoModeEnabled())
-		return;
 	self.folderTagsEnabled = [[NSUserDefaults standardUserDefaults]
 		boolForKey:[TGAccountManager defaultsKey:@"tgFolderTagsEnabled"]];
 	self.mainChatListPosition = [[NSUserDefaults standardUserDefaults]
@@ -1015,8 +999,6 @@ static NSString *const TGFolderSnapshotName = @"folders";
 }
 
 - (void)loadCachedChats {
-	if (TGDemoModeEnabled())
-		return;
 	if (self.cachedChatsLoaded || self.chatsById.count)
 		return;
 	self.cachedChatsLoaded = YES;
@@ -1063,8 +1045,6 @@ static NSString *const TGFolderSnapshotName = @"folders";
 }
 
 - (void)saveCachedChats {
-	if (TGDemoModeEnabled())
-		return;
 	if (self.authState != TGAuthStateReady)
 		return;
 	self.lastChatSnapshotSave = [NSDate timeIntervalSinceReferenceDate];

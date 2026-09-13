@@ -634,9 +634,6 @@ src/TDLibClient/TGClient+WebLinks.m
 src/TDLibClient/TGClient.m
 src/TDLibClient/TGClientSessionRestart.m
 src/TDLibClient/TGDatabaseEncryptionKey.m
-src/TDLibClient/TGDemoAssets.m
-src/TDLibClient/TGDemoData.m
-src/TDLibClient/TGDemoTransport.m
 src/TDLibClient/TGFloodWaitMessage.m
 src/TDLibClient/TGFloodWaitNotice.m
 src/TDLibClient/TGInternalLinkUsername.m
@@ -675,7 +672,6 @@ src/Utilities/TGContactName.m
 src/Utilities/TGCountAfterRead.m
 src/Utilities/TGDateDayDifference.m
 src/Utilities/TGDayWindow.m
-src/Utilities/TGDemoMode.m
 src/Utilities/TGDevice.m
 src/Utilities/TGDurationText.m
 src/Utilities/TGEmoji.m
