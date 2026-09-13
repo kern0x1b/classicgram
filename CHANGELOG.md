@@ -14,9 +14,13 @@ while `1.0` is the release/package version.
 
 ## [Unreleased]
 
-Telegram Classic is developed continuously on `main`; there is no tagged release.
+Classicgram is developed continuously on `main`; there is no tagged release.
 The [feature table](README.md#feature-table) is the authoritative statement of
 what works. Notable recent changes:
+
+- The project is presented consistently as **Classicgram**: the README title, the in-app
+  Settings footer (which now also states it is an unofficial client using the Telegram API), and
+  the repository name all match the app.
 
 - The build moved to a [Theos](https://theos.dev) application project (`make
   FINALPACKAGE=1`), replacing the hand-written Makefile.
@@ -26,5 +30,5 @@ what works. Notable recent changes:
   editorconfig, issue/PR templates, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT) were
   added.
 
-[Unreleased]: https://github.com/kern0x1b/telegram-classic/compare/v1.0...HEAD
-[1.0]: https://github.com/kern0x1b/telegram-classic/releases/tag/v1.0
+[Unreleased]: https://github.com/kern0x1b/classicgram/compare/v1.0...HEAD
+[1.0]: https://github.com/kern0x1b/classicgram/releases/tag/v1.0

@@ -217,9 +217,12 @@
 - (void)buildVersionFooter {
 	NSDictionary *info = [NSBundle mainBundle].infoDictionary;
 	UILabel *label = [[UILabel alloc] initWithFrame:
-			CGRectMake(0, 0, self.view.bounds.size.width ?: TGSettingsScreenWidth(), 40)];
-	label.text = [NSString stringWithFormat:TGL(@"Settings.TelegramArmv7", @"Telegram %@ (%@) armv7"),
+			CGRectMake(0, 0, self.view.bounds.size.width ?: TGSettingsScreenWidth(), 58)];
+	NSString *version = [NSString stringWithFormat:TGL(@"Settings.TelegramArmv7", @"Classicgram %@ (%@)"),
 		info[@"CFBundleShortVersionString"] ?: @"", info[@"CFBundleVersion"] ?: @""];
+	label.text = [NSString stringWithFormat:@"%@\n%@", version,
+		TGL(@"Settings.UnofficialNotice", @"Unofficial Telegram client · uses the Telegram API")];
+	label.numberOfLines = 2;
 	label.font = [UIFont systemFontOfSize:14];
 	label.textAlignment = NSTextAlignmentCenter;
 	label.textColor = TGColourFromHex(0x697487);

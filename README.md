@@ -1,4 +1,4 @@
-# Telegram Classic
+# Classicgram
 
 [![Platform](https://img.shields.io/badge/platform-iOS%206%20%C2%B7%20armv7-lightgrey)](#supported-targets)
 [![Licence](https://img.shields.io/badge/licence-GPLv3-blue)](LICENSE)
@@ -345,7 +345,7 @@ Four further pieces are optional, not part of the app binary itself, each instal
 ```
 telegram-classic/
 ├── Makefile              # the entire build — there is no Xcode project
-├── src/                  # everything that compiles into Telegram Classic.app
+├── src/                  # everything that compiles into Classicgram.app
 │   ├── App/               # application lifecycle, root view controllers, TGCoordinator (navigation seam)
 │   ├── TDLibClient/        # the TDLib wrapper (TGClient and its per-feature categories) — the only package allowed to import TDLib's own headers
 │   ├── Model/              # value objects
@@ -414,5 +414,5 @@ project, originally GPL-2.0-or-later and relicensed here under GPLv3 as that lic
   for QR code decoding.
 - **This project**: maintained by kern0x1b and contributors.
 
-Telegram Classic is an independent project and is not affiliated with, endorsed by, or sponsored by
+Classicgram is an independent, unofficial project and is not affiliated with, endorsed by, or sponsored by
 Telegram FZ-LLC, Telegram Messenger Inc., or Apple Inc.

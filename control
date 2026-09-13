@@ -9,4 +9,4 @@ Section: Social
 Depends: firmware (>= 6.0)
 Depiction: https://kern0x1b.github.io/cydia/depictions/classicgram.html
 Icon: https://kern0x1b.github.io/cydia/icons/classicgram.png
-Homepage: https://github.com/kern0x1b/telegram-classic
+Homepage: https://github.com/kern0x1b/classicgram
