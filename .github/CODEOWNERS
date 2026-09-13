@@ -1,0 +1,3 @@
+# Default owner for everything in the repository.
+# Ordered from least to most specific; the last matching pattern wins.
+* @kern0x1b

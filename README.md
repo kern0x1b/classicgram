@@ -20,6 +20,17 @@ from [Twelve](https://github.com/theanazerka/twelve-project); both are credited 
 [Credits](#credits) and [`NOTICE`](NOTICE), as the licence requires. It is not affiliated with,
 endorsed by, or in any way connected to Telegram FZ-LLC or Telegram Messenger Inc.
 
+## Contents
+
+- [Supported targets](#supported-targets)
+- [Feature table](#feature-table)
+- [Building](#building)
+- [Installing on a device](#installing-on-a-device)
+- [Repository layout](#repository-layout)
+- [Where the reasoning lives](#where-the-reasoning-lives)
+- [Licence](#licence)
+- [Credits](#credits)
+
 ## Supported targets
 
 | | |
