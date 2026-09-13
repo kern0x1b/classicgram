@@ -3,7 +3,6 @@
 [![Platform](https://img.shields.io/badge/platform-iOS%206%20%C2%B7%20armv7-lightgrey)](#supported-targets)
 [![Licence](https://img.shields.io/badge/licence-GPLv3-blue)](LICENSE)
 [![Language](https://img.shields.io/badge/written%20in-Objective--C-438eff)](#repository-layout)
-[![Host tests](https://github.com/kern0x1b/telegram-classic/actions/workflows/host-tests.yml/badge.svg)](../../actions/workflows/host-tests.yml)
 
 An unofficial Telegram client for the hardware Telegram itself stopped supporting years ago:
 32-bit armv7 iPhones and iPads on iOS 6, the last release those devices ever received. It talks to
