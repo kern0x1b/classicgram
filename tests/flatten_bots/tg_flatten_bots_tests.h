@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_FLATTEN_BOTS_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_BOTS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenBotsTestFileIdOfPhotoLastSizeWinsOverLargerEarlierSize(void);
+TGTestOutcome TGFlattenBotsTestFileIdOfPhotoSingleSize(void);
+TGTestOutcome TGFlattenBotsTestFileIdOfPhotoEmptyOrMissingSizesReturnsNil(void);
+TGTestOutcome TGFlattenBotsTestMarkupComposesFromRealisticPayload(void);
+TGTestOutcome TGFlattenBotsTestMarkupReturnsNilForNonDictionaryOrMissingKeys(void);
+TGTestOutcome TGFlattenBotsTestFileIdOfThumbnailPresentAndAbsent(void);
+TGTestOutcome TGFlattenBotsTestFileIdOfDocumentPresentAndAbsent(void);
+
+#endif

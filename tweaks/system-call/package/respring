@@ -1,0 +1,5 @@
+#!/bin/sh
+sleep "${1:-2}"
+sync
+killall -9 SpringBoard >/dev/null 2>&1 || true
+exit 0

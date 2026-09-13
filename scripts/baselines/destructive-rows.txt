@@ -1,0 +1,4 @@
+# A section that is a list of destructive actions, not one action standing alone.
+# The 2013 client draws a plate for an action by itself; four in a row are rows,
+# read from the leading edge in the destructive colour. Only such a section belongs here.
+src/Screens/Storage/TGStorageViewController+Table.m  # Clear photos / videos / other files / drafts

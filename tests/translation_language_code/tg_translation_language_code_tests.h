@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_TRANSLATION_LANGUAGE_CODE_TESTS_H
+#define TG_HOST_TESTS_TRANSLATION_LANGUAGE_CODE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGTranslationLanguageCodeTestOrdinaryTwoLetterLocaleTruncates(void);
+TGTestOutcome TGTranslationLanguageCodeTestNorwegianBokmalMapsToNo(void);
+TGTestOutcome TGTranslationLanguageCodeTestNorwegianNynorskMapsToNo(void);
+TGTestOutcome TGTranslationLanguageCodeTestFilipinoMapsToTl(void);
+TGTestOutcome TGTranslationLanguageCodeTestHawaiianKeepsFullCode(void);
+TGTestOutcome TGTranslationLanguageCodeTestNilLocaleFallsBackToEnglish(void);
+TGTestOutcome TGTranslationLanguageCodeTestEmptyLocaleFallsBackToEnglish(void);
+
+#endif

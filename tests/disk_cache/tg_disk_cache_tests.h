@@ -1,0 +1,23 @@
+#ifndef TG_HOST_TESTS_DISK_CACHE_TESTS_H
+#define TG_HOST_TESTS_DISK_CACHE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryDiffersByScope(void);
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryWithNoScopeIsPrimary(void);
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryForScopeCreatesTheDirectory(void);
+TGTestOutcome TGDiskCacheTestDiscardDatabaseForScopeRemovesItsDirectory(void);
+TGTestOutcome TGDiskCacheTestDiscardDatabaseForScopeIgnoresEmptyScope(void);
+TGTestOutcome TGDiskCacheTestSnapshotPathVariesByScope(void);
+TGTestOutcome TGDiskCacheTestSnapshotPathIsStableForSameNameAndScope(void);
+TGTestOutcome TGDiskCacheTestWriteDataToProtectedPathRoundTrips(void);
+TGTestOutcome TGDiskCacheTestWriteDataToProtectedPathFailsForNilData(void);
+TGTestOutcome TGDiskCacheTestImageForKeyMissingFileReturnsNil(void);
+TGTestOutcome TGDiskCacheTestImageForKeyEmptyKeyReturnsNil(void);
+TGTestOutcome TGDiskCacheTestStoreThenFetchImageRoundTrips(void);
+TGTestOutcome TGDiskCacheTestDifferentKeysDoNotClobberEachOther(void);
+TGTestOutcome TGDiskCacheTestKeysWithSpecialCharactersDoNotCollide(void);
+TGTestOutcome TGDiskCacheTestClearImagesRemovesStoredImage(void);
+TGTestOutcome TGDiskCacheTestImageForKeyWithCorruptFileRemovesIt(void);
+
+#endif

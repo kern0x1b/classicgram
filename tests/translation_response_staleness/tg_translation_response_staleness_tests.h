@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_TRANSLATION_RESPONSE_STALENESS_TESTS_H
+#define TG_HOST_TESTS_TRANSLATION_RESPONSE_STALENESS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGTranslationResponseStalenessTestPendingKeyIsNotStale(void);
+TGTestOutcome TGTranslationResponseStalenessTestClearedKeyIsStale(void);
+TGTestOutcome TGTranslationResponseStalenessTestNilKeyIsStale(void);
+TGTestOutcome TGTranslationResponseStalenessTestNilGenerationIsStale(void);
+TGTestOutcome TGTranslationResponseStalenessTestNonDictionaryPendingIsStale(void);
+TGTestOutcome TGTranslationResponseStalenessTestEmptyPendingIsStale(void);
+TGTestOutcome TGTranslationResponseStalenessTestSupersededGenerationIsStale(void);
+
+#endif

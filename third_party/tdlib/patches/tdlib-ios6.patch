@@ -1,0 +1,823 @@
+diff --git a/td/telegram/ClientJson.cpp b/td/telegram/ClientJson.cpp
+index a8e93ec18..2f932f18e 100644
+--- a/td/telegram/ClientJson.cpp
++++ b/td/telegram/ClientJson.cpp
+@@ -13,6 +13,7 @@
+ #include "td/utils/FlatHashMap.h"
+ #include "td/utils/JsonBuilder.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/SliceBuilder.h"
+ #include "td/utils/StackAllocator.h"
+ #include "td/utils/StringBuilder.h"
+@@ -71,9 +72,8 @@ static string from_response(const td_api::Object &object, const string &extra, i
+   return sb.as_cslice().str();
+ }
+ 
+-static TD_THREAD_LOCAL string *current_output;
+-
+ static const char *store_string(string str) {
++  TD_EMULATED_TLS_LOCAL(string *, current_output);
+   init_thread_local<string>(current_output);
+   *current_output = std::move(str);
+   return current_output->c_str();
+diff --git a/td/telegram/net/Session.cpp b/td/telegram/net/Session.cpp
+index d772c4538..276b58cdb 100644
+--- a/td/telegram/net/Session.cpp
++++ b/td/telegram/net/Session.cpp
+@@ -34,6 +34,7 @@
+ #include "td/utils/logging.h"
+ #include "td/utils/misc.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/Random.h"
+ #include "td/utils/Slice.h"
+ #include "td/utils/SliceBuilder.h"
+@@ -49,6 +50,22 @@
+ #include <tuple>
+ #include <utility>
+ 
++#include "td/utils/port/config.h"
++
++#if TD_DARWIN_IOS
++extern "C" {
++
++typedef void (*td_ios_primary_socket_callback)(int fd);
++
++static td_ios_primary_socket_callback td_ios_primary_socket_cb = nullptr;
++
++__attribute__((visibility("default"))) void td_ios_set_primary_socket_callback(
++    td_ios_primary_socket_callback callback) {
++  td_ios_primary_socket_cb = callback;
++}
++}
++#endif
++
+ namespace td {
+ 
+ namespace detail {
+@@ -150,14 +167,14 @@ class GenAuthKeyActor final : public Actor {
+   static constexpr size_t MIN_HIGH_LOAD_ACTOR_COUNT = 100;
+   static std::atomic<size_t> actor_count_;
+ 
+-  static TD_THREAD_LOCAL Semaphore *semaphore_;
++  static Semaphore *&semaphore_();
+   Semaphore &get_handshake_semaphore() {
+     auto old_context = set_context(std::make_shared<ActorContext>());
+     auto old_tag = set_tag(string());
+-    init_thread_local<Semaphore>(semaphore_, 50);
++    init_thread_local<Semaphore>(semaphore_(), 50);
+     set_context(std::move(old_context));
+     set_tag(std::move(old_tag));
+-    return *semaphore_;
++    return *semaphore_();
+   }
+ 
+   void start_up() final {
+@@ -208,7 +225,9 @@ class GenAuthKeyActor final : public Actor {
+ };
+ 
+ std::atomic<size_t> GenAuthKeyActor::actor_count_;
+-TD_THREAD_LOCAL Semaphore *GenAuthKeyActor::semaphore_{};
++Semaphore *&GenAuthKeyActor::semaphore_() {
++  return ::td::detail::emulated_tls_ref<Semaphore *, __COUNTER__>();
++}
+ 
+ }  // namespace detail
+ 
+@@ -1289,6 +1308,14 @@ void Session::connection_open_finish(ConnectionInfo *info,
+   }
+   info->connection_->set_online(connection_online_flag_, is_primary_);
+   info->connection_->set_name(name);
++#if TD_DARWIN_IOS
++  if (is_main_ && is_primary_ && info->connection_id_ == 0 && td_ios_primary_socket_cb != nullptr) {
++    const auto &primary_native_fd = info->connection_->get_poll_info().native_fd();
++    if (primary_native_fd) {
++      td_ios_primary_socket_cb(primary_native_fd.socket());
++    }
++  }
++#endif
+   Scheduler::subscribe(info->connection_->get_poll_info().extract_pollable_fd(this));
+   info->mode_ = mode_;
+   info->state_ = ConnectionInfo::State::Ready;
+diff --git a/tdactor/td/actor/ConcurrentScheduler.cpp b/tdactor/td/actor/ConcurrentScheduler.cpp
+index 40c9c9fa4..2f528cff2 100644
+--- a/tdactor/td/actor/ConcurrentScheduler.cpp
++++ b/tdactor/td/actor/ConcurrentScheduler.cpp
+@@ -9,6 +9,7 @@
+ #include "td/utils/ExitGuard.h"
+ #include "td/utils/MpscPollableQueue.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/ScopeGuard.h"
+ 
+ #include <memory>
+@@ -111,7 +112,9 @@ void ConcurrentScheduler::start() {
+   state_ = State::Run;
+ }
+ 
+-static TD_THREAD_LOCAL double emscripten_timeout;
++static double &emscripten_timeout() {
++  return ::td::detail::emulated_tls_ref<double, __COUNTER__>();
++}
+ 
+ bool ConcurrentScheduler::run_main(Timestamp timeout) {
+   CHECK(state_ == State::Run);
+@@ -125,7 +128,7 @@ bool ConcurrentScheduler::run_main(Timestamp timeout) {
+   }
+ 
+   // hack for emscripten
+-  emscripten_timeout = get_main_timeout().at();
++  emscripten_timeout() = get_main_timeout().at();
+ 
+   return !is_finished();
+ }
+@@ -136,10 +139,10 @@ Timestamp ConcurrentScheduler::get_main_timeout() {
+ }
+ 
+ double ConcurrentScheduler::emscripten_get_main_timeout() {
+-  return Timestamp::at(emscripten_timeout).in();
++  return Timestamp::at(emscripten_timeout()).in();
+ }
+ void ConcurrentScheduler::emscripten_clear_main_timeout() {
+-  emscripten_timeout = 0;
++  emscripten_timeout() = 0;
+ }
+ 
+ void ConcurrentScheduler::finish() {
+diff --git a/tdactor/td/actor/impl/Scheduler-decl.h b/tdactor/td/actor/impl/Scheduler-decl.h
+index 5dbd6b434..55ddb9d37 100644
+--- a/tdactor/td/actor/impl/Scheduler-decl.h
++++ b/tdactor/td/actor/impl/Scheduler-decl.h
+@@ -221,8 +221,8 @@ class Scheduler {
+   ActorOwn<ActorT> register_actor_impl(Slice name, ActorT *actor_ptr, Actor::Deleter deleter, int32 sched_id);
+   void destroy_actor(ActorInfo *actor_info);
+ 
+-  static TD_THREAD_LOCAL Scheduler *scheduler_;
+-  static TD_THREAD_LOCAL ActorContext *context_;
++  static Scheduler *&scheduler_();
++  static ActorContext *&context_();
+ 
+   Callback *callback_ = nullptr;
+   unique_ptr<ObjectPool<ActorInfo>> actor_info_pool_;
+diff --git a/tdactor/td/actor/impl/Scheduler.cpp b/tdactor/td/actor/impl/Scheduler.cpp
+index dd5a1d768..8e0656bd9 100644
+--- a/tdactor/td/actor/impl/Scheduler.cpp
++++ b/tdactor/td/actor/impl/Scheduler.cpp
+@@ -22,6 +22,7 @@
+ #include "td/utils/MpscPollableQueue.h"
+ #include "td/utils/ObjectPool.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/Promise.h"
+ #include "td/utils/ScopeGuard.h"
+ #include "td/utils/SliceBuilder.h"
+@@ -35,27 +36,31 @@ namespace td {
+ 
+ int VERBOSITY_NAME(actor) = VERBOSITY_NAME(DEBUG) + 10;
+ 
+-TD_THREAD_LOCAL Scheduler *Scheduler::scheduler_;   // static zero-initialized
+-TD_THREAD_LOCAL ActorContext *Scheduler::context_;  // static zero-initialized
++Scheduler *&Scheduler::scheduler_() {
++  return ::td::detail::emulated_tls_ref<Scheduler *, __COUNTER__>();
++}
++ActorContext *&Scheduler::context_() {
++  return ::td::detail::emulated_tls_ref<ActorContext *, __COUNTER__>();
++}
+ 
+ Scheduler::~Scheduler() {
+   clear();
+ }
+ 
+ Scheduler *Scheduler::instance() {
+-  return scheduler_;
++  return scheduler_();
+ }
+ 
+ ActorContext *&Scheduler::context() {
+-  return context_;
++  return context_();
+ }
+ 
+ void Scheduler::on_context_updated() {
+-  LOG_TAG = context_->tag_;
++  LOG_TAG = context_()->tag_;
+ }
+ 
+ void Scheduler::set_scheduler(Scheduler *scheduler) {
+-  scheduler_ = scheduler;
++  scheduler_() = scheduler;
+ }
+ 
+ void Scheduler::ServiceActor::set_queue(std::shared_ptr<MpscPollableQueue<EventFull>> queues) {
+@@ -393,15 +398,15 @@ void Scheduler::run_on_scheduler(int32 sched_id, Promise<Unit> action) {
+ void Scheduler::destroy_on_scheduler_impl(int32 sched_id, Promise<Unit> action) {
+   auto empty_context = std::make_shared<ActorContext>();
+   empty_context->this_ptr_ = empty_context;
+-  ActorContext *current_context = context_;
+-  context_ = empty_context.get();
++  ActorContext *current_context = context_();
++  context_() = empty_context.get();
+ 
+   const char *current_tag = LOG_TAG;
+   LOG_TAG = nullptr;
+ 
+   run_on_scheduler(sched_id, std::move(action));
+ 
+-  context_ = current_context;
++  context_() = current_context;
+   LOG_TAG = current_tag;
+ }
+ 
+diff --git a/tdclientjson_export_list b/tdclientjson_export_list
+index 51f370e6f..da36eb9ec 100644
+--- a/tdclientjson_export_list
++++ b/tdclientjson_export_list
+@@ -12,3 +12,4 @@ _td_send
+ _td_receive
+ _td_execute
+ _td_set_log_message_callback
++_td_ios_set_primary_socket_callback
+diff --git a/tdutils/td/utils/BufferedUdp.cpp b/tdutils/td/utils/BufferedUdp.cpp
+index a5a2202da..aa95c50c1 100644
+--- a/tdutils/td/utils/BufferedUdp.cpp
++++ b/tdutils/td/utils/BufferedUdp.cpp
+@@ -5,13 +5,16 @@
+ // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ //
+ #include "td/utils/BufferedUdp.h"
++#include "compat/emulated_tls.h"
+ 
+ char disable_linker_warning_about_empty_file_buffered_udp_cpp TD_UNUSED;
+ 
+ namespace td {
+ 
+ #if TD_PORT_POSIX
+-TD_THREAD_LOCAL detail::UdpReader *BufferedUdp::udp_reader_;
++detail::UdpReader *&BufferedUdp::udp_reader_() {
++  return ::td::detail::emulated_tls_ref<detail::UdpReader *, __COUNTER__>();
++}
+ #endif
+ 
+ }  // namespace td
+diff --git a/tdutils/td/utils/BufferedUdp.h b/tdutils/td/utils/BufferedUdp.h
+index 0cec11b1e..93b28149d 100644
+--- a/tdutils/td/utils/BufferedUdp.h
++++ b/tdutils/td/utils/BufferedUdp.h
+@@ -167,11 +167,11 @@ class BufferedUdp final : public UdpSocketFd {
+   }
+ 
+   Status flush_read_once() TD_WARN_UNUSED_RESULT {
+-    init_thread_local<detail::UdpReader>(udp_reader_);
+-    return udp_reader_->read_once(as_fd(), input_);
++    init_thread_local<detail::UdpReader>(udp_reader_());
++    return udp_reader_()->read_once(as_fd(), input_);
+   }
+ 
+-  static TD_THREAD_LOCAL detail::UdpReader *udp_reader_;
++  static detail::UdpReader *&udp_reader_();
+ #endif
+ };
+ 
+diff --git a/tdutils/td/utils/Context.h b/tdutils/td/utils/Context.h
+index 2d9992b34..12f438b35 100644
+--- a/tdutils/td/utils/Context.h
++++ b/tdutils/td/utils/Context.h
+@@ -7,6 +7,7 @@
+ #pragma once
+ 
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ namespace td {
+ 
+@@ -14,16 +15,16 @@ template <class Impl>
+ class Context {
+  public:
+   static Impl *get() {
+-    return context_;
++    return context_();
+   }
+   class Guard {
+    public:
+     explicit Guard(Impl *new_context) {
+-      old_context_ = context_;
+-      context_ = new_context;
++      old_context_ = context_();
++      context_() = new_context;
+     }
+     ~Guard() {
+-      context_ = old_context_;
++      context_() = old_context_;
+     }
+     Guard(const Guard &) = delete;
+     Guard &operator=(const Guard &) = delete;
+@@ -35,10 +36,9 @@ class Context {
+   };
+ 
+  private:
+-  static TD_THREAD_LOCAL Impl *context_;
++  static Impl *&context_() {
++    return ::td::detail::emulated_tls_ref<Impl *, 0>();
++  }
+ };
+ 
+-template <class Impl>
+-TD_THREAD_LOCAL Impl *Context<Impl>::context_;
+-
+ }  // namespace td
+diff --git a/tdutils/td/utils/Random.cpp b/tdutils/td/utils/Random.cpp
+index 3b8071fb4..6053576ff 100644
+--- a/tdutils/td/utils/Random.cpp
++++ b/tdutils/td/utils/Random.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include "td/utils/logging.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ #if TD_HAVE_OPENSSL
+ #include <openssl/rand.h>
+@@ -32,9 +33,9 @@ void Random::secure_bytes(MutableSlice dest) {
+ 
+ void Random::secure_bytes(unsigned char *ptr, size_t size) {
+   constexpr size_t BUF_SIZE = 512;
+-  static TD_THREAD_LOCAL unsigned char *buf;  // static zero-initialized
+-  static TD_THREAD_LOCAL size_t buf_pos;
+-  static TD_THREAD_LOCAL int64 generation;
++  TD_EMULATED_TLS_LOCAL(unsigned char *, buf);  // static zero-initialized
++  TD_EMULATED_TLS_LOCAL(size_t, buf_pos);
++  TD_EMULATED_TLS_LOCAL(int64, generation);
+   if (init_thread_local<unsigned char[]>(buf, BUF_SIZE)) {
+     buf_pos = BUF_SIZE;
+     generation = 0;
+@@ -109,13 +110,13 @@ void Random::secure_cleanup() {
+ #endif
+ 
+ static unsigned int rand_device_helper() {
+-  static TD_THREAD_LOCAL std::random_device *rd;
++  TD_EMULATED_TLS_LOCAL(std::random_device *, rd);
+   init_thread_local<std::random_device>(rd);
+   return (*rd)();
+ }
+ 
+ uint32 Random::fast_uint32() {
+-  static TD_THREAD_LOCAL std::mt19937 *gen;
++  TD_EMULATED_TLS_LOCAL(std::mt19937 *, gen);
+   if (!gen) {
+     auto &rg = rand_device_helper;
+     std::seed_seq seq{rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg()};
+@@ -125,7 +126,7 @@ uint32 Random::fast_uint32() {
+ }
+ 
+ uint64 Random::fast_uint64() {
+-  static TD_THREAD_LOCAL std::mt19937_64 *gen;
++  TD_EMULATED_TLS_LOCAL(std::mt19937_64 *, gen);
+   if (!gen) {
+     auto &rg = rand_device_helper;
+     std::seed_seq seq{rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg(), rg()};
+diff --git a/tdutils/td/utils/StackAllocator.cpp b/tdutils/td/utils/StackAllocator.cpp
+index d5886e1cd..f78f71153 100644
+--- a/tdutils/td/utils/StackAllocator.cpp
++++ b/tdutils/td/utils/StackAllocator.cpp
+@@ -7,6 +7,7 @@
+ #include "td/utils/StackAllocator.h"
+ 
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ #include <array>
+ #include <cstdlib>
+@@ -68,7 +69,7 @@ StackAllocator::Ptr::~Ptr() {
+ 
+ StackAllocator::AllocatorImpl *StackAllocator::impl() {
+   if (get_thread_id() != 0) {
+-    static TD_THREAD_LOCAL ArrayAllocator *array_allocator;  // static zero-initialized
++    TD_EMULATED_TLS_LOCAL(ArrayAllocator *, array_allocator);  // static zero-initialized
+     init_thread_local<ArrayAllocator>(array_allocator);
+     return array_allocator;
+   } else {
+diff --git a/tdutils/td/utils/Status.cpp b/tdutils/td/utils/Status.cpp
+index dafae200d..6a642d125 100644
+--- a/tdutils/td/utils/Status.cpp
++++ b/tdutils/td/utils/Status.cpp
+@@ -14,6 +14,7 @@
+ 
+ #if TD_PORT_POSIX
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ #include <string.h>
+ 
+@@ -26,7 +27,7 @@ namespace td {
+ CSlice strerror_safe(int code) {
+   const size_t size = 1000;
+ 
+-  static TD_THREAD_LOCAL char *buf;
++  TD_EMULATED_TLS_LOCAL(char *, buf);
+   init_thread_local<char[]>(buf, size);
+ 
+ #if !defined(__GLIBC__) || ((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && !_GNU_SOURCE)
+diff --git a/tdutils/td/utils/StringBuilder.cpp b/tdutils/td/utils/StringBuilder.cpp
+index 77a130c15..37eeb7e05 100644
+--- a/tdutils/td/utils/StringBuilder.cpp
++++ b/tdutils/td/utils/StringBuilder.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include "td/utils/misc.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ #include <cstdio>
+ #include <cstring>
+@@ -196,7 +197,7 @@ StringBuilder &StringBuilder::operator<<(FixedDouble x) {
+     return on_error();
+   }
+ 
+-  static TD_THREAD_LOCAL std::stringstream *ss;
++  TD_EMULATED_TLS_LOCAL(std::stringstream *, ss);
+   if (init_thread_local<std::stringstream>(ss)) {
+     auto previous_locale = ss->imbue(std::locale::classic());
+     ss->setf(std::ios_base::fixed, std::ios_base::floatfield);
+diff --git a/tdutils/td/utils/buffer.cpp b/tdutils/td/utils/buffer.cpp
+index 29e6d02a4..c7a131b9c 100644
+--- a/tdutils/td/utils/buffer.cpp
++++ b/tdutils/td/utils/buffer.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include "td/utils/logging.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ #include <cstddef>
+ #include <new>
+@@ -21,7 +22,9 @@
+ 
+ namespace td {
+ 
+-TD_THREAD_LOCAL BufferAllocator::BufferRawTls *BufferAllocator::buffer_raw_tls;  // static zero-initialized
++BufferAllocator::BufferRawTls *&BufferAllocator::buffer_raw_tls() {
++  return ::td::detail::emulated_tls_ref<BufferAllocator::BufferRawTls *, __COUNTER__>();
++}
+ 
+ std::atomic<size_t> BufferAllocator::buffer_mem;
+ 
+@@ -63,12 +66,12 @@ BufferAllocator::ReaderPtr BufferAllocator::create_reader(size_t size) {
+ BufferAllocator::ReaderPtr BufferAllocator::create_reader_fast(size_t size) {
+   size = (size + 7) & -8;
+ 
+-  init_thread_local<BufferRawTls>(buffer_raw_tls);
++  init_thread_local<BufferRawTls>(buffer_raw_tls());
+ 
+-  auto buffer_raw = buffer_raw_tls->buffer_raw.get();
++  auto buffer_raw = buffer_raw_tls()->buffer_raw.get();
+   if (buffer_raw == nullptr || buffer_raw->data_size_ - buffer_raw->end_.load(std::memory_order_relaxed) < size) {
+     buffer_raw = create_buffer_raw(4096 * 4);
+-    buffer_raw_tls->buffer_raw = std::unique_ptr<BufferRaw, BufferAllocator::BufferRawDeleter>(buffer_raw);
++    buffer_raw_tls()->buffer_raw = std::unique_ptr<BufferRaw, BufferAllocator::BufferRawDeleter>(buffer_raw);
+   }
+   buffer_raw->end_.fetch_add(size, std::memory_order_relaxed);
+   buffer_raw->ref_cnt_.fetch_add(1, std::memory_order_acq_rel);
+diff --git a/tdutils/td/utils/buffer.h b/tdutils/td/utils/buffer.h
+index b45d9b7e9..0e9d9a141 100644
+--- a/tdutils/td/utils/buffer.h
++++ b/tdutils/td/utils/buffer.h
+@@ -88,7 +88,7 @@ class BufferAllocator {
+     std::unique_ptr<BufferRaw, BufferRawDeleter> buffer_raw;
+   };
+ 
+-  static TD_THREAD_LOCAL BufferRawTls *buffer_raw_tls;
++  static BufferRawTls *&buffer_raw_tls();
+ 
+   static void dec_ref_cnt(BufferRaw *ptr);
+ 
+diff --git a/tdutils/td/utils/crypto.cpp b/tdutils/td/utils/crypto.cpp
+index 8b8f85a93..922940cbf 100644
+--- a/tdutils/td/utils/crypto.cpp
++++ b/tdutils/td/utils/crypto.cpp
+@@ -16,6 +16,7 @@
+ #include "td/utils/port/config.h"
+ #include "td/utils/port/RwMutex.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/Random.h"
+ #include "td/utils/ScopeGuard.h"
+ #include "td/utils/SharedSlice.h"
+@@ -332,7 +333,7 @@ class Evp {
+ 
+   void init_encrypt_ecb(Slice key) {
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-    static TD_THREAD_LOCAL const EVP_CIPHER *evp_cipher;
++    TD_EMULATED_TLS_LOCAL(const EVP_CIPHER *, evp_cipher);
+     if (unlikely(evp_cipher == nullptr)) {
+       init_thread_local_evp_cipher(evp_cipher, "AES-256-ECB");
+     }
+@@ -344,7 +345,7 @@ class Evp {
+ 
+   void init_decrypt_ecb(Slice key) {
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-    static TD_THREAD_LOCAL const EVP_CIPHER *evp_cipher;
++    TD_EMULATED_TLS_LOCAL(const EVP_CIPHER *, evp_cipher);
+     if (unlikely(evp_cipher == nullptr)) {
+       init_thread_local_evp_cipher(evp_cipher, "AES-256-ECB");
+     }
+@@ -356,7 +357,7 @@ class Evp {
+ 
+   void init_encrypt_cbc(Slice key) {
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-    static TD_THREAD_LOCAL const EVP_CIPHER *evp_cipher;
++    TD_EMULATED_TLS_LOCAL(const EVP_CIPHER *, evp_cipher);
+     if (unlikely(evp_cipher == nullptr)) {
+       init_thread_local_evp_cipher(evp_cipher, "AES-256-CBC");
+     }
+@@ -368,7 +369,7 @@ class Evp {
+ 
+   void init_decrypt_cbc(Slice key) {
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-    static TD_THREAD_LOCAL const EVP_CIPHER *evp_cipher;
++    TD_EMULATED_TLS_LOCAL(const EVP_CIPHER *, evp_cipher);
+     if (unlikely(evp_cipher == nullptr)) {
+       init_thread_local_evp_cipher(evp_cipher, "AES-256-CBC");
+     }
+@@ -381,7 +382,7 @@ class Evp {
+ #if OPENSSL_VERSION_NUMBER >= 0x10100000L
+   void init_encrypt_ctr(Slice key) {
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-    static TD_THREAD_LOCAL const EVP_CIPHER *evp_cipher;
++    TD_EMULATED_TLS_LOCAL(const EVP_CIPHER *, evp_cipher);
+     if (unlikely(evp_cipher == nullptr)) {
+       init_thread_local_evp_cipher(evp_cipher, "AES-256-CTR");
+     }
+@@ -724,11 +725,11 @@ void AesCtrState::decrypt(Slice from, MutableSlice to) {
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+ static void make_digest(Slice data, MutableSlice output, const EVP_MD_CTX *evp_md_ctx) {
+-  static TD_THREAD_LOCAL EVP_MD_CTX *ctx;
++  TD_EMULATED_TLS_LOCAL(EVP_MD_CTX *, ctx);
+   if (unlikely(ctx == nullptr)) {
+     ctx = EVP_MD_CTX_new();
+     LOG_IF(FATAL, ctx == nullptr);
+-    detail::add_thread_local_destructor(create_destructor([] {
++    detail::add_thread_local_destructor(create_destructor([&ctx] {
+       EVP_MD_CTX_free(ctx);
+       ctx = nullptr;
+     }));
+@@ -774,7 +775,7 @@ static void init_thread_local_evp_mac_ctx(EVP_MAC_CTX *&evp_mac_ctx, const char
+ 
+ void sha1(Slice data, unsigned char output[20]) {
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-  static TD_THREAD_LOCAL const EVP_MD_CTX *evp_md_ctx;
++  TD_EMULATED_TLS_LOCAL(const EVP_MD_CTX *, evp_md_ctx);
+   if (unlikely(evp_md_ctx == nullptr)) {
+     init_thread_local_evp_md_ctx(evp_md_ctx, "sha1");
+   }
+@@ -788,7 +789,7 @@ void sha1(Slice data, unsigned char output[20]) {
+ void sha256(Slice data, MutableSlice output) {
+   CHECK(output.size() >= 32);
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-  static TD_THREAD_LOCAL const EVP_MD_CTX *evp_md_ctx;
++  TD_EMULATED_TLS_LOCAL(const EVP_MD_CTX *, evp_md_ctx);
+   if (unlikely(evp_md_ctx == nullptr)) {
+     init_thread_local_evp_md_ctx(evp_md_ctx, "sha256");
+   }
+@@ -802,7 +803,7 @@ void sha256(Slice data, MutableSlice output) {
+ void sha512(Slice data, MutableSlice output) {
+   CHECK(output.size() >= 64);
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-  static TD_THREAD_LOCAL const EVP_MD_CTX *evp_md_ctx;
++  TD_EMULATED_TLS_LOCAL(const EVP_MD_CTX *, evp_md_ctx);
+   if (unlikely(evp_md_ctx == nullptr)) {
+     init_thread_local_evp_md_ctx(evp_md_ctx, "sha512");
+   }
+@@ -886,7 +887,7 @@ void Sha256State::init() {
+   }
+   CHECK(!is_inited_);
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-  static TD_THREAD_LOCAL const EVP_MD_CTX *evp_md_ctx;
++  TD_EMULATED_TLS_LOCAL(const EVP_MD_CTX *, evp_md_ctx);
+   if (unlikely(evp_md_ctx == nullptr)) {
+     init_thread_local_evp_md_ctx(evp_md_ctx, "sha256");
+   }
+@@ -928,7 +929,7 @@ void Sha256State::extract(MutableSlice output, bool destroy) {
+ void md5(Slice input, MutableSlice output) {
+   CHECK(output.size() >= 16);
+ #if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(LIBRESSL_VERSION_NUMBER)
+-  static TD_THREAD_LOCAL const EVP_MD_CTX *evp_md_ctx;
++  TD_EMULATED_TLS_LOCAL(const EVP_MD_CTX *, evp_md_ctx);
+   if (unlikely(evp_md_ctx == nullptr)) {
+     init_thread_local_evp_md_ctx(evp_md_ctx, "md5");
+   }
+@@ -995,7 +996,7 @@ static void hmac_impl_finish(EVP_MAC_CTX *ctx, Slice key, Slice message, Mutable
+ }
+ 
+ static void hmac_impl_sha256(Slice key, Slice message, MutableSlice dest) {
+-  static TD_THREAD_LOCAL EVP_MAC_CTX *ctx = nullptr;
++  TD_EMULATED_TLS_LOCAL(EVP_MAC_CTX *, ctx);
+   if (ctx == nullptr) {
+     init_thread_local_evp_mac_ctx(ctx, "SHA256");
+   }
+@@ -1003,7 +1004,7 @@ static void hmac_impl_sha256(Slice key, Slice message, MutableSlice dest) {
+ }
+ 
+ static void hmac_impl_sha512(Slice key, Slice message, MutableSlice dest) {
+-  static TD_THREAD_LOCAL EVP_MAC_CTX *ctx = nullptr;
++  TD_EMULATED_TLS_LOCAL(EVP_MAC_CTX *, ctx);
+   if (ctx == nullptr) {
+     init_thread_local_evp_mac_ctx(ctx, "SHA512");
+   }
+@@ -1162,7 +1163,7 @@ std::vector<RwMutex> &openssl_mutexes() {
+ 
+ #if OPENSSL_VERSION_NUMBER >= 0x10000000L
+ void openssl_threadid_callback(CRYPTO_THREADID *thread_id) {
+-  static TD_THREAD_LOCAL int id;
++  TD_EMULATED_TLS_LOCAL(int, id);
+   CRYPTO_THREADID_set_pointer(thread_id, &id);
+ }
+ #endif
+diff --git a/tdutils/td/utils/logging.cpp b/tdutils/td/utils/logging.cpp
+index c42a43269..591f1e121 100644
+--- a/tdutils/td/utils/logging.cpp
++++ b/tdutils/td/utils/logging.cpp
+@@ -11,6 +11,7 @@
+ #include "td/utils/port/thread_local.h"
+ #include "td/utils/Slice.h"
+ #include "td/utils/TsCerr.h"
++#include "compat/emulated_tls.h"
+ 
+ #include <atomic>
+ #include <cstdlib>
+@@ -55,8 +56,12 @@ void LogInterface::append(int log_level, CSlice slice) {
+   }
+ }
+ 
+-TD_THREAD_LOCAL const char *Logger::tag_ = nullptr;
+-TD_THREAD_LOCAL const char *Logger::tag2_ = nullptr;
++const char *&Logger::tag_() {
++  return ::td::detail::emulated_tls_ref<const char *, __COUNTER__>();
++}
++const char *&Logger::tag2_() {
++  return ::td::detail::emulated_tls_ref<const char *, __COUNTER__>();
++}
+ 
+ Logger::Logger(LogInterface &log, const LogOptions &options, int log_level, Slice file_name, int line_num,
+                Slice comment)
+@@ -113,13 +118,13 @@ Logger::Logger(LogInterface &log, const LogOptions &options, int log_level, Slic
+   }
+ 
+   // context from tag_
+-  if (tag_ != nullptr && *tag_) {
+-    sb_ << "[#" << Slice(tag_) << ']';
++  if (tag_() != nullptr && *tag_()) {
++    sb_ << "[#" << Slice(tag_()) << ']';
+   }
+ 
+   // context from tag2_
+-  if (tag2_ != nullptr && *tag2_) {
+-    sb_ << "[!" << Slice(tag2_) << ']';
++  if (tag2_() != nullptr && *tag2_()) {
++    sb_ << "[!" << Slice(tag2_()) << ']';
+   }
+ 
+   // comment (e.g. condition in LOG_IF)
+diff --git a/tdutils/td/utils/logging.h b/tdutils/td/utils/logging.h
+index 87812bee4..ae3c7e831 100644
+--- a/tdutils/td/utils/logging.h
++++ b/tdutils/td/utils/logging.h
+@@ -59,8 +59,8 @@
+ #define VLOG(level) LOG_IMPL(DEBUG, level, true, TD_DEFINE_STR(level))
+ #define VLOG_IF(level, condition) LOG_IMPL(DEBUG, level, condition, TD_DEFINE_STR(level) " " #condition)
+ 
+-#define LOG_TAG ::td::Logger::tag_
+-#define LOG_TAG2 ::td::Logger::tag2_
++#define LOG_TAG ::td::Logger::tag_()
++#define LOG_TAG2 ::td::Logger::tag2_()
+ 
+ #if TD_CLANG
+ bool no_return_func() __attribute__((analyzer_noreturn));
+@@ -210,8 +210,8 @@ class Logger {
+   Logger &operator=(Logger &&) = delete;
+   ~Logger();
+ 
+-  static TD_THREAD_LOCAL const char *tag_;
+-  static TD_THREAD_LOCAL const char *tag2_;
++  static const char *&tag_();
++  static const char *&tag2_();
+ 
+  private:
+   decltype(StackAllocator::alloc(0)) buffer_;
+diff --git a/tdutils/td/utils/misc.cpp b/tdutils/td/utils/misc.cpp
+index 3615bc708..7a5b461ce 100644
+--- a/tdutils/td/utils/misc.cpp
++++ b/tdutils/td/utils/misc.cpp
+@@ -10,6 +10,7 @@
+ #include "td/utils/StackAllocator.h"
+ #include "td/utils/StringBuilder.h"
+ #include "td/utils/utf8.h"
++#include "compat/emulated_tls.h"
+ 
+ #include <algorithm>
+ #include <cstdlib>
+@@ -100,7 +101,7 @@ Status get_to_integer_safe_error(Slice str) {
+ }  // namespace detail
+ 
+ double to_double(Slice str) {
+-  static TD_THREAD_LOCAL std::stringstream *ss;
++  TD_EMULATED_TLS_LOCAL(std::stringstream *, ss);
+   if (init_thread_local<std::stringstream>(ss)) {
+     auto previous_locale = ss->imbue(std::locale::classic());
+   } else {
+diff --git a/tdutils/td/utils/port/IPAddress.cpp b/tdutils/td/utils/port/IPAddress.cpp
+index 8a08d344b..3b9e7b6af 100644
+--- a/tdutils/td/utils/port/IPAddress.cpp
++++ b/tdutils/td/utils/port/IPAddress.cpp
+@@ -13,6 +13,7 @@
+ #include "td/utils/misc.h"
+ #include "td/utils/port/SocketFd.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/ScopeGuard.h"
+ #include "td/utils/Slice.h"
+ #include "td/utils/SliceBuilder.h"
+@@ -176,7 +177,7 @@ Result<string> idn_to_ascii(CSlice host) {
+ 
+ static CSlice get_ip_str(int family, const void *addr) {
+   const int buf_size = INET6_ADDRSTRLEN;
+-  static TD_THREAD_LOCAL char *buf;
++  TD_EMULATED_TLS_LOCAL(char *, buf);
+   init_thread_local<char[]>(buf, buf_size);
+ 
+   const char *res = inet_ntop(family,
+diff --git a/tdutils/td/utils/port/thread_local.cpp b/tdutils/td/utils/port/thread_local.cpp
+index 4868dc957..9b6d95642 100644
+--- a/tdutils/td/utils/port/thread_local.cpp
++++ b/tdutils/td/utils/port/thread_local.cpp
+@@ -5,37 +5,38 @@
+ // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ //
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ 
+ namespace td {
+ 
+ namespace detail {
+ 
+-static TD_THREAD_LOCAL int32 thread_id_;
+-static TD_THREAD_LOCAL std::vector<unique_ptr<Destructor>> *thread_local_destructors;
++TD_EMULATED_TLS_MEMBER(int32, thread_id_)
++TD_EMULATED_TLS_MEMBER(std::vector<unique_ptr<Destructor>> *, thread_local_destructors)
+ 
+ void add_thread_local_destructor(unique_ptr<Destructor> destructor) {
+-  if (thread_local_destructors == nullptr) {
+-    thread_local_destructors = new std::vector<unique_ptr<Destructor>>();
++  if (thread_local_destructors() == nullptr) {
++    thread_local_destructors() = new std::vector<unique_ptr<Destructor>>();
+   }
+-  thread_local_destructors->push_back(std::move(destructor));
++  thread_local_destructors()->push_back(std::move(destructor));
+ }
+ 
+ }  // namespace detail
+ 
+ void clear_thread_locals() {
+   // ensure that no destructors were added during destructors invocation
+-  auto to_delete = detail::thread_local_destructors;
+-  detail::thread_local_destructors = nullptr;
++  auto to_delete = detail::thread_local_destructors();
++  detail::thread_local_destructors() = nullptr;
+   delete to_delete;
+-  CHECK(detail::thread_local_destructors == nullptr);
++  CHECK(detail::thread_local_destructors() == nullptr);
+ }
+ 
+ void set_thread_id(int32 id) {
+-  detail::thread_id_ = id;
++  detail::thread_id_() = id;
+ }
+ 
+ int32 get_thread_id() {
+-  return detail::thread_id_;
++  return detail::thread_id_();
+ }
+ 
+ }  // namespace td
+diff --git a/tdutils/td/utils/simple_tests.h b/tdutils/td/utils/simple_tests.h
+index d5a912610..24a464bd3 100644
+--- a/tdutils/td/utils/simple_tests.h
++++ b/tdutils/td/utils/simple_tests.h
+@@ -9,6 +9,7 @@
+ #include "td/utils/logging.h"
+ #include "td/utils/PathView.h"
+ #include "td/utils/port/thread_local.h"
++#include "compat/emulated_tls.h"
+ #include "td/utils/Slice.h"
+ #include "td/utils/Status.h"
+ #include "td/utils/StringBuilder.h"
+@@ -22,7 +23,7 @@ namespace simple_test {
+ class DebugContext {
+  public:
+   static DebugContext &instance() {
+-    static TD_THREAD_LOCAL DebugContext *instance{};
++    TD_EMULATED_TLS_LOCAL(DebugContext *, instance);
+     init_thread_local<DebugContext>(instance);
+     return *instance;
+   }

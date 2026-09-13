@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_COMPOSER_STATE_TESTS_H
+#define TG_HOST_TESTS_COMPOSER_STATE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGComposerStateTestNilPermissionsFallBackToCanSendForEveryAttachmentFlag(void);
+TGTestOutcome TGComposerStateTestExplicitPermissionsOverrideTheCanSendFallback(void);
+TGTestOutcome TGComposerStateTestSlowModeBlockedReflectsSecondsRemaining(void);
+TGTestOutcome TGComposerStateTestTopicClosedReflectsThePermissionsDict(void);
+TGTestOutcome TGComposerStateTestNonNumberPermissionValuesDoNotCrashAndFallBack(void);
+TGTestOutcome TGComposerStateTestIsMemberDefaultsTrueButHonoursExplicitFalse(void);
+
+#endif

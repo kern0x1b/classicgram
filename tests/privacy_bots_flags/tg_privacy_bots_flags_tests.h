@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_PRIVACY_BOTS_FLAGS_TESTS_H
+#define TG_HOST_TESTS_PRIVACY_BOTS_FLAGS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPrivacyBotsFlagsTestEverybodyKeepsOnlyTheRestriction(void);
+TGTestOutcome TGPrivacyBotsFlagsTestContactsAndNobodyKeepOnlyTheAllowance(void);
+TGTestOutcome TGPrivacyBotsFlagsTestSwitchingBaseDropsTheStaleFlag(void);
+TGTestOutcome TGPrivacyBotsFlagsTestToleratesMissingBaseAndNullOutputs(void);
+
+#endif

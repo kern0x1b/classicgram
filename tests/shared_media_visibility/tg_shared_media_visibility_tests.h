@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_SHARED_MEDIA_VISIBILITY_TESTS_H
+#define TG_HOST_TESTS_SHARED_MEDIA_VISIBILITY_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGSharedMediaVisibilityTestOrdinaryMediaIsListed(void);
+TGTestOutcome TGSharedMediaVisibilityTestViewOnceMediaIsNot(void);
+TGTestOutcome TGSharedMediaVisibilityTestSecretMediaIsNot(void);
+TGTestOutcome TGSharedMediaVisibilityTestMissingContentIsNotListed(void);
+
+#endif

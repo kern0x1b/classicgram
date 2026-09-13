@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+PKG="@PACKAGE@"
+PKGDIR="@PKGDIR@"
+DYLIB="@DYLIB@"
+FILTER="@FILTER@"
+
+say() { echo "$PKG: $*"; }
+warn() { echo "$PKG: $*" >&2; }
+die() { echo "$PKG: $*" >&2; exit 1; }
+
+[ "$1" = "configure" ] || exit 0
+
+[ -f "$DYLIB" ] || die "$DYLIB is missing; the package did not unpack correctly."
+[ -f "$FILTER" ] || die "$FILTER is missing; the package did not unpack correctly."
+
+if [ ! -d /Library/MobileSubstrate/DynamicLibraries ]; then
+    warn "/Library/MobileSubstrate/DynamicLibraries does not exist."
+    warn "MobileSubstrate does not look installed, so nothing will load this tweak."
+fi
+
+if [ -f "$PKGDIR/disabled" ]; then
+    warn "$PKGDIR/disabled exists, so the tweak will load and then do nothing."
+    warn "Remove that file and respring to switch it back on."
+fi
+
+if [ -n "${TELEGRAMSYSTEMCALL_NO_RESPRING:-}" ]; then
+    say "TELEGRAMSYSTEMCALL_NO_RESPRING is set; respring by hand to load the tweak."
+else
+    say "respringing"
+    "$PKGDIR/respring" 4 >/dev/null 2>&1 &
+fi
+
+exit 0

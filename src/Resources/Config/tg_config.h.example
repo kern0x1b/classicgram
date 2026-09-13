@@ -1,0 +1,12 @@
+#ifndef TG_CONFIG_H
+#define TG_CONFIG_H
+
+// Telegram API Configuration Example
+// 1. Copy this file to app/Resources/Config/tg_config.h
+// 2. Register your application at https://my.telegram.org to get your api_id and api_hash.
+// 3. Fill in your TG_API_ID and TG_API_HASH below.
+
+#define TG_API_ID   12345
+#define TG_API_HASH "0123456789abcdef0123456789abcdef"
+
+#endif

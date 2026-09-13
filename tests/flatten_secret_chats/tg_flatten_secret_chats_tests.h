@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_FLATTEN_SECRET_CHATS_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_SECRET_CHATS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenSecretChatsTestStateNameForReady(void);
+TGTestOutcome TGFlattenSecretChatsTestStateNameForClosed(void);
+TGTestOutcome TGFlattenSecretChatsTestStateNameFallsBackToPending(void);
+TGTestOutcome TGFlattenSecretChatsTestBase64DecodeValidInput(void);
+TGTestOutcome TGFlattenSecretChatsTestBase64DecodeEmptyInput(void);
+TGTestOutcome TGFlattenSecretChatsTestBase64DecodeInputNeedingPadding(void);
+TGTestOutcome TGFlattenSecretChatsTestBase64DecodeMalformedInput(void);
+
+#endif

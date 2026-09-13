@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_STORAGE_CACHE_POLICY_LIMITS_TESTS_H
+#define TG_HOST_TESTS_STORAGE_CACHE_POLICY_LIMITS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGStorageCachePolicyTestBothUnlimitedSkipsTheDailyJob(void);
+TGTestOutcome TGStorageCachePolicyTestOnlySizeSetLeavesTTLGenuinelyUnlimited(void);
+TGTestOutcome TGStorageCachePolicyTestOnlyTTLSetLeavesSizeGenuinelyUnlimited(void);
+TGTestOutcome TGStorageCachePolicyTestBothSetPassThroughUnchanged(void);
+TGTestOutcome TGStorageCachePolicyTestZeroIsARealFiniteValueNotUnlimited(void);
+TGTestOutcome TGStorageCachePolicyTestEffectivelyUnlimitedValuesNeverSubstituteTDLibDefault(void);
+
+#endif

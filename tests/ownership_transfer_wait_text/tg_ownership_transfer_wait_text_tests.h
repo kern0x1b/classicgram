@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_OWNERSHIP_TRANSFER_WAIT_TEXT_TESTS_H
+#define TG_HOST_TESTS_OWNERSHIP_TRANSFER_WAIT_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestZeroClampsToOneSecond(void);
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestNegativeClampsToOneSecond(void);
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestSubMinuteValue(void);
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestExactlyOneMinuteBoundary(void);
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestExactlyOneHourBoundary(void);
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestExactlyTwentyFourHourBoundary(void);
+TGTestOutcome TGOwnershipTransferRetryDurationTextTestMultiDayValue(void);
+
+#endif

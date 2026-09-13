@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_BURN_LABEL_LINE_TESTS_H
+#define TG_HOST_TESTS_BURN_LABEL_LINE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGBurnLabelLineTestOutgoingWithTimerShowsTimerNotOpenedOnce(void);
+TGTestOutcome TGBurnLabelLineTestOutgoingWithoutTimerShowsCanBeOpenedOnce(void);
+TGTestOutcome TGBurnLabelLineTestIncomingWithTimerShowsTimer(void);
+TGTestOutcome TGBurnLabelLineTestIncomingWithoutTimerShowsTapToOpenOnce(void);
+TGTestOutcome TGBurnLabelLineTestVideoKindUsesVideoNoun(void);
+TGTestOutcome TGBurnLabelLineTestVideoNoteKindUsesVideoMessageNoun(void);
+TGTestOutcome TGBurnLabelLineTestUnknownKindFallsBackToPhotoNoun(void);
+
+#endif

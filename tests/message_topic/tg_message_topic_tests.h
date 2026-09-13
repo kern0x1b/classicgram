@@ -1,0 +1,18 @@
+#ifndef TG_HOST_TESTS_MESSAGE_TOPIC_TESTS_H
+#define TG_HOST_TESTS_MESSAGE_TOPIC_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGMessageTopicTestZeroThreadIdReturnsNil(void);
+TGTestOutcome TGMessageTopicTestNonForumChatWrapsAsMessageTopicThread(void);
+TGTestOutcome TGMessageTopicTestForumChatWrapsAsMessageTopicForum(void);
+TGTestOutcome TGMessageTopicTestThreadIdPassesThroughFullPrecisionForMessageThread(void);
+TGTestOutcome TGMessageTopicTestForumTopicIdTruncatesTo32Bits(void);
+TGTestOutcome TGTopicDictionaryTestSavedTopicTakesPriority(void);
+TGTestOutcome TGTopicDictionaryTestDirectMessagesTopicTakesPriority(void);
+TGTestOutcome TGTopicDictionaryTestDirectMessagesTopicOutranksSavedTopic(void);
+TGTestOutcome TGTopicDictionaryTestForumThreadFallsBackToMessageTopicForum(void);
+TGTestOutcome TGTopicDictionaryTestNonForumThreadFallsBackToMessageTopicThread(void);
+TGTestOutcome TGTopicDictionaryTestNoTopicAtAllReturnsNil(void);
+
+#endif

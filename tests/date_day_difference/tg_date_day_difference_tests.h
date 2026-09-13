@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_DATE_DAY_DIFFERENCE_TESTS_H
+#define TG_HOST_TESTS_DATE_DAY_DIFFERENCE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGDateDayDifferenceTestSameDayIsZero(void);
+TGTestOutcome TGDateDayDifferenceTestNeighbouringDays(void);
+TGTestOutcome TGDateDayDifferenceTestCrossesTheYearBoundary(void);
+TGTestOutcome TGDateDayDifferenceTestCrossesALeapDay(void);
+TGTestOutcome TGDateDayDifferenceTestSpansWholeYears(void);
+TGTestOutcome TGDateDayDifferenceTestIgnoresTheTimeOfDay(void);
+
+#endif

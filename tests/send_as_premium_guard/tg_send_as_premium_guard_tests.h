@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_SEND_AS_PREMIUM_GUARD_TESTS_H
+#define TG_HOST_TESTS_SEND_AS_PREMIUM_GUARD_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGSendAsPremiumGuardTestNilSenderIsNotBlocked(void);
+TGTestOutcome TGSendAsPremiumGuardTestNonDictionarySenderIsNotBlocked(void);
+TGTestOutcome TGSendAsPremiumGuardTestFreeSenderIsNeverBlocked(void);
+TGTestOutcome TGSendAsPremiumGuardTestPremiumGatedSenderIsBlockedForFreeAccount(void);
+TGTestOutcome TGSendAsPremiumGuardTestPremiumGatedSenderIsNotBlockedForPremiumAccount(void);
+TGTestOutcome TGSendAsPremiumGuardTestMissingNeedsPremiumKeyIsNotBlocked(void);
+
+#endif

@@ -1,0 +1,26 @@
+name: Feature request
+description: Something the app should be able to do and cannot
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What is missing
+      description: What you want to do, and what stops you today
+    validations:
+      required: true
+  - type: textarea
+    id: original
+    attributes:
+      label: How the 2013 client did it
+      description: >
+        The look comes from Telegram for iOS as it shipped in 2013. If that version had this
+        feature, describe or screenshot how it looked; if it did not, say how it should fit
+        the era's interface.
+  - type: checkboxes
+    id: ceiling
+    attributes:
+      label: Platform ceiling
+      options:
+        - label: I understand the iOS 6 SDK is the ceiling, so anything needing a later API cannot be built here
+          required: true

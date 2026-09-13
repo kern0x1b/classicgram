@@ -1,0 +1,23 @@
+#ifndef TG_HOST_TESTS_FLATTEN_DIRECT_MESSAGES_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_DIRECT_MESSAGES_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForPhoto(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForVideo(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForVideoNote(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForVoiceNote(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForSticker(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForDocument(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewPrefersTextOverKind(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewFallsBackToCaptionWhenNoText(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForAudio(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForAnimation(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForLocation(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForContact(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewForPoll(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewFallsBackForUnknownKind(void);
+TGTestOutcome TGFlattenDirectMessagesTestPreviewFallsBackForNilMessage(void);
+TGTestOutcome TGFlattenDirectMessagesTestFlattenTopicComposesRealisticPayload(void);
+
+#endif

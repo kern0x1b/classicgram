@@ -1,0 +1,138 @@
+Telegram (iTgLegacy)
+Copyright (C) 2026 the iTgLegacy contributors
+Telegram for iOS 6
+Copyright (C) 2024-2026 kern0x1b and contributors.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+The earliest revisions of this codebase were published by Igor V. Sementsov under the MIT
+licence; that permission notice is kept verbatim in LICENSES/MIT-Sementsov.txt, as the MIT
+licence requires. Those portions remain MIT-licensed in isolation and are redistributed here
+as part of a GPLv3 work.
+
+Portions based on Twelve by theanazerka — https://github.com/theanazerka/twelve-project (GPL-2.0-or-later).
+
+Twelve is distributed under the GNU General Public License version 2, or at
+your option any later version; those portions are relicensed here under GPLv3
+as that licence permits.
+
+Material taken from Twelve:
+
+  src/TGBackgroundSession.m
+  third_party/tdlib/td/td/telegram/net/Session.cpp
+      The selective VoIP socket policy, from
+      submodules/MTProtoKit/MTProtoKit/MTTcpConnection.m
+      (-socket:didConnectToHost:port:). Only the long-lived primary data
+      connection is promoted to a VoIP stream and given SO_KEEPALIVE with
+      TCP_KEEPALIVE set to 60 seconds; media and download sockets are never
+      marked, because marking them disturbed scrolling.
+
+  src/TGNotificationManager.m
+      The iOS 6 local-notification burst control, from
+      Telegraph/TGApplyUpdatesActor.mm
+      (TGIOS6ConsumeLocalNotificationBudget and
+      +presentSafeLocalNotification:text:). The first message of a burst wins
+      and the following second folds into it, at most one sound plays every
+      three seconds, an aggregate banner blocks further banners for ten
+      seconds, and a hard budget of five banners per ten seconds applies,
+      because iOS 6 can stall SpringBoard under a large update burst.
+
+  src/TGClient.m
+      The deferred-UI-update pattern, from legacy/TelegraphKit/TGDatabase.mm
+      (TGIOS6ShouldDeferDatabaseUiUpdates and the deferred replay). Updates
+      are ingested in full while the application is not active, but the chat
+      list rebuild is held back and replayed as one batch when the
+      application becomes active again.
+
+  src/TGCall.mm
+      The call audio-session latency setting, from Telegraph/TGCallSession.mm.
+      The preferred IO buffer duration is pinned to 5 ms while a call is up
+      and released back to the system default on teardown, because the iOS 6
+      default buffer adds audible latency to a voice call.
+
+  src/TGStoriesViewController.m
+      The poster-frame selection, from Telegraph/TGVideoThumbnailDataSource.m
+      (TGIOS6VideoFrameImage and TGIOS6ImageLooksBlack). The first frame of a
+      recorded video is frequently still black, so several candidate times are
+      tried and the first frame that is not almost entirely black wins, with
+      the first decoded frame kept as a fallback.
+
+  src/TGEmoji.m
+      src/TGReactionPickerView.m
+      The explicit emoji-font selection, from
+      Telegraph/TGModernConversationController.mm. UIKit's system font on
+      iOS 6 does not perform emoji fallback for every newer glyph even when an
+      updated AppleColorEmoji font is installed, so labels that carry emoji
+      ask for AppleColorEmoji by name and fall back to the system font only
+      when that face cannot be resolved.
+
+Additional material taken from Twelve:
+
+  Artwork, sounds and data files
+  -----------------------------
+  The image, sound and data resources listed below were taken from the
+  Twelve project's Telegraph/Resources/ClassicIOS6 directory, which carries
+  the original 2013 Telegram for iOS artwork:
+  Copyright Peter Iakovlev, 2013.
+  option) any later version.
+  src/Resources/images/ActionMenu*.png
+  src/Resources/images/Banner*.png
+  src/Resources/images/Browser*.png
+  src/Resources/images/Camera*.png
+  src/Resources/images/Clock*.png
+  src/Resources/images/DialogListAvatarSystem.png
+  src/Resources/images/DialogListAvatarSystem@2x.png
+  src/Resources/images/Gallery*.png
+  src/Resources/images/HeaderButton*.png
+  src/Resources/images/ImagePicker*.png
+  src/Resources/images/LoginGreenButton*.png
+  src/Resources/images/Map*.png
+  src/Resources/images/RProgress*.png
+  src/Resources/images/SelAll_*.png
+  src/Resources/images/SwitchBulb*.png
+  src/Resources/images/TokenBackground*.png
+  src/Resources/images/Tour*.png
+  src/Resources/images/VideoSliderHandle*.png
+  src/Resources/images/grayProgress*.png
+  src/Resources/images/navbar_big_progress_*.png
+  src/Resources/images/PhoneCountries.txt
+  src/Resources/images/PhoneFormats.dat
+  src/Resources/images/{0,3,4,5,6,7,8,9}.caf
+  The non-retina (@1x) variants of the above PNGs were produced here by
+  downscaling the original @2x files; the caf sound files were transcoded
+  here from the original AAC/m4a notification sounds, which iOS 6 cannot
+  use for a local notification.
+  Source code
+  -----------
+  src/TGPhoneFormat.h
+  src/TGPhoneFormat.m
+  are a rename of RMPhoneFormat.h / RMPhoneFormat.m as shipped by the
+  Twelve project, which in turn carries two notices:
+  This is the source code of Telegram for iOS v. 1.1
+  It is licensed under GNU GPL v. 2 or later.
+  Copyright Peter Iakovlev, 2013.
+  and
+  RMPhoneFormat v1.0
+  Copyright (c) 2012, Rick Maddy. All rights reserved.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met: redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer;
+  redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES ARE DISCLAIMED.
+  Those notices could not be kept as comments in the source files: this
+  repository forbids comments in source and a pre-commit hook rejects
+  them, so they are reproduced here instead.
+  Not taken
+  ---------
+  TwelviumSavedMessagesAvatar.png and TwelviumTelegramSupportAvatar.png are
+  the Twelve project's own artwork and were deliberately left behind.
+version. See LICENSE for the full text.
+
+Portions based on Twelve by theanazerka — https://github.com/theanazerka/twelve-project (GPL-2.0-or-later).

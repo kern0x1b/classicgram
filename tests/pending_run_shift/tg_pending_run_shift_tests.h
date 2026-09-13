@@ -1,0 +1,18 @@
+#ifndef TG_HOST_TESTS_PENDING_RUN_SHIFT_TESTS_H
+#define TG_HOST_TESTS_PENDING_RUN_SHIFT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPendingRunShiftTestEditEntirelyBeforeRunShiftsOffsetOnly(void);
+TGTestOutcome TGPendingRunShiftTestEditTouchingRunStartCountsAsBefore(void);
+TGTestOutcome TGPendingRunShiftTestEditEntirelyAfterRunIsUnchanged(void);
+TGTestOutcome TGPendingRunShiftTestEditTouchingRunEndCountsAsAfter(void);
+TGTestOutcome TGPendingRunShiftTestInsertionInsideRunGrowsItInPlace(void);
+TGTestOutcome TGPendingRunShiftTestDeletionInsideRunShrinksItInPlace(void);
+TGTestOutcome TGPendingRunShiftTestRetypingExactRunContentsKeepsItAtNewLength(void);
+TGTestOutcome TGPendingRunShiftTestFullyDeletingRunContentsDropsIt(void);
+TGTestOutcome TGPendingRunShiftTestEditCrossingRunStartBoundaryIsDropped(void);
+TGTestOutcome TGPendingRunShiftTestEditCrossingRunEndBoundaryIsDropped(void);
+TGTestOutcome TGPendingRunShiftTestEditSpanningPastBothBoundariesIsDropped(void);
+
+#endif

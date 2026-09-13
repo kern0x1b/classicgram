@@ -1,0 +1,10 @@
+#ifndef TG_HOST_TESTS_CHAT_LIST_OUTGOING_STATE_TESTS_H
+#define TG_HOST_TESTS_CHAT_LIST_OUTGOING_STATE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChatListOutgoingStateTestASentMessageShowsItsTick(void);
+TGTestOutcome TGChatListOutgoingStateTestAMessageOnItsWayIsPendingNotSent(void);
+TGTestOutcome TGChatListOutgoingStateTestAFailedMessageIsFailedOnly(void);
+
+#endif

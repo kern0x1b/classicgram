@@ -1,0 +1,16 @@
+#ifndef TG_HOST_TESTS_MENTION_TRIGGER_TESTS_H
+#define TG_HOST_TESTS_MENTION_TRIGGER_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGMentionTriggerTestAtStartOfTextIsATrigger(void);
+TGTestOutcome TGMentionTriggerTestAfterWhitespaceIsATrigger(void);
+TGTestOutcome TGMentionTriggerTestBareAtSignIsATriggerWithEmptyQuery(void);
+TGTestOutcome TGMentionTriggerTestAtSignGluedToPrecedingWordIsNotATrigger(void);
+TGTestOutcome TGMentionTriggerTestSpaceAfterAtSignEndsTheTrigger(void);
+TGTestOutcome TGMentionTriggerTestPunctuationAfterAtSignEndsTheTrigger(void);
+TGTestOutcome TGMentionTriggerTestNoAtSignIsNotATrigger(void);
+TGTestOutcome TGMentionTriggerTestCaretMidwordNarrowsTheQueryToTheCaret(void);
+TGTestOutcome TGMentionTriggerTestCaretPastEndOfTextClampsToTextLength(void);
+
+#endif

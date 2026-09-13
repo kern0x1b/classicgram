@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_LIVE_LOCATION_EXPIRY_TESTS_H
+#define TG_HOST_TESTS_LIVE_LOCATION_EXPIRY_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGLiveLocationExpiryTestZeroPeriodNeverExpires(void);
+TGTestOutcome TGLiveLocationExpiryTestNegativePeriodNeverExpires(void);
+TGTestOutcome TGLiveLocationExpiryTestBeforeEndIsNotExpired(void);
+TGTestOutcome TGLiveLocationExpiryTestExactlyAtEndIsExpired(void);
+TGTestOutcome TGLiveLocationExpiryTestLongAfterEndIsExpired(void);
+TGTestOutcome TGLiveLocationExpiryTestZeroExpiresAtIsAlreadyExpired(void);
+TGTestOutcome TGLiveLocationExpiryTestIgnoresDeviceClockDrift(void);
+
+#endif

@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_MESSAGE_READ_SOURCE_TESTS_H
+#define TG_HOST_TESTS_MESSAGE_READ_SOURCE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGMessageReadSourceTestViewingThreadReturnsThread(void);
+TGTestOutcome TGMessageReadSourceTestViewingForumTopicReturnsForumTopic(void);
+TGTestOutcome TGMessageReadSourceTestNotViewingThreadReturnsHistory(void);
+TGTestOutcome TGMessageReadSourceTestNotViewingThreadInForumChatReturnsHistory(void);
+
+#endif

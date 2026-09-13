@@ -1,0 +1,18 @@
+#ifndef TG_HOST_TESTS_LOGIN_LINK_RECOGNITION_TESTS_H
+#define TG_HOST_TESTS_LOGIN_LINK_RECOGNITION_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGLoginLinkRecognitionTestNilTextIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestEmptyTextIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestExactTokenPrefixIsALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestUppercaseTokenPrefixIsALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestMixedCaseTokenPrefixIsALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestSmsAuthCodeDeepLinkIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestPlainLoginPrefixWithoutTokenIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestChatNamedLoginIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestUnrelatedTextIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestLeadingWhitespaceIsNotALoginLink(void);
+TGTestOutcome TGLoginLinkRecognitionTestTrailingWhitespaceStillMatchesPrefix(void);
+
+#endif

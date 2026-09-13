@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+PKG="@PACKAGE@"
+PKGDIR="@PKGDIR@"
+
+say() { echo "$PKG: $*"; }
+
+case "$1" in
+remove)
+    if [ -n "${TELEGRAMSYSTEMCALL_NO_RESPRING:-}" ]; then
+        say "TELEGRAMSYSTEMCALL_NO_RESPRING is set; respring by hand to unload the tweak."
+    elif [ -x "$PKGDIR/respring" ]; then
+        "$PKGDIR/respring" 4 >/dev/null 2>&1 &
+    else
+        ( sleep 4; killall -9 SpringBoard ) >/dev/null 2>&1 &
+    fi
+    ;;
+purge)
+    rm -f "$PKGDIR/disabled" "$PKGDIR/respring"
+    rmdir "$PKGDIR" 2>/dev/null || true
+    ;;
+upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    ;;
+esac
+
+exit 0

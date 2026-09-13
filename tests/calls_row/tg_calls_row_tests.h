@@ -1,0 +1,17 @@
+#ifndef TG_HOST_TESTS_CALLS_ROW_TESTS_H
+#define TG_HOST_TESTS_CALLS_ROW_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGCallsRowTestKindTextNamesEveryCombination(void);
+TGTestOutcome TGCallsRowTestMissedByMeExcludesDeclinedAndOutgoing(void);
+TGTestOutcome TGCallsRowTestDurationTextGrowsAnHourColumn(void);
+TGTestOutcome TGCallsRowTestSubtitleAppendsADurationOnlyWhenThereIsOne(void);
+TGTestOutcome TGCallsRowTestInitialsTakeOneComposedCharacter(void);
+TGTestOutcome TGCallsRowTestDisplayNameFallsBackToUnknown(void);
+TGTestOutcome TGCallsRowTestItemCarriesTheGroupsFields(void);
+TGTestOutcome TGCallsRowTestItemColoursOnlyACallMissedByMe(void);
+TGTestOutcome TGCallsRowTestItemCountsRepeatedCallsAndDropsTheDuration(void);
+TGTestOutcome TGCallsRowTestCellShowsTheItemAndPrefersALoadedAvatar(void);
+
+#endif

@@ -1,0 +1,19 @@
+#ifndef TG_HOST_TESTS_PLURAL_RULES_TESTS_H
+#define TG_HOST_TESTS_PLURAL_RULES_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPluralRulesTestArabicSixForm(void);
+TGTestOutcome TGPluralRulesTestBalticLithuanian(void);
+TGTestOutcome TGPluralRulesTestCzechSlovak(void);
+TGTestOutcome TGPluralRulesTestRomanian(void);
+TGTestOutcome TGPluralRulesTestSlavicThreeForm(void);
+TGTestOutcome TGPluralRulesTestPolish(void);
+TGTestOutcome TGPluralRulesTestFrenchZeroAsOne(void);
+TGTestOutcome TGPluralRulesTestEnglishDefault(void);
+TGTestOutcome TGPluralRulesTestNegativeCountsUseAbsoluteValue(void);
+TGTestOutcome TGPluralRulesTestUnknownLanguageCodeFallsBackToDefaultRule(void);
+TGTestOutcome TGPluralRulesTestSubstituteCountReplacesPlaceholders(void);
+TGTestOutcome TGPluralRulesTestSubstituteCountReplacesEveryIntegerForm(void);
+
+#endif

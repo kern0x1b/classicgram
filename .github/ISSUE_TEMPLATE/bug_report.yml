@@ -1,0 +1,41 @@
+name: Bug report
+description: Something in the app behaves wrongly on a device
+labels: ["bug"]
+body:
+  - type: input
+    id: device
+    attributes:
+      label: Device and iOS version
+      placeholder: iPhone 4S, iOS 6.1.3
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: Build
+      description: Commit hash, or the version shown in Settings
+      placeholder: 4b39b57e
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what the app did, and what you expected instead
+    validations:
+      required: true
+  - type: textarea
+    id: crash
+    attributes:
+      label: Crash report
+      description: >
+        If the app died, paste the report from
+        /var/mobile/Library/Logs/CrashReporter/. Remove anything personal first.
+      render: text
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Before submitting
+      options:
+        - label: No real account's name, username, phone number or chat content appears above
+          required: true

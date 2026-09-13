@@ -1,0 +1,15 @@
+#ifndef TG_HOST_TESTS_CHECKLIST_TASKS_TESTS_H
+#define TG_HOST_TESTS_CHECKLIST_TASKS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChecklistTasksTestNextIdStartsAtOneForAnEmptyChecklist(void);
+TGTestOutcome TGChecklistTasksTestNextIdSkipsPastTheHighestExistingId(void);
+TGTestOutcome TGChecklistTasksTestNextIdIgnoresGapsAndOrdering(void);
+TGTestOutcome TGChecklistTasksTestReplaceRewritesOnlyTheNamedTask(void);
+TGTestOutcome TGChecklistTasksTestReplaceLeavesTheChecklistAloneForAMissingId(void);
+TGTestOutcome TGChecklistTasksTestRemoveDropsOnlyTheNamedTask(void);
+TGTestOutcome TGChecklistTasksTestNonDictionaryEntriesAreSkippedEverywhere(void);
+TGTestOutcome TGChecklistTasksTestReplaceAndRemoveNeverCarryTheDoneFlag(void);
+
+#endif

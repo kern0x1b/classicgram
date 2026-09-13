@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_STORY_COMPOSER_PRIVACY_RESET_TESTS_H
+#define TG_HOST_TESTS_STORY_COMPOSER_PRIVACY_RESET_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGStoryComposerPrivacyResetTestPersonalProfileShowsPrivacy(void);
+TGTestOutcome TGStoryComposerPrivacyResetTestOwnAccountShowsPrivacy(void);
+TGTestOutcome TGStoryComposerPrivacyResetTestChannelHidesPrivacy(void);
+TGTestOutcome TGStoryComposerPrivacyResetTestSupergroupHidesPrivacy(void);
+
+#endif

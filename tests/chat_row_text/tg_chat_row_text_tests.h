@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_CHAT_ROW_TEXT_TESTS_H
+#define TG_HOST_TESTS_CHAT_ROW_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChatRowTextTestPinnedDescriptorPrefersTheContentKind(void);
+TGTestOutcome TGChatRowTextTestPinnedDescriptorQuotesAndFlattensTheBody(void);
+TGTestOutcome TGChatRowTextTestPinnedDescriptorTruncatesALongBody(void);
+TGTestOutcome TGChatRowTextTestPinnedDescriptorFallsBackForAnEmptyBody(void);
+TGTestOutcome TGChatRowTextTestFileStatusKindOrdersPlayingOverEverything(void);
+TGTestOutcome TGChatRowTextTestFileStatusKindDistinguishesLocalFromDownloadable(void);
+TGTestOutcome TGChatRowTextTestClockTextPadsSecondsAndClampsNegative(void);
+
+#endif

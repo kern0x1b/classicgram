@@ -1,0 +1,5 @@
+# Keys a reader asks for that nothing in the tree writes yet. Each is a capability
+# whose wire side is built and whose screen side is not, so the read is deliberate
+# and the test that pins it is deliberate too. A key belongs here only with that
+# story; anything else is a defect and the fence should refuse it.
+protect  # message-level protect_content: TGMsgSendOptions builds it, no screen offers it

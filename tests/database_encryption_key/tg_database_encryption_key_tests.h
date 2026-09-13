@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_DATABASE_ENCRYPTION_KEY_TESTS_H
+#define TG_HOST_TESTS_DATABASE_ENCRYPTION_KEY_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGDatabaseEncryptionKeyTestDecideGeneratesNewKeyOnFreshInstall(void);
+TGTestOutcome TGDatabaseEncryptionKeyTestDecideLeavesUnsetWhenDatabaseExistsWithoutKey(void);
+TGTestOutcome TGDatabaseEncryptionKeyTestDecideReusesExistingKeyWhenDatabaseExists(void);
+TGTestOutcome TGDatabaseEncryptionKeyTestDecideReusesExistingKeyEvenWithoutDatabase(void);
+
+#endif

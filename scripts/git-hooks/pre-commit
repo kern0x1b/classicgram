@@ -1,0 +1,342 @@
+#!/bin/sh
+
+staged_all=$(git diff --cached --name-only --diff-filter=ACM)
+
+staged=$(printf '%s\n' "$staged_all" | grep -E '\.(m|h|c|mm)$' | grep -vE '^(src|third_party)/(libvpx|libtgvoip|opus|opusenc|opusfile|ogg|quirc)/')
+if [ -n "$staged" ]; then
+	LINTER=scripts/lint-source-comments.py
+	[ -f "$LINTER" ] || LINTER=scripts/strip-comments.py
+	python3 "$LINTER" --check $staged || {
+		echo "commit refused: comments in source (run python3 $LINTER <file>)"
+		exit 1
+	}
+fi
+
+if [ -n "$staged" ] && [ -f scripts/lint-sdk-ceiling.py ]; then
+	python3 scripts/lint-sdk-ceiling.py || {
+		echo "commit refused: source uses API the iOS 6 SDK does not have (see the lines above)"
+		exit 1
+	}
+fi
+
+if [ -n "$staged" ] && [ -f scripts/lint-fallback-markdown.py ]; then
+	python3 scripts/lint-fallback-markdown.py || {
+		echo "commit refused: a string literal carries ** markdown that nothing renders here"
+		exit 1
+	}
+fi
+
+if [ -n "$staged" ] && [ -f scripts/lint-strings-escapes.py ]; then
+	python3 scripts/lint-strings-escapes.py || {
+		echo "commit refused: a localized string escapes its own escape, so the app prints a literal backslash-n"
+		exit 1
+	}
+fi
+
+if [ -n "$staged" ] && [ -f scripts/lint-recursive-setters.py ]; then
+	python3 scripts/lint-recursive-setters.py || {
+		echo "commit refused: a setter assigns through its own property, which recurses until the stack runs out"
+		exit 1
+	}
+fi
+
+staged_manifest_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|c)$|^src/sources\.manifest$')
+if [ -n "$staged_manifest_relevant" ]; then
+	python3 scripts/lint-source-manifest.py || {
+		echo "commit refused: src/sources.manifest does not match disk (run scripts/gen-source-manifest.sh, git add src/sources.manifest, commit again)"
+		exit 1
+	}
+fi
+
+staged_layer_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm|h|c)$')
+if [ -n "$staged_layer_relevant" ]; then
+	layer_output=$(python3 scripts/lint-layer-imports.py \
+		--baseline-rank scripts/baselines/layer-rank.txt \
+		--baseline-screen-wall scripts/baselines/layer-screen-wall.txt \
+		--baseline-tdlib-schema scripts/baselines/tdlib-schema.txt)
+	layer_status=$?
+	if [ "$layer_status" != "0" ]; then
+		printf '%s\n' "$layer_output" | grep -E '^\[.+\] violations found|\[NEW\]$'
+		echo "commit refused: this commit adds a new layer-import violation not in any baseline (see the [NEW] lines above); the layer rules are described in scripts/lint-layer-imports.py; a baseline may be updated only when this commit moves a pre-existing violation rather than adding one"
+		exit 1
+	fi
+fi
+
+staged_plural_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$|^src/Resources/Localization/en\.lproj/Localizable\.strings$')
+if [ -n "$staged_plural_relevant" ] && [ -f scripts/lint-plural-keys.py ]; then
+	python3 scripts/lint-plural-keys.py || {
+		echo "commit refused: a TGLPlural key has no real _1/_any entry, or a TGL call reads a plural form (see the [NEW] lines above)"
+		exit 1
+	}
+fi
+
+if [ -n "$staged_plural_relevant" ] && [ -f scripts/lint-bare-ui-strings.py ]; then
+	python3 scripts/lint-bare-ui-strings.py || {
+		echo "commit refused: a user-visible literal reaches the screen without TGL (see the [NEW] lines above)"
+		exit 1
+	}
+fi
+
+staged_client_api_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/TDLibClient/.*\.(h|m)$')
+if [ -n "$staged_client_api_relevant" ] && [ -f scripts/lint-dead-client-api.py ]; then
+	python3 scripts/lint-dead-client-api.py || {
+		echo "commit refused: a method was added to TGClient that nothing sends (see the [NEW] lines above)"
+		exit 1
+	}
+fi
+
+staged_dead_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm|h)$')
+if [ -n "$staged_dead_relevant" ] && [ -f scripts/lint-dead-declarations.py ]; then
+	python3 scripts/lint-dead-declarations.py src || {
+		echo "commit refused: a property or method is declared and never used (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_types_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_types_relevant" ] && [ -f scripts/lint-tdlib-type-names.py ]; then
+	python3 scripts/lint-tdlib-type-names.py src || {
+		echo "commit refused: a TDLib type name in the tree is not in td_api.tl, so that branch can never run (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_tdlib_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/(TDLibClient|Wire)/.*\.(m|mm)$')
+if [ -n "$staged_tdlib_relevant" ] && [ -f scripts/lint-tdlib-request-fields.py ]; then
+	python3 scripts/lint-tdlib-request-fields.py || {
+		echo "commit refused: a TDLib request names a type or a field that td_api.tl does not have (see the [NEW] lines above)"
+		exit 1
+	}
+fi
+
+if [ -n "$staged_tdlib_relevant" ] && [ -f scripts/lint-tdlib-int64-reads.py ]; then
+	python3 scripts/lint-tdlib-int64-reads.py || {
+		echo "commit refused: an int64 field is read as an NSNumber only, and TDLib sends int64 as a string (see the lines above)"
+		exit 1
+	}
+fi
+
+if [ -n "$staged_tdlib_relevant" ] && [ -f scripts/lint-topic-threading.py ]; then
+	python3 scripts/lint-topic-threading.py src || {
+		echo "commit refused: a request builds its topic_id from a message thread alone, so a saved or direct-messages topic would be dropped (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_english_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/(Screens|Views|App|Companions)/.*\.(m|mm)$')
+if [ -n "$staged_english_relevant" ] && [ -f scripts/lint-english-fallbacks.py ]; then
+	python3 scripts/lint-english-fallbacks.py src || {
+		echo "commit refused: a screen falls back to an English word that no translation can reach (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_translations_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*(\.m|\.mm|Localizable\.strings)$')
+if [ -n "$staged_translations_relevant" ] && [ -f scripts/lint-translation-placeholders.py ]; then
+	python3 scripts/lint-translation-placeholders.py || {
+		echo "commit refused: a translation takes different arguments than the English string the app formats (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_drift_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*(\.m|\.mm|\.h|Localizable\.strings)$')
+if [ -n "$staged_drift_relevant" ] && [ -f scripts/lint-fallback-drift.py ]; then
+	python3 scripts/lint-fallback-drift.py src || {
+		echo "commit refused: a TGL fallback says something the English table does not (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_format_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*(\.m|\.mm|Localizable\.strings)$')
+if [ -n "$staged_format_relevant" ] && [ -f scripts/lint-format-arguments.py ]; then
+	python3 scripts/lint-format-arguments.py src || {
+		echo "commit refused: a translated string reaches the screen with its own %@ in it (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_truncation_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_truncation_relevant" ] && [ -f scripts/lint-text-truncation.py ]; then
+	python3 scripts/lint-text-truncation.py src || {
+		echo "commit refused: a string is cut by hand rather than through TGStringTruncation (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_navbar_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_navbar_relevant" ] && [ -f scripts/lint-navbar-buttons.py ]; then
+	python3 scripts/lint-navbar-buttons.py src || {
+		echo "commit refused: a navigation-bar button is the system one rather than this app's plate (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_grouped_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_grouped_relevant" ] && [ -f scripts/lint-grouped-background.py ]; then
+	python3 scripts/lint-grouped-background.py src || {
+		echo "commit refused: a grouped list is off the settings tile or ruled with the plain hairline (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_row_colour_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_row_colour_relevant" ] && [ -f scripts/lint-row-colours.py ]; then
+	python3 scripts/lint-row-colours.py src || {
+		echo "commit refused: a row paints its text in a colour of its own rather than the theme's (see the lines above)"
+		exit 1
+	}
+fi
+
+if [ -f scripts/tg_grouped_classes.py ]; then
+	python3 scripts/tg_grouped_classes.py >/dev/null || {
+		echo "commit refused: the shared grouped-class helper fails its own self-test (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_row_font_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_row_font_relevant" ] && [ -f scripts/lint-grouped-row-font.py ]; then
+	python3 scripts/lint-grouped-row-font.py src || {
+		echo "commit refused: a grouped row's title is set in regular 17 rather than the bold 17 of the original (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_field_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_field_relevant" ] && [ -f scripts/lint-text-field-style.py ]; then
+	python3 scripts/lint-text-field-style.py src || {
+		echo "commit refused: a text field is left with UIKit's own placeholder colour, or paints one of its own (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_screen_bg_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_screen_bg_relevant" ] && [ -f scripts/lint-screen-backgrounds.py ]; then
+	python3 scripts/lint-screen-backgrounds.py src scripts/baselines/screen-backgrounds.txt || {
+		echo "commit refused: a screen paints its own background white rather than taking the theme's (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_unset_keys_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm|h)$')
+if [ -n "$staged_unset_keys_relevant" ] && [ -f scripts/lint-unset-dictionary-keys.py ]; then
+	schema=third_party/tdlib/td/td/generate/scheme/td_api.tl
+	[ -f "$schema" ] || schema=$(git rev-parse --git-common-dir)/../third_party/tdlib/td/td/generate/scheme/td_api.tl
+	python3 scripts/lint-unset-dictionary-keys.py src "$schema" scripts/baselines/unset-dictionary-keys.txt || {
+		echo "commit refused: a dictionary key is read that nothing ever writes, so it is always nil (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_centred_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_centred_relevant" ] && [ -f scripts/lint-centred-action-rows.py ]; then
+	python3 scripts/lint-centred-action-rows.py src || {
+		echo "commit refused: an action in a grouped list is centred in the row rather than standing on a plate or reading from the leading edge (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_destructive_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_destructive_relevant" ] && [ -f scripts/lint-destructive-rows.py ]; then
+	python3 scripts/lint-destructive-rows.py src || {
+		echo "commit refused: a destructive row paints its own label red rather than standing on the red plate (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_grouped_captions_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_grouped_captions_relevant" ] && [ -f scripts/lint-grouped-captions.py ]; then
+	python3 scripts/lint-grouped-captions.py src || {
+		echo "commit refused: a heading or a footer over a grouped list is left to UIKit to draw (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_captions_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_captions_relevant" ] && [ -f scripts/lint-caption-reads.py ]; then
+	python3 scripts/lint-caption-reads.py src || {
+		echo "commit refused: a caption is shown without asking whether the content disappears (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_previews_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_previews_relevant" ] && [ -f scripts/lint-preview-tables.py ]; then
+	python3 scripts/lint-preview-tables.py src || {
+		echo "commit refused: a preview that names message kinds reads a caption before asking whether the content disappears, so it would repeat the words of a photo meant to be seen once (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_dates_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm)$')
+if [ -n "$staged_dates_relevant" ] && [ -f scripts/lint-date-formatting.py ]; then
+	python3 scripts/lint-date-formatting.py src || {
+		echo "commit refused: a visible date is formatted outside TGDateUtils, so it would ignore the app's own month and weekday names and the device's 12- or 24-hour clock (see the lines above)"
+		exit 1
+	}
+fi
+
+staged_dup_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.m$')
+if [ -n "$staged_dup_relevant" ] && [ -f scripts/lint-duplicate-selectors.py ]; then
+	python3 scripts/lint-duplicate-selectors.py || {
+		echo "commit refused: see the [NEW] lines above (scripts/lint-duplicate-selectors.py)"
+		exit 1
+	}
+fi
+
+staged_header_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.h$')
+if [ -n "$staged_header_relevant" ] && [ -f scripts/lint-duplicate-declarations.py ]; then
+	python3 scripts/lint-duplicate-declarations.py || {
+		echo "commit refused: an interface declares the same method twice (see the [NEW] lines above)"
+		exit 1
+	}
+fi
+
+if [ -n "$staged_header_relevant" ]; then
+	scripts/lint-header-standalone.sh --changed || {
+		echo "commit refused: a staged header does not compile on its own (see the FAIL block above); run scripts/lint-header-standalone.sh --full for the whole tree"
+		exit 1
+	}
+fi
+
+staged_bubble_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/Screens/Chat/Cells/.*\.(m|h)$|^src/Views/Cells/TGBubbleCell\.(m|h)$')
+if [ -n "$staged_bubble_relevant" ]; then
+	if [ -n "$BUBBLE_SCREENSHOT" ]; then
+		shot_status=0
+		for shot in $BUBBLE_SCREENSHOT; do
+			python3 scripts/check-bubble-geometry.py "$shot" || shot_status=1
+		done
+		if [ "$shot_status" != "0" ]; then
+			echo "commit refused: scripts/check-bubble-geometry.py failed against \$BUBBLE_SCREENSHOT (see output above)"
+			exit 1
+		fi
+	elif [ -n "$SKIP_LOOK_VERIFY" ]; then
+		echo "look-verify skipped for this commit (SKIP_LOOK_VERIFY set), touches:"
+		printf '%s\n' "$staged_bubble_relevant"
+	else
+		echo "commit refused: this commit touches bubble-cell geometry:"
+		printf '%s\n' "$staged_bubble_relevant"
+		echo "a screenshot check cannot run inside a commit hook by itself - capture one on device (see the look-verify skill), then either:"
+		echo "  BUBBLE_SCREENSHOT=/path/to/shot.png git commit ..."
+		echo "  SKIP_LOOK_VERIFY=1 git commit ...   (only when the change has no visual effect)"
+		exit 1
+	fi
+fi
+
+staged_images=$(printf '%s\n' "$staged_all" | grep -E '^src/Resources/images/.*\.png$')
+if [ -n "$staged_images" ] && [ -f scripts/lint-image-scales.py ]; then
+	python3 scripts/lint-image-scales.py || {
+		echo "commit refused: artwork ships at @2x only; the supported iPads draw at scale 1 and imageNamed: hands back nil for a missing @1x file"
+		exit 1
+	}
+fi
+
+staged_strings_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.m$|^src/Resources/Localization/en\.lproj/Localizable\.strings$')
+if [ -n "$staged_strings_relevant" ] && [ -f scripts/lint-unused-strings.py ]; then
+	python3 scripts/lint-unused-strings.py --missing-keys || {
+		echo "commit refused: a TGL() call uses a key Localizable.strings does not define (see the lines above)"
+		exit 1
+	}
+fi
+
+exit 0

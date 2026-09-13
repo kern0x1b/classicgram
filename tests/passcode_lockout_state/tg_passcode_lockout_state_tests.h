@@ -1,0 +1,16 @@
+#ifndef TG_HOST_TESTS_PASSCODE_LOCKOUT_STATE_TESTS_H
+#define TG_HOST_TESTS_PASSCODE_LOCKOUT_STATE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPasscodeLockoutStateTestBelowThresholdNeverLocksOut(void);
+TGTestOutcome TGPasscodeLockoutStateTestAtThresholdLocksOutForFullDuration(void);
+TGTestOutcome TGPasscodeLockoutStateTestPastThresholdLocksOutForFullDuration(void);
+TGTestOutcome TGPasscodeLockoutStateTestRemainingCountsDownToZero(void);
+TGTestOutcome TGPasscodeLockoutStateTestExpiresExactlyAtDuration(void);
+TGTestOutcome TGPasscodeLockoutStateTestNeverGoesNegative(void);
+TGTestOutcome TGPasscodeLockoutStateTestClockRunningBackwardsStillLocksOut(void);
+TGTestOutcome TGPasscodeLockoutStateTestForwardWallClockJumpCannotShortenLockout(void);
+TGTestOutcome TGPasscodeLockoutStateTestRebootFallsBackToWallClock(void);
+
+#endif

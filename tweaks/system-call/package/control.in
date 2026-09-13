@@ -1,0 +1,31 @@
+Package: @PACKAGE@
+Name: @NAME@
+Version: @VERSION@
+Architecture: iphoneos-arm
+Maintainer: @MAINTAINER@
+Author: @AUTHOR@
+Section: System
+Priority: optional
+Depends: mobilesubstrate, firmware (>= 6.0), firmware (<< 7.0)
+Installed-Size: @INSTALLED_SIZE@
+Description: an incoming Telegram call on the system call screen
+ iOS 6 has no CallKit, and this device's SpringBoard has no SBCallAlert
+ either: on 10B329 the incoming-call screen belongs to MobilePhone.app and
+ is driven by a CTCall that only CommCenter can create. What SpringBoard
+ does own is SBAlertItem, and its own call alert - SBCallFailureAlertItem -
+ is exactly an SBAlertItem with a lock-screen slide label and two buttons.
+ .
+ This package adds one class of the same shape for @APPNAME@. When a call
+ comes in, the app posts a Darwin notification and SpringBoard raises the
+ alert: over the lock screen it becomes the standard slide bar, labelled
+ with SpringBoard's own SLIDE_TO_ANSWER string, and over an app it becomes
+ the standard modal alert with Decline and Answer, titled with the caller's
+ name and labelled from TelephonyUI's own ANSWER and DECLINE strings.
+ Sliding or tapping Answer hands the call back to the app and brings it
+ forward; Decline hangs up without leaving the screen you were on.
+ .
+ The tweak hooks nothing. It adds a class and listens for two notifications,
+ so the worst it can do to SpringBoard is nothing at all. Every selector it
+ overrides is checked for existence and signature first, and if any of them
+ is not the shape this build expects the class is never registered.
+ Creating @PKGDIR@/disabled switches it off without uninstalling.

@@ -1,0 +1,15 @@
+#ifndef TG_HOST_TESTS_SAVED_MESSAGES_TEXT_TESTS_H
+#define TG_HOST_TESTS_SAVED_MESSAGES_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGSavedMessagesTextTestFilterForEachScope(void);
+TGTestOutcome TGSavedMessagesTextTestEmptyStateDiffersPerScope(void);
+TGTestOutcome TGSavedMessagesTextTestKindLabelCoversEveryMediaKind(void);
+TGTestOutcome TGSavedMessagesTextTestKindLabelIsEmptyForAnythingElse(void);
+TGTestOutcome TGSavedMessagesTextTestShortTextTruncatesAtTheLimit(void);
+TGTestOutcome TGSavedMessagesTextTestShortTextFallsBackToTheMediaLabel(void);
+TGTestOutcome TGSavedMessagesTextTestTopicKindIsAlwaysAString(void);
+TGTestOutcome TGSavedMessagesTextTestKindLabelFallsThroughToTheSharedTable(void);
+
+#endif

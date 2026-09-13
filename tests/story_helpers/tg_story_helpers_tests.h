@@ -1,0 +1,12 @@
+#ifndef TG_HOST_TESTS_STORY_HELPERS_TESTS_H
+#define TG_HOST_TESTS_STORY_HELPERS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGStoryHelpersTestReadersTolerateEveryWireShape(void);
+TGTestOutcome TGStoryHelpersTestAgeTextIsEmptyWithoutADate(void);
+TGTestOutcome TGStoryHelpersTestPosterEntryCarriesEveryStoryId(void);
+TGTestOutcome TGStoryHelpersTestPosterEntryRefusesArchivedAndEmptyPosters(void);
+TGTestOutcome TGStoryHelpersTestPosterEntryDefaultsTheOrder(void);
+
+#endif

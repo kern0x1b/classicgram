@@ -1,0 +1,269 @@
+iOS 6.1.3 (10B329, iPhone4,1) - what the incoming-call path is actually made of.
+
+Read out of the stock firmware, not off the device: the root filesystem of
+iPhone4,1_6.1.3_10B329 mounted read-only, SpringBoard.app/SpringBoard parsed
+directly and the frameworks parsed out of
+System/Library/Caches/com.apple.dyld/dyld_shared_cache_armv7.
+
+Findings that decided the design:
+
+  * There is no SBCallAlert on this build. SpringBoard's only call classes are
+    SBCallFailureAlert / SBCallFailureAlertItem / SBCallFailureAlertDisplay,
+    SBCallPermissionAlertItem, SBAwayInCallController and SBTelephonyManager.
+
+  * The incoming-call screen belongs to MobilePhone.app: InCallController and
+    PhoneCall, and PhoneCall is a wrapper around a CTCallRef. SpringBoard drives
+    it through the private URL schemes MobilePhone declares - telshow, tellock,
+    telanswer, telemergency. A CTCallRef comes from CommCenter and nothing else,
+    so that screen cannot be raised for a call the modem never saw.
+
+  * TelephonyUtilities.framework exists on this build but is only logging plus
+    TUReplyWithMessageStore. There is no TUCall or TUCallCenter - no CallKit
+    ancestor to talk to.
+
+  * What SpringBoard does own, and what its own call alert is built on, is
+    SBAlertItem (SpringBoardUI.framework). SBCallFailureAlertItem is exactly an
+    SBAlertItem with -lockLabel, -performUnlockAction and a two-button sheet.
+    -[SBAwayView _updateLockBarLabelByClearingFirst:] and
+    -[SBAwayBulletinCell _createLockBar] read -lockLabel;
+    -[SBAwayController _finishUnlockWithSound:unlockSource:isAutoUnlock:] calls
+    -performUnlockAction. That is the lock-screen answer affordance.
+
+  * SpringBoard.strings carries SLIDE_TO_ANSWER ("slide to answer") in every
+    lproj, and TelephonyUI.framework/*/General.strings carries ANSWER and
+    DECLINE. The tweak takes its three visible strings from those two bundles.
+
+--- SBAlertItem (SpringBoardUI.framework) ---
+@interface SBAlertItem : NSObject
+   ivar _alertSheet                              @"UIAlertView" @4
+   ivar _orderOverSBAlert                        c @8
+   ivar _preventLockOver                         c @9
+   ivar _didEverActivate                         c @10
+   ivar _ignoreIfAlreadyDisplaying               c @11
+   ivar _didPlayPresentationSound                c @12
+   ivar _allowInSetup                            c @13
+   ivar _pendInSetupIfNotAllowed                 c @14
+   ivar _allowedBundleIDs                        @"NSArray" @16
+   + _alertItemsController                                        @8@0:4               0x366b7c31
+   + activateAlertItem:                                           v12@0:4@8            0x366b7c59
+   - alertView:clickedButtonAtIndex:                              v16@0:4@8i12         0x366b80f9
+   - dismiss                                                      v8@0:4               0x366b8041
+   - alertSheetClass                                              #8@0:4               0x366b7c85
+   - setAllowInSetup:                                             v12@0:4c8            0x366b8139
+   - setPendInSetupIfNotAllowed:                                  v12@0:4c8            0x366b8159
+   - didPlayPresentationSound                                     c8@0:4               0x366b7e65
+   - _playPresentationSound                                       v8@0:4               0x366b7e75
+   - alertSheet                                                   @8@0:4               0x366b7ca1
+   - hasActiveKeyboardOnScreen                                    c8@0:4               0x366b80d1
+   - buttonDismissed                                              v8@0:4               0x366b802d
+   - allowMenuButtonDismissal                                     c8@0:4               0x366b7e3d
+   - allowAutoUnlock                                              c8@0:4               0x366b7e41
+   - shouldShowInLockScreen                                       c8@0:4               0x366b7e45
+   - shouldShowInEmergencyCall                                    c8@0:4               0x366b7e49
+   - undimsScreen                                                 c8@0:4               0x366b7e4d
+   - unlocksScreen                                                c8@0:4               0x366b7e51
+   - togglesMediaControls                                         c8@0:4               0x366b7e55
+   - dismissOnModalDisplayActivation                              c8@0:4               0x366b7e5d
+   - isCriticalAlert                                              c8@0:4               0x366b7e61
+   - playPresentationSound                                        v8@0:4               0x366b7e79
+   - cleanPreviousConfiguration                                   v8@0:4               0x366b7ec1
+   - configure:requirePasscodeForActions:                         v16@0:4c8c12         0x366b7f01
+   - lockLabel                                                    @8@0:4               0x366b7f05
+   - shortLockLabel                                               @8@0:4               0x366b7f09
+   - lockLabelFontSize                                            f8@0:4               0x366b7f0d
+   - autoDismissInterval                                          d8@0:4               0x366b7f29
+   - performUnlockAction                                          v8@0:4               0x366b7f41
+   - setOrderOverSBAlert:                                         v12@0:4c8            0x366b7f45
+   - preventLockOver                                              c8@0:4               0x366b7f75
+   - setPreventLockOver:                                          v12@0:4c8            0x366b7f85
+   - _didEverActivate                                             c8@0:4               0x366b7fc1
+   - willActivate                                                 v8@0:4               0x366b7fd1
+   - didActivate                                                  v8@0:4               0x366b8025
+   - willRelockForButtonPress:                                    v12@0:4c8            0x366b8029
+   - screenWillUndim                                              v8@0:4               0x366b8099
+   - didFailToActivate                                            v8@0:4               0x366b809d
+   - willDeactivateForReason:                                     v12@0:4i8            0x366b80a1
+   - didDeactivateForReason:                                      v12@0:4i8            0x366b80a5
+   - noteVolumeOrLockPressed                                      v8@0:4               0x366b80a9
+   - alertItemNotificationType                                    i8@0:4               0x366b80ad
+   - alertItemNotificationDate                                    @8@0:4               0x366b80b1
+   - alertItemNotificationSender                                  @8@0:4               0x366b80b5
+   - forcesModalAlertAppearance                                   c8@0:4               0x366b80b9
+   - behavesSuperModally                                          c8@0:4               0x366b80bd
+   - reappearsAfterLock                                           c8@0:4               0x366b80c1
+   - reappearsAfterUnlock                                         c8@0:4               0x366b80c5
+   - preventInterruption                                          c8@0:4               0x366b80c9
+   - alertPriority                                                i8@0:4               0x366b80cd
+   - ignoreIfAlreadyDisplaying                                    c8@0:4               0x366b8109
+   - setIgnoreIfAlreadyDisplaying:                                v12@0:4c8            0x366b8119
+   - allowInSetup                                                 c8@0:4               0x366b8129
+   - pendInSetupIfNotAllowed                                      c8@0:4               0x366b8149
+   - allowedBundleIDs                                             @8@0:4               0x366b8169
+   - setAllowedBundleIDs:                                         v12@0:4@8            0x366b8179
+   - init                                                         @8@0:4               0x366b7d69
+   - dealloc                                                      v8@0:4               0x366b7dc5
+   - dismissOnLock                                                c8@0:4               0x366b7e59
+   - dismiss:                                                     v12@0:4i8            0x366b8055
+@end
+
+--- SBCallFailureAlertItem (SpringBoard) - the shape being mirrored ---
+@interface SBCallFailureAlertItem : ?
+   ivar _causeCode                               l @20
+   ivar _address                                 @"NSString" @24
+   ivar _call                                    ^{__CTCall=} @28
+   - initWithCauseCode:call:                                      @16@0:4l8^{__CTCall=}12 0x89755
+   - dealloc                                                      v8@0:4               0x897e5
+   - _callback                                                    v8@0:4               0x89849
+   - lockLabel                                                    @8@0:4               0x898b9
+   - shortLockLabel                                               @8@0:4               0x89955
+   - configure:requirePasscodeForActions:                         v16@0:4c8c12         0x899f1
+   - performUnlockAction                                          v8@0:4               0x89c89
+   - alertView:clickedButtonAtIndex:                              v16@0:4@8i12         0x89c99
+@end
+
+--- -[SBCallFailureAlertItem configure:requirePasscodeForActions:] 0x899f1 ---
+00089a08  add      r0, pc    ; ptr 002504e4 sel:alertSheet
+00089a0a  ldr      r1, [r0]    ; = 001c26d1 sel:alertSheet
+00089a24  add      r0, pc    ; ptr 0024ea50 sel:mainBundle
+00089a28  ldr      r1, [r0]    ; = 001b3e5c sel:mainBundle
+00089a3e  add      r1, pc    ; ptr 0024ea54 sel:localizedStringForKey:value:table:
+00089a48  add      r2, pc    ; ptr 0025e93c @"CALL_FAILURE"
+00089a4e  ldr      r1, [r1]    ; = 001b3e67 sel:localizedStringForKey:value:table:
+00089a56  add      r3, pc    ; ptr 0025a71c @""
+00089a5c  add      r6, pc    ; ptr 0025a32c @"SpringBoard"
+00089a6e  add      r0, pc    ; ptr 00250674 sel:setTitle:
+00089a70  ldr      r1, [r0]    ; = 001c39aa sel:setTitle:
+00089ad0  add      r1, pc    ; ptr 0024eae8 sel:length
+00089ad4  ldr      r1, [r1]    ; = 001b4174 sel:length
+00089aee  add      r1, pc    ; ptr 0024ee34 sel:substringToIndex:
+00089af2  ldr      r1, [r1]    ; = 001b527e sel:substringToIndex:
+00089b04  add      r0, pc    ; ptr 002512d0 sel:substringFromIndex:
+00089b06  ldr      r1, [r0]    ; = 001c936a sel:substringFromIndex:
+00089b1c  add      r0, pc    ; ptr 0024fcc4 sel:stringByAppendingFormat:
+00089b22  add      r2, pc    ; ptr 0025dbec @" %@"
+00089b24  ldr      r1, [r0]    ; = 001be3d0 sel:stringByAppendingFormat:
+00089b3a  add      r0, pc    ; ptr 0025bdac @"Couldn't create address book: %@"
+00089b48  add      r0, pc    ; ptr 0024e82c sel:release
+00089b4a  ldr      r1, [r0]    ; = 001b3206 sel:release
+00089b7a  add      r0, pc    ; ptr 002512ec sel:setBodyText:
+00089b7c  ldr      r1, [r0]    ; = 001c93f7 sel:setBodyText:
+00089bb6  add      r6, pc    ; ptr 0025a32c @"SpringBoard"
+00089bc8  add      r0, pc    ; ptr 002504f0 sel:setNumberOfRows:
+00089bca  ldr      r1, [r0]    ; = 001c2711 sel:setNumberOfRows:
+00089bec  add      r2, pc    ; ptr 0025d8ec @"DISMISS_ALERT"
+00089bee  add      r3, pc    ; ptr 0025a71c @""
+00089c00  add      r0, pc    ; ptr 002512f0 sel:addButtonWithTitle:
+00089c02  ldr      r1, [r0]    ; = 001c9404 sel:addButtonWithTitle:
+00089c1e  add      r1, pc    ; ptr 0024eae8 sel:length
+00089c22  ldr      r1, [r1]    ; = 001b4174 sel:length
+00089c4e  add      r2, pc    ; ptr 0025e94c @"CALL_BACK"
+00089c50  add      r3, pc    ; ptr 0025a71c @""
+00089c62  add      r0, pc    ; ptr 002512f4 sel:_addButtonWithTitle:
+00089c64  ldr      r1, [r0]    ; = 001c9418 sel:_addButtonWithTitle:
+00089c76  add      r0, pc    ; ptr 002512f8 sel:setDefaultButton:
+00089c78  ldr      r1, [r0]    ; = 001c942d sel:setDefaultButton:
+
+--- -[SBCallFailureAlertItem alertView:clickedButtonAtIndex:] 0x89c99 (index 1 is the second button) ---
+00089c98  cmp      r3, #1
+00089c9a  bne      #0x89cac
+00089c9c  movw     r1, #0x7654
+00089ca0  movt     r1, #0x1c
+00089ca4  add      r1, pc    ; ptr 002512fc sel:_callback
+00089ca6  ldr      r1, [r1]    ; = 001c943f sel:_callback
+00089ca8  b.w      #0x1b067c
+00089cac  movw     r1, #0x7648
+00089cb0  movt     r1, #0x1c
+00089cb4  add      r1, pc    ; ptr 00251300 sel:buttonDismissed
+00089cb6  ldr      r1, [r1]    ; = 001c9449 sel:buttonDismissed
+00089cb8  b.w      #0x1b067c
+00089cbc  push     {r4, r5, r7, lr}
+00089cbe  add      r7, sp, #8
+
+--- -[SBCallFailureAlertItem lockLabel] 0x898b9 ---
+000898d2  add      r1, pc    ; ptr 0024eae8 sel:length
+000898d6  ldr      r1, [r1]    ; = 001b4174 sel:length
+000898f0  add      r1, pc    ; ptr 0024ea50 sel:mainBundle
+000898f4  ldr      r1, [r1]    ; = 001b3e5c sel:mainBundle
+00089908  add      r1, pc    ; ptr 0024ea54 sel:localizedStringForKey:value:table:
+00089912  add      r2, pc    ; ptr 0025e91c @"SLIDE_TO_CALL_BACK"
+00089918  ldr      r1, [r1]    ; = 001b3e67 sel:localizedStringForKey:value:table:
+0008991e  add      r3, pc    ; ptr 0025a71c @""
+00089924  add      r4, pc    ; ptr 0025a32c @"SpringBoard"
+00089940  add      r0, pc    ; ptr 00250a5c sel:lockLabel
+00089948  ldr      r1, [r0]    ; = 001c56f6 sel:lockLabel
+
+--- SBApplication / SBApplicationController (finding the app's container) ---
+   + _sharedInstanceCreateIfNecessary:                            @12@0:4c8            0xc3d35
+   + sharedInstance                                               @8@0:4               0xc3dad
+   + sharedInstanceIfExists                                       @8@0:4               0xc3dc1
+   ivar _bundleIdentifier                        @"NSString" @4
+   - bundleIdentifier                                             @8@0:4               0x2f35d
+   - containerPath                                                @8@0:4               0x2f37d
+
+--- SpringBoard (bringing the app forward) ---
+   - applicationOpenURL:publicURLsOnly:                           v16@0:4@8c12         0xd5f5
+   - launchApplicationWithIdentifier:suspended:                   c16@0:4@8c12         0x10b4d
+
+--- SBAwayController (is the device locked) ---
+   ivar _isLocked                                b1 @52
+   + sharedAwayControllerIfExists                                 @8@0:4               0x3c691
+   - isLocked                                                     c8@0:4               0x42c15
+   - isLockedAndUndimmed                                          c8@0:4               0x441d1
+   - isLockedAndInactive                                          c8@0:4               0x4420d
+
+--- MobilePhone.app private URL schemes (why the real screen is out of reach) ---
+	<key>PrivateURLSchemes</key>
+	<array>
+		<string>callto</string>
+		<string>telshow</string>
+		<string>tellock</string>
+		<string>telanswer</string>
+		<string>telemergency</string>
+		<string>vmshow</string>
+		<string>facetime-accept</string>
+		<string>facetime-lock</string>
+		<string>facetime-show</string>
+		<string>mobilephone-recents</string>
+	</array>
+
+--- TelephonyUI.framework classes (the widgets the phone draws with) ---
+@interface TPAlertViewHelper : NSObject
+@interface TPAudioDeviceView : UIView
+@interface TPAudioRouteCell : UITableViewCell
+@interface TPAudioSelectionButton : UIButton
+@interface TPAudioTableSurroundingView : UIView
+@interface TPBottomBar : UIView
+@interface TPBottomDoubleButtonBar : TPBottomSingleButtonBar
+@interface TPBottomDoubleButtonGrabberBar : TPBottomDoubleButtonBar
+@interface TPBottomDoubleHeightButtonBar : TPBottomBar
+@interface TPBottomGrabberLockBar : TPBottomLockBar
+@interface TPBottomLockBar : TPBottomBar
+@interface TPBottomSingleButtonBar : TPBottomBar
+@interface TPBottomSingleButtonGrabberBar : TPBottomSingleButtonBar
+@interface TPButton : UIButton
+@interface TPButtonBackingView : UIView
+@interface TPCallWaitingButton : UIImageView
+@interface TPIncomingCallOptionsScrollView : UIScrollView
+@interface TPIncomingCallOptionsView : UIView
+@interface TPLCDBar : UIImageView
+@interface TPLCDDoubleButtonView : TPLCDView
+@interface TPLCDSubImageView : UIView
+@interface TPLCDTextView : UIView
+@interface TPLCDTextViewScrollingView : UIView
+@interface TPLCDView : TPLCDBar
+@interface TPLockKnobView : UIImageView
+@interface TPLockTextView : UIView
+@interface TPPhoneCallModel : NSObject
+@interface TPPhonePad : UIControl
+@interface TPTopLockBar : TPBottomLockBar
+@interface TPWell : UIImageView
+@interface TPWellButtonView : UIView
+
+--- TelephonyUtilities.framework classes (no CallKit ancestor) ---
+@interface TUBasicLogger : NSObject
+@interface TUInMemoryAppender : NSObject
+@interface TUPhoneLogger : NSObject
+@interface TURemoteAppender : NSObject
+@interface TUReplyWithMessageStore : NSObject
+@interface TURollingFileAppender : NSObject
+@interface TUSimpleBacktrace : NSObject

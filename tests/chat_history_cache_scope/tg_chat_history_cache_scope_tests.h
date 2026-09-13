@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_CHAT_HISTORY_CACHE_SCOPE_TESTS_H
+#define TG_HOST_TESTS_CHAT_HISTORY_CACHE_SCOPE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChatHistoryCacheScopeTestPrimaryAccountKeepsTheOldFile(void);
+TGTestOutcome TGChatHistoryCacheScopeTestEverySlotHasItsOwnFile(void);
+TGTestOutcome TGChatHistoryCacheScopeTestScopeCannotEscapeTheFileName(void);
+TGTestOutcome TGChatHistoryCacheScopeTestSwitchingAccountsDropsTheMessages(void);
+
+#endif

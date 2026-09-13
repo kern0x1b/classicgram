@@ -1,0 +1,17 @@
+#ifndef TG_HOST_TESTS_AUTOSAVE_TESTS_H
+#define TG_HOST_TESTS_AUTOSAVE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGAutosaveTestCategoryForKindMapsPhotoAndVideoOnly(void);
+TGTestOutcome TGAutosaveTestNilSettingsAndNilExceptionBlocksSave(void);
+TGTestOutcome TGAutosaveTestScopePhotosDisabledBlocksPhoto(void);
+TGTestOutcome TGAutosaveTestScopePhotosEnabledAllowsPhotoRegardlessOfSize(void);
+TGTestOutcome TGAutosaveTestScopeVideosDisabledBlocksVideo(void);
+TGTestOutcome TGAutosaveTestVideoUnderCapIsAllowed(void);
+TGTestOutcome TGAutosaveTestVideoOverCapIsBlocked(void);
+TGTestOutcome TGAutosaveTestZeroCapFallsBackToTenMegabyteDefault(void);
+TGTestOutcome TGAutosaveTestChatExceptionOverridesScopeSettings(void);
+TGTestOutcome TGAutosaveTestNilExceptionFallsBackToScopeSettings(void);
+
+#endif

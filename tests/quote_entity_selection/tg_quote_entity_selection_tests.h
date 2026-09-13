@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_QUOTE_ENTITY_SELECTION_TESTS_H
+#define TG_HOST_TESTS_QUOTE_ENTITY_SELECTION_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGQuoteEntitySelectionTestEmptySelectionReturnsNoEntities(void);
+TGTestOutcome TGQuoteEntitySelectionTestEntityFullyInsideSelectionKeepsLengthAndShiftsOffset(void);
+TGTestOutcome TGQuoteEntitySelectionTestEntityFullyOutsideSelectionIsDropped(void);
+TGTestOutcome TGQuoteEntitySelectionTestEntityClippedAtSelectionStart(void);
+TGTestOutcome TGQuoteEntitySelectionTestEntityClippedAtSelectionEnd(void);
+TGTestOutcome TGQuoteEntitySelectionTestEntitySpanningWholeSelectionIsClippedBothSides(void);
+TGTestOutcome TGQuoteEntitySelectionTestOtherFieldsArePreservedAfterAdjustment(void);
+
+#endif

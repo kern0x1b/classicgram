@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_PROXY_LINK_IN_TEXT_TESTS_H
+#define TG_HOST_TESTS_PROXY_LINK_IN_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGProxyLinkInTextTestFindsTgProxyLinkAndStopsAtWhitespace(void);
+TGTestOutcome TGProxyLinkInTextTestMatchIsCaseInsensitive(void);
+TGTestOutcome TGProxyLinkInTextTestReturnsNilWhenNoKnownLinkIsPresent(void);
+TGTestOutcome TGProxyLinkInTextTestReturnsNilForTextShorterThanTheShortestNeedle(void);
+TGTestOutcome TGProxyLinkInTextTestReturnsNilForNonStringInput(void);
+TGTestOutcome TGProxyLinkInTextTestDottedCapitalIPrefixDoesNotCrashAndStillMatches(void);
+
+#endif

@@ -1,0 +1,12 @@
+#ifndef TG_HOST_TESTS_MESSAGE_DISAPPEARS_TESTS_H
+#define TG_HOST_TESTS_MESSAGE_DISAPPEARS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGMessageDisappearsTestTheMessageCarriesTheTimer(void);
+TGTestOutcome TGMessageDisappearsTestContentStillCounts(void);
+TGTestOutcome TGMessageDisappearsTestAnOrdinaryMessageStays(void);
+TGTestOutcome TGMessageDisappearsTestAVoiceNoteOnATimerIsNamed(void);
+TGTestOutcome TGMessageDisappearsTestMissingInputIsHandled(void);
+
+#endif

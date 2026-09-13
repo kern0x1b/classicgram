@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_LIVE_LOCATION_REHYDRATION_TESTS_H
+#define TG_HOST_TESTS_LIVE_LOCATION_REHYDRATION_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGLiveLocationRehydrationTestOwnActiveShareIsFound(void);
+TGTestOutcome TGLiveLocationRehydrationTestIncomingLiveLocationIsIgnored(void);
+TGTestOutcome TGLiveLocationRehydrationTestOwnExpiredShareIsIgnored(void);
+TGTestOutcome TGLiveLocationRehydrationTestNoLiveLocationMessagesReturnsZero(void);
+TGTestOutcome TGLiveLocationRehydrationTestOwnStaticLocationIsIgnored(void);
+TGTestOutcome TGLiveLocationRehydrationTestMultipleOwnSharesPicksTheMostRecent(void);
+TGTestOutcome TGLiveLocationRehydrationTestNonDictionaryEntriesDoNotCrash(void);
+
+#endif

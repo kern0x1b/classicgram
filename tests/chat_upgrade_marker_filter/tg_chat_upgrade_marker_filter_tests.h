@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_CHAT_UPGRADE_MARKER_FILTER_TESTS_H
+#define TG_HOST_TESTS_CHAT_UPGRADE_MARKER_FILTER_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChatUpgradeMarkerFilterTestUpgradeToIsAMarker(void);
+TGTestOutcome TGChatUpgradeMarkerFilterTestUpgradeFromIsAMarker(void);
+TGTestOutcome TGChatUpgradeMarkerFilterTestOrdinaryMessageIsNotAMarker(void);
+TGTestOutcome TGChatUpgradeMarkerFilterTestNilMessageIsNotAMarker(void);
+TGTestOutcome TGChatUpgradeMarkerFilterTestArrayWithoutMarkersIsUnchanged(void);
+TGTestOutcome TGChatUpgradeMarkerFilterTestArrayDropsUpgradeMarkersOnly(void);
+TGTestOutcome TGChatUpgradeMarkerFilterTestEmptyArrayIsUnchanged(void);
+
+#endif

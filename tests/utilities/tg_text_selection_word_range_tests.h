@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_TEXT_SELECTION_WORD_RANGE_TESTS_H
+#define TG_HOST_TESTS_TEXT_SELECTION_WORD_RANGE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGTextSelectionWordRangeTestPlainAsciiWordExpandsToWholeWord(void);
+TGTestOutcome TGTextSelectionWordRangeTestIndexOnHighSurrogateReturnsWholePair(void);
+TGTestOutcome TGTextSelectionWordRangeTestIndexOnLowSurrogateReturnsWholePair(void);
+TGTestOutcome TGTextSelectionWordRangeTestWordAfterEmojiDoesNotMergeAcrossIt(void);
+TGTestOutcome TGTextSelectionWordRangeTestIndexPastEndOfTextClampsToLastCharacter(void);
+TGTestOutcome TGTextSelectionWordRangeTestEmptyTextReturnsZeroRange(void);
+
+#endif

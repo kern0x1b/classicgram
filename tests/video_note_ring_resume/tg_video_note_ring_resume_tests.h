@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_VIDEO_NOTE_RING_RESUME_TESTS_H
+#define TG_HOST_TESTS_VIDEO_NOTE_RING_RESUME_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGVideoNoteRingResumeTestFreshStartAnimatesFullRange(void);
+TGTestOutcome TGVideoNoteRingResumeTestHalfwayAtSameRateResumesFromHalf(void);
+TGTestOutcome TGVideoNoteRingResumeTestMidPlayRateChangeUsesRemainingTimeAtNewRate(void);
+TGTestOutcome TGVideoNoteRingResumeTestRateBelowFloorIsClampedToHalfSpeed(void);
+TGTestOutcome TGVideoNoteRingResumeTestElapsedPastTotalClampsToComplete(void);
+TGTestOutcome TGVideoNoteRingResumeTestNegativeOrNanElapsedTreatedAsZero(void);
+TGTestOutcome TGVideoNoteRingResumeTestNonPositiveTotalLengthReturnsZero(void);
+
+#endif

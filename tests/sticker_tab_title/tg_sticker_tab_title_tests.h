@@ -1,0 +1,12 @@
+#ifndef TG_HOST_TESTS_STICKER_TAB_TITLE_TESTS_H
+#define TG_HOST_TESTS_STICKER_TAB_TITLE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGStickerTabTitleTestShortTitleIsLeftAlone(void);
+TGTestOutcome TGStickerTabTitleTestLongAsciiTitleIsCutAndUppercased(void);
+TGTestOutcome TGStickerTabTitleTestEmojiTitleKeepsWholeGlyphs(void);
+TGTestOutcome TGStickerTabTitleTestEmojiOnlyTitleIsNeverHalfAGlyph(void);
+TGTestOutcome TGStickerTabTitleTestMissingTitleIsEmpty(void);
+
+#endif

@@ -1,0 +1,12 @@
+#ifndef TG_HOST_TESTS_LIVE_LOCATION_MESSAGE_ID_REMAP_TESTS_H
+#define TG_HOST_TESTS_LIVE_LOCATION_MESSAGE_ID_REMAP_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGLiveLocationMessageIdRemapTestTrackedMessagePromotedToServerId(void);
+TGTestOutcome TGLiveLocationMessageIdRemapTestUnrelatedMessagePromotionLeavesIdUnchanged(void);
+TGTestOutcome TGLiveLocationMessageIdRemapTestNoActiveShareLeavesIdAtZero(void);
+TGTestOutcome TGLiveLocationMessageIdRemapTestZeroOldMessageIdLeavesIdUnchanged(void);
+TGTestOutcome TGLiveLocationMessageIdRemapTestZeroNewMessageIdLeavesIdUnchanged(void);
+
+#endif

@@ -1,0 +1,17 @@
+#ifndef TG_HOST_TESTS_CHAT_HISTORY_CACHE_TESTS_H
+#define TG_HOST_TESTS_CHAT_HISTORY_CACHE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChatHistoryCacheTestMissingChatReturnsNil(void);
+TGTestOutcome TGChatHistoryCacheTestSetThenGetReturnsSameMessages(void);
+TGTestOutcome TGChatHistoryCacheTestSettingEmptyArrayRemovesEntry(void);
+TGTestOutcome TGChatHistoryCacheTestDifferentThreadsSameChatAreDistinctKeys(void);
+TGTestOutcome TGChatHistoryCacheTestOverCapacityEvictsOldestEntry(void);
+TGTestOutcome TGChatHistoryCacheTestReinsertingKeyMovesItToNewest(void);
+TGTestOutcome TGChatHistoryCacheTestClearRemovesEveryEntry(void);
+TGTestOutcome TGChatHistoryCacheTestMemoryWarningNotificationClearsCache(void);
+TGTestOutcome TGChatHistoryCacheTestPersistThenFreshInstanceLoadsSameMessages(void);
+TGTestOutcome TGChatHistoryCacheTestPersistWithNoMessagesRemovesStaleFile(void);
+
+#endif

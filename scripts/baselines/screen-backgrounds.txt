@@ -1,0 +1,3 @@
+# Screens whose white is not the theme's list colour but the thing itself:
+# an article page is paper, a camera roll is a light room. Each is deliberate.
+src/Screens/Media/TGInstantViewController.m  # an instant-view article is a sheet of paper

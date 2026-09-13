@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_REACHABILITY_TESTS_H
+#define TG_HOST_TESTS_REACHABILITY_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGReachabilityTestUnreachableMapsToNone(void);
+TGTestOutcome TGReachabilityTestReachableWifiMapsToWifi(void);
+TGTestOutcome TGReachabilityTestReachableWwanMapsToMobile(void);
+TGTestOutcome TGReachabilityTestConnectionRequiredWithoutAutomaticConnectMapsToNone(void);
+TGTestOutcome TGReachabilityTestConnectionOnDemandMapsToReachableKind(void);
+TGTestOutcome TGReachabilityTestInterventionRequiredMapsToNoneEvenWithOnDemand(void);
+
+#endif

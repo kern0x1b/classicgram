@@ -1,0 +1,32 @@
+name: Host tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  host-tests:
+    name: Host tests and linters
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Host tests
+        run: ./scripts/run-host-tests.sh
+
+      - name: No comments in source
+        run: python3 scripts/lint-source-comments.py --check src
+
+      - name: iOS 6 SDK ceiling
+        run: python3 scripts/lint-sdk-ceiling.py
+
+      - name: Layer imports
+        run: |
+          python3 scripts/lint-layer-imports.py \
+            --baseline-rank scripts/baselines/layer-rank.txt \
+            --baseline-screen-wall scripts/baselines/layer-screen-wall.txt \
+            --baseline-tdlib-schema scripts/baselines/tdlib-schema.txt

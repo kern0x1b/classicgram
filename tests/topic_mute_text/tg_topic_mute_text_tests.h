@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_TOPIC_MUTE_TEXT_TESTS_H
+#define TG_HOST_TESTS_TOPIC_MUTE_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGTopicMuteTextTestZeroSecondsIsEnabled(void);
+TGTestOutcome TGTopicMuteTextTestNegativeSecondsIsEnabled(void);
+TGTestOutcome TGTopicMuteTextTestSubMinuteValueClampsToOneMinute(void);
+TGTestOutcome TGTopicMuteTextTestExactlyOneHourBoundary(void);
+TGTestOutcome TGTopicMuteTextTestExactlyTwentyFourHourBoundary(void);
+TGTestOutcome TGTopicMuteTextTestMultiDayValue(void);
+TGTestOutcome TGTopicMuteTextTestHugeOverAYearValueIsMutedForever(void);
+
+#endif

@@ -1,0 +1,16 @@
+#ifndef TG_HOST_TESTS_PROFILE_AUTO_DELETE_SUBTITLE_TESTS_H
+#define TG_HOST_TESTS_PROFILE_AUTO_DELETE_SUBTITLE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGProfileAutoDeleteSubtitleTestZeroIsOff(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestNegativeIsOff(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestExactlyOneDayPreset(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestExactlyOneWeekPreset(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestExactlyOneMonthPreset(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestNonPresetThreeDaysShowsThreeDays(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestNonPresetLongerThanAWeekShowsWeeks(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestSecretChatSubMinuteValueShowsSeconds(void);
+TGTestOutcome TGProfileAutoDeleteSubtitleTestSecretChatSubHourValueShowsMinutes(void);
+
+#endif

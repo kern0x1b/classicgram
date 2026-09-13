@@ -1,0 +1,25 @@
+#ifndef TG_HOST_TESTS_FLATTEN_WEBLINKS_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_WEBLINKS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenWebLinksTestFlattensPlainTextWithNoRuns(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensGenericFormattingKinds(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensUrlLink(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensEmailAddress(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensPhoneNumber(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensMention(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensHashtagAndCashtag(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensBankCardNumber(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensAnchorLink(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensMentionName(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensConcatenatedTextsList(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensNestedBoldContainingLink(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensNonRunProducingKinds(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensEmptyOrNilNode(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensUnknownNodeTypeFallsThroughSafely(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensPageBlocksWithMultipleKinds(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensPageBlocksSkipsMalformedEntries(void);
+TGTestOutcome TGFlattenWebLinksTestFlattensCoverHoistsInnerPhotoFields(void);
+
+#endif

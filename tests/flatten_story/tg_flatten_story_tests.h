@@ -1,0 +1,47 @@
+#ifndef TG_HOST_TESTS_FLATTEN_STORY_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_STORY_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenStoryTestAreaFlattensLocation(void);
+TGTestOutcome TGFlattenStoryTestAreaFlattensVenue(void);
+TGTestOutcome TGFlattenStoryTestAreaFlattensReaction(void);
+TGTestOutcome TGFlattenStoryTestAreaFlattensMessage(void);
+TGTestOutcome TGFlattenStoryTestAreaFlattensLink(void);
+TGTestOutcome TGFlattenStoryTestAreaFlattensWeather(void);
+TGTestOutcome TGFlattenStoryTestAreaFlattensUpgradedGift(void);
+TGTestOutcome TGFlattenStoryTestAreaUnknownTypeFallsThroughSafely(void);
+TGTestOutcome TGFlattenStoryTestAreaNilRawReturnsNil(void);
+
+TGTestOutcome TGFlattenStoryTestFlattensPhotoStory(void);
+TGTestOutcome TGFlattenStoryTestFlattensVideoStory(void);
+TGTestOutcome TGFlattenStoryTestFlattensLiveStory(void);
+TGTestOutcome TGFlattenStoryTestFlattensRepostedStory(void);
+TGTestOutcome TGFlattenStoryTestFlattensStoryWithAreas(void);
+TGTestOutcome TGFlattenStoryTestMissingIdReturnsNil(void);
+TGTestOutcome TGFlattenStoryTestArrayDropsInvalidEntries(void);
+
+TGTestOutcome TGFlattenStoryTestAlbumFlattensValid(void);
+TGTestOutcome TGFlattenStoryTestAlbumMissingIdReturnsNil(void);
+
+TGTestOutcome TGFlattenStoryTestErrorTextFloodWaitBoundaries(void);
+TGTestOutcome TGFlattenStoryTestErrorTextKnownCodes(void);
+TGTestOutcome TGFlattenStoryTestErrorTextUnknownMessagePassesThrough(void);
+TGTestOutcome TGFlattenStoryTestErrorTextMissingMessageUsesDefault(void);
+
+TGTestOutcome TGFlattenStoryTestLimitReasonKnownVariants(void);
+TGTestOutcome TGFlattenStoryTestLimitReasonUnknownFallsBackToGenericText(void);
+
+TGTestOutcome TGFlattenStoryTestPrivacyRoundTripsEveryVariant(void);
+TGTestOutcome TGFlattenStoryTestPrivacyNameUnknownTypeReturnsEmpty(void);
+TGTestOutcome TGFlattenStoryTestFlattenExposesPrivacyUserIdLists(void);
+
+TGTestOutcome TGFlattenStoryTestReactionEmojiExtractsAndFallsBack(void);
+TGTestOutcome TGFlattenStoryTestLargestPhotoIdPicksLastSize(void);
+TGTestOutcome TGFlattenStoryTestLargestPhotoIdEmptySizesReturnsNil(void);
+TGTestOutcome TGFlattenStoryTestNetworkTypeMapsAllVariants(void);
+
+TGTestOutcome TGFlattenStoryTestSenderIdHandlesUserAndChat(void);
+TGTestOutcome TGFlattenStoryTestFlattenCarriesTheAlbumPermission(void);
+
+#endif

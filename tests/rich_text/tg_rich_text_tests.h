@@ -1,0 +1,19 @@
+#ifndef TG_HOST_TESTS_RICH_TEXT_TESTS_H
+#define TG_HOST_TESTS_RICH_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGRichTextTestEmptyTextBuildsNothing(void);
+TGTestOutcome TGRichTextTestPlainTextKeepsItsCharactersWithNoEntityAttributes(void);
+TGTestOutcome TGRichTextTestUrlEntityCarriesTheUrlItSpans(void);
+TGTestOutcome TGRichTextTestTextUrlEntityCarriesTheEntitysOwnUrlNotTheSpannedText(void);
+TGTestOutcome TGRichTextTestEmailEntityGetsMailtoScheme(void);
+TGTestOutcome TGRichTextTestMentionNameEntityCarriesTheUserId(void);
+TGTestOutcome TGRichTextTestSpoilerEntityMarksItsRangeAndHidesItUntilRevealed(void);
+TGTestOutcome TGRichTextTestCustomEmojiEntityCarriesItsIdAsLongLong(void);
+TGTestOutcome TGRichTextTestEntityRunningPastTheEndIsClampedNotDropped(void);
+TGTestOutcome TGRichTextTestOutOfRangeAndMalformedEntitiesAreIgnored(void);
+TGTestOutcome TGRichTextTestEntityOffsetsAreUtf16UnitsNotCharacters(void);
+TGTestOutcome TGRichTextTestBlockquoteEntityMarksItsRangeAndNumbersBlocks(void);
+
+#endif

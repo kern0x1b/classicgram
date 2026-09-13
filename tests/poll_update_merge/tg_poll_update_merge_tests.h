@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_POLL_UPDATE_MERGE_TESTS_H
+#define TG_HOST_TESTS_POLL_UPDATE_MERGE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPollUpdateMergeTestVotesReachTheMessageThatShowsThePoll(void);
+TGTestOutcome TGPollUpdateMergeTestOtherMessagesAreLeftAlone(void);
+TGTestOutcome TGPollUpdateMergeTestTheSamePollTwiceChangesNothing(void);
+TGTestOutcome TGPollUpdateMergeTestAPollWithNoIdIsIgnored(void);
+TGTestOutcome TGPollUpdateMergeTestMissingInputIsHandled(void);
+TGTestOutcome TGPollUpdateMergeTestFlattenedPollCarriesItsId(void);
+
+#endif

@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_CALL_END_TEXT_TESTS_H
+#define TG_HOST_TESTS_CALL_END_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGCallEndTextTestNoAnswerReasonMapsToLocalizedNoAnswer(void);
+TGTestOutcome TGCallEndTextTestDeclinedReasonMapsToBusy(void);
+TGTestOutcome TGCallEndTextTestDisconnectedReasonMapsToCallFailed(void);
+TGTestOutcome TGCallEndTextTestCallEndedReasonMapsToCallEnded(void);
+TGTestOutcome TGCallEndTextTestMovedToGroupCallReasonMapsToMovedToGroupCall(void);
+TGTestOutcome TGCallEndTextTestEmptyAndNonStringReasonsUseFallback(void);
+TGTestOutcome TGCallEndTextTestUnrecognizedBackendMessageUsesFallbackNotItself(void);
+
+#endif

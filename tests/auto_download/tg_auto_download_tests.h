@@ -1,0 +1,16 @@
+#ifndef TG_HOST_TESTS_AUTO_DOWNLOAD_TESTS_H
+#define TG_HOST_TESTS_AUTO_DOWNLOAD_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGAutoDownloadTestCategoryForKindMapsPhotoVideoAndOthers(void);
+TGTestOutcome TGAutoDownloadTestNilSettingsAllowsDownload(void);
+TGTestOutcome TGAutoDownloadTestDisabledSettingsBlocksDownload(void);
+TGTestOutcome TGAutoDownloadTestZeroCapBlocksDownloadEvenWhenEnabled(void);
+TGTestOutcome TGAutoDownloadTestFileOverCapIsBlocked(void);
+TGTestOutcome TGAutoDownloadTestFileUnderCapIsAllowed(void);
+TGTestOutcome TGAutoDownloadTestUnknownFileSizeIsAllowedWhenEnabled(void);
+TGTestOutcome TGAutoDownloadTestMergeForMobileTakesTheMostRestrictiveOfEachField(void);
+TGTestOutcome TGAutoDownloadTestMergeForMobileFallsBackToWhicheverBucketExists(void);
+
+#endif

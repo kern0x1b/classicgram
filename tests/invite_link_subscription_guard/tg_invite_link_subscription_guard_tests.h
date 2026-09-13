@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_INVITE_LINK_SUBSCRIPTION_GUARD_TESTS_H
+#define TG_HOST_TESTS_INVITE_LINK_SUBSCRIPTION_GUARD_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGInviteLinkSubscriptionGuardTestNilLinkIsNotSubscription(void);
+TGTestOutcome TGInviteLinkSubscriptionGuardTestNonDictionaryLinkIsNotSubscription(void);
+TGTestOutcome TGInviteLinkSubscriptionGuardTestZeroStarCountIsNotSubscription(void);
+TGTestOutcome TGInviteLinkSubscriptionGuardTestMissingStarCountIsNotSubscription(void);
+TGTestOutcome TGInviteLinkSubscriptionGuardTestPositiveStarCountIsSubscription(void);
+TGTestOutcome TGInviteLinkSubscriptionGuardTestNegativeStarCountIsNotSubscription(void);
+
+#endif

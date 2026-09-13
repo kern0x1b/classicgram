@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_FORWARD_CHUNKING_TESTS_H
+#define TG_HOST_TESTS_FORWARD_CHUNKING_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGForwardChunkingTestEmptyIdsProducesNoChunks(void);
+TGTestOutcome TGForwardChunkingTestFewerIdsThanChunkSizeProducesOneChunk(void);
+TGTestOutcome TGForwardChunkingTestExactMultipleOfChunkSizeProducesEvenChunks(void);
+TGTestOutcome TGForwardChunkingTestRemainderProducesASmallerFinalChunk(void);
+TGTestOutcome TGForwardChunkingTestChunksStayInAscendingOrder(void);
+TGTestOutcome TGForwardChunkingTestZeroChunkSizeProducesNoChunks(void);
+
+#endif

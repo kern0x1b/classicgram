@@ -1,0 +1,80 @@
+# Build directory and auxiliary build files
+build/
+.theos/
+packages/
+!third_party/tdlib/build/
+!third_party/tdlib/build/weak_import_shims.c
+!third_party/libvpx/build/
+!third_party/libvpx/build/**
+build-aux/
+aclocal.m4
+configure
+!third_party/libvpx/configure
+COPYING
+INSTALL
+
+# Certificates and local configs
+certificates
+configure_ios.sh
+src/Resources/Config/tg_config.h
+.vim*
+*~
+
+# Build artifacts
+*.o
+*.lo
+*.la
+build/**/*.a
+*.dylib
+*.Plo
+*.Tpo
+*.app
+*.ipa
+.deps/
+.libs/
+autom4te.cache/
+config.log
+config.status
+config.cache
+Makefile.in
+
+/third_party/tdlib/native-build
+.DS_Store
+/.zsign_cache
+
+# libtgvoip ships an autotools build we do not use - the root Makefile compiles it directly
+third_party/libtgvoip/.deps/
+third_party/libtgvoip/**/.deps/
+third_party/libtgvoip/**/.dirstamp
+third_party/libtgvoip/configure
+third_party/libtgvoip/libtool
+third_party/libtgvoip/stamp-h1
+
+daemon/relaunch/out/
+
+tweaks/system-call/out/
+tweaks/system-call/work/
+tools/pushdaemon/out/
+
+# local-only reference material, never committed
+design-reference/
+scratch/
+*.o
+
+# internal working material — never committed, lives on disk only
+.claude/screenshots/
+.claude/clean.sh
+.claude/commands/
+.claude/settings.local.json
+.claude/worktree/
+.claude/AUDIT-LOG.md
+.claude/scheduled_tasks.lock
+
+# local notes and scratch documentation stay out of the repository
+/docs/
+
+# fuzzer-grown corpora and crash artifacts stay out of the repository
+tests/fuzz/corpus/
+tests/fuzz/crash-*
+tests/fuzz/leak-*
+tests/fuzz/oom-*

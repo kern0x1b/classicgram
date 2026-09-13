@@ -1,0 +1,16 @@
+#ifndef TG_HOST_TESTS_LAYOUT_TESTS_H
+#define TG_HOST_TESTS_LAYOUT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGLayoutTestGenericHeightWithoutMedia(void);
+TGTestOutcome TGLayoutTestGenericHeightWithMedia(void);
+TGTestOutcome TGLayoutTestGenericHeightClampedAtMinimum(void);
+TGTestOutcome TGLayoutTestGenericXShiftsByAvatarShift(void);
+TGTestOutcome TGLayoutTestTailOnRightForOutgoing(void);
+TGTestOutcome TGLayoutTestTailOnLeftForIncoming(void);
+TGTestOutcome TGLayoutTestTailSizeNonZeroBothDirections(void);
+TGTestOutcome TGLayoutTestStickerArtAvoidsTailSideWhenOutgoing(void);
+TGTestOutcome TGLayoutTestCenteredDiscIsCenteredOnPicture(void);
+
+#endif

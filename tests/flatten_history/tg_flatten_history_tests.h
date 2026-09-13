@@ -1,0 +1,15 @@
+#ifndef TG_HOST_TESTS_FLATTEN_HISTORY_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_HISTORY_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenHistoryTestMergeRawMessagesDedupsOverlappingIdsKeepingFirstArrayVersion(void);
+TGTestOutcome TGFlattenHistoryTestMergeRawMessagesUnionsNonOverlappingIds(void);
+TGTestOutcome TGFlattenHistoryTestMergeRawMessagesHandlesOneEmptyArray(void);
+TGTestOutcome TGFlattenHistoryTestMergeRawMessagesHandlesBothEmptyArrays(void);
+TGTestOutcome TGFlattenHistoryTestOldestFirstReversesWithoutLimit(void);
+TGTestOutcome TGFlattenHistoryTestOldestFirstLeavesArrayUnderLimitAlone(void);
+TGTestOutcome TGFlattenHistoryTestOldestFirstAtExactlyTheLimit(void);
+TGTestOutcome TGFlattenHistoryTestOldestFirstPastTheLimit(void);
+
+#endif

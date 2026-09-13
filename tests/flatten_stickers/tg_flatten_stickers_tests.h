@@ -1,0 +1,33 @@
+#ifndef TG_HOST_TESTS_FLATTEN_STICKERS_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_STICKERS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenStickersTestFlattensWebpFormat(void);
+TGTestOutcome TGFlattenStickersTestFlattensAnimatedFormat(void);
+TGTestOutcome TGFlattenStickersTestFlattensVideoFormat(void);
+TGTestOutcome TGFlattenStickersTestCustomEmojiIdPresent(void);
+TGTestOutcome TGFlattenStickersTestCustomEmojiIdAbsent(void);
+TGTestOutcome TGFlattenStickersTestMissingFileIdReturnsNil(void);
+TGTestOutcome TGFlattenStickersTestThumbnailDefaultsToZeroWhenMissing(void);
+
+TGTestOutcome TGFlattenStickersTestSetFlattensRealisticPayload(void);
+TGTestOutcome TGFlattenStickersTestSetMissingIdReturnsNil(void);
+TGTestOutcome TGFlattenStickersTestSetCoversFallBackToStickersWhenEmpty(void);
+TGTestOutcome TGFlattenStickersTestSetCountFallsBackToStickersCountWhenSizeMissing(void);
+TGTestOutcome TGFlattenStickersTestSetIsEmojiTrueForCustomEmojiType(void);
+TGTestOutcome TGFlattenStickersTestSetIsMaskTrueForMaskType(void);
+TGTestOutcome TGFlattenStickersTestSetIsMaskFalseForRegularType(void);
+
+TGTestOutcome TGFlattenStickersTestIsFlattenableRecognizesValidAndInvalid(void);
+
+TGTestOutcome TGFlattenStickersTestRangeAtStart(void);
+TGTestOutcome TGFlattenStickersTestRangeAtMiddle(void);
+TGTestOutcome TGFlattenStickersTestRangeAtEnd(void);
+TGTestOutcome TGFlattenStickersTestRangePastTheEnd(void);
+TGTestOutcome TGFlattenStickersTestRangeSkipsNonFlattenableEntriesInterspersed(void);
+TGTestOutcome TGFlattenStickersTestRangeEmptyStreamReturnsEmptyArray(void);
+
+TGTestOutcome TGFlattenStickersTestCountSkipsInvalidEntries(void);
+
+#endif

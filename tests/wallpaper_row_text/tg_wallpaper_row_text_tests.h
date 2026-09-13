@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_WALLPAPER_ROW_TEXT_TESTS_H
+#define TG_HOST_TESTS_WALLPAPER_ROW_TEXT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGWallpaperRowTextTestKindDefaultsToWallpaper(void);
+TGTestOutcome TGWallpaperRowTextTestColourWordForSolidAndGradient(void);
+TGTestOutcome TGWallpaperRowTextTestColourWordIgnoresTheAlphaByte(void);
+TGTestOutcome TGWallpaperRowTextTestTitleNamesGradientOnlyWhenTheEndsDiffer(void);
+TGTestOutcome TGWallpaperRowTextTestTitleNumbersPatternsAndPhotographsFromOne(void);
+TGTestOutcome TGWallpaperRowTextTestDetailJoinsOnlyThePartsThatApply(void);
+
+#endif

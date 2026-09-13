@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_PHONE_STRIP_TESTS_H
+#define TG_HOST_TESTS_PHONE_STRIP_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPhoneStripTestKeepsOnlyDigitsFromLettersSpacesAndDashes(void);
+TGTestOutcome TGPhoneStripTestKeepsLeadingPlus(void);
+TGTestOutcome TGPhoneStripTestKeepsStarAndHash(void);
+TGTestOutcome TGPhoneStripTestAllInvalidCharactersYieldsEmptyString(void);
+TGTestOutcome TGPhoneStripTestAlreadyCleanNumericStringIsUnchanged(void);
+TGTestOutcome TGPhoneStripTestEmptyStringYieldsEmptyString(void);
+
+#endif

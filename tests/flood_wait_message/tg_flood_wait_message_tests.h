@@ -1,0 +1,13 @@
+#ifndef TG_HOST_TESTS_FLOOD_WAIT_MESSAGE_TESTS_H
+#define TG_HOST_TESTS_FLOOD_WAIT_MESSAGE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFloodWaitMessageTestParsesRetryAfterSeconds(void);
+TGTestOutcome TGFloodWaitMessageTestMatchIsCaseInsensitive(void);
+TGTestOutcome TGFloodWaitMessageTestNonFloodWaitMessageReturnsNegativeOne(void);
+TGTestOutcome TGFloodWaitMessageTestNilMessageReturnsNegativeOne(void);
+TGTestOutcome TGFloodWaitMessageTestMissingDigitsAfterMarkerReturnsNegativeOne(void);
+TGTestOutcome TGFloodWaitMessageTestZeroSecondsReturnsNegativeOne(void);
+
+#endif

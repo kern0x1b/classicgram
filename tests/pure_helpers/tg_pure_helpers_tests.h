@@ -1,0 +1,20 @@
+#ifndef TG_HOST_TESTS_PURE_HELPERS_TESTS_H
+#define TG_HOST_TESTS_PURE_HELPERS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGPlayerClockTestFormatsMinutesAndPadsSeconds(void);
+TGTestOutcome TGPlayerClockTestRoundsToTheNearestSecond(void);
+TGTestOutcome TGPlayerClockTestClampsNegativeNanAndAbsurdDurations(void);
+TGTestOutcome TGPlayerClockTestNegativeFlagPrefixesTheRemainingTime(void);
+TGTestOutcome TGLiveLocationFixTestHeadingReservesZeroForUnknown(void);
+TGTestOutcome TGLiveLocationFixTestHeadingRoundsAndClampsToThreeSixty(void);
+TGTestOutcome TGLiveLocationFixTestAccuracyClampsAnInvalidFix(void);
+TGTestOutcome TGDiceEmojiTestAcceptsEveryDiceEmojiTelegramSends(void);
+TGTestOutcome TGDiceEmojiTestRejectsPlainTextAndOtherEmoji(void);
+TGTestOutcome TGThemeGeometryTestGradientPointsForCardinalRotations(void);
+TGTestOutcome TGThemeGeometryTestGradientPointsAreSymmetricAboutTheCentre(void);
+TGTestOutcome TGThemeGeometryTestGroupedCommentInsetOnlyAppliesOnWideLayouts(void);
+TGTestOutcome TGWebBrowserExceptionURLTestPrependsHttpsOnlyWhenNoSchemeIsPresent(void);
+
+#endif

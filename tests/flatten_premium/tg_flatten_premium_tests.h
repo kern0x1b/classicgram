@@ -1,0 +1,21 @@
+#ifndef TG_HOST_TESTS_FLATTEN_PREMIUM_TESTS_H
+#define TG_HOST_TESTS_FLATTEN_PREMIUM_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGFlattenPremiumTestHumanizeAllLowercase(void);
+TGTestOutcome TGFlattenPremiumTestHumanizeAllUppercaseFirstLetter(void);
+TGTestOutcome TGFlattenPremiumTestHumanizeAlreadySpacedString(void);
+TGTestOutcome TGFlattenPremiumTestHumanizeEmptyString(void);
+TGTestOutcome TGFlattenPremiumTestFullTypeAddsPrefixToShortTag(void);
+TGTestOutcome TGFlattenPremiumTestTagStripsPrefixFromFullType(void);
+TGTestOutcome TGFlattenPremiumTestFeatureSupportedForKnownUnsupportedFeature(void);
+TGTestOutcome TGFlattenPremiumTestFeatureSupportedForUnknownFeature(void);
+TGTestOutcome TGFlattenPremiumTestFeatureSubtitleLooksUpKnownAndUnknownTags(void);
+TGTestOutcome TGFlattenPremiumTestBusinessSubtitleLooksUpKnownAndUnknownTags(void);
+TGTestOutcome TGFlattenPremiumTestFeatureTitleIsLocalizedNotHumanized(void);
+TGTestOutcome TGFlattenPremiumTestBusinessAndLimitTitlesAreLocalized(void);
+TGTestOutcome TGFlattenPremiumTestUnknownTitleTagFallsBackToHumanize(void);
+TGTestOutcome TGFlattenPremiumTestSubtitlesCoverEveryUnsupportedFeature(void);
+
+#endif

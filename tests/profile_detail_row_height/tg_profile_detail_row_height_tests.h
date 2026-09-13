@@ -1,0 +1,10 @@
+#ifndef TG_HOST_TESTS_PROFILE_DETAIL_ROW_HEIGHT_TESTS_H
+#define TG_HOST_TESTS_PROFILE_DETAIL_ROW_HEIGHT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGProfileDetailRowHeightTestOneLineValueKeepsTheStandardRow(void);
+TGTestOutcome TGProfileDetailRowHeightTestALongValueGrowsTheRow(void);
+TGTestOutcome TGProfileDetailRowHeightTestNarrowTablesKeepAUsableValueColumn(void);
+
+#endif

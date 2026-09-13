@@ -1,0 +1,16 @@
+#ifndef TG_HOST_TESTS_BYTE_FORMAT_TESTS_H
+#define TG_HOST_TESTS_BYTE_FORMAT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGByteFormatTestZeroBytes(void);
+TGTestOutcome TGByteFormatTestSmallValueUnderKilobyte(void);
+TGTestOutcome TGByteFormatTestExactlyAtKilobyteBoundary(void);
+TGTestOutcome TGByteFormatTestMidRangeKilobytesRounds(void);
+TGTestOutcome TGByteFormatTestExactlyAtMegabyteBoundary(void);
+TGTestOutcome TGByteFormatTestMidRangeMegabytes(void);
+TGTestOutcome TGByteFormatTestExactlyAtGigabyteBoundary(void);
+TGTestOutcome TGByteFormatTestLargeGigabyteValue(void);
+TGTestOutcome TGByteFormatTestRoundingCrossesIntoNextUnit(void);
+
+#endif

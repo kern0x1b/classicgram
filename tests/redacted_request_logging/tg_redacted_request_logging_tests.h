@@ -1,0 +1,14 @@
+#ifndef TG_HOST_TESTS_REDACTED_REQUEST_LOGGING_TESTS_H
+#define TG_HOST_TESTS_REDACTED_REQUEST_LOGGING_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGRedactedRequestLoggingTestRedactsPlainPasswordField(void);
+TGTestOutcome TGRedactedRequestLoggingTestRedactsOldAndNewPasswordFields(void);
+TGTestOutcome TGRedactedRequestLoggingTestLeavesRequestWithoutPasswordFieldsUnchanged(void);
+TGTestOutcome TGRedactedRequestLoggingTestLeavesNonStringPasswordValueUnredacted(void);
+TGTestOutcome TGRedactedRequestLoggingTestDoesNotMutateTheOriginalRequest(void);
+TGTestOutcome TGRedactedRequestLoggingTestRedactsPasswordNestedInsideAPayloadDictionary(void);
+TGTestOutcome TGRedactedRequestLoggingTestRedactsMtprotoProxySecretField(void);
+
+#endif

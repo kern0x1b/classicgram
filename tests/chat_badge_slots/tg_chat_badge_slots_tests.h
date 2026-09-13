@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_CHAT_BADGE_SLOTS_TESTS_H
+#define TG_HOST_TESTS_CHAT_BADGE_SLOTS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGChatBadgeSlotsTestTheCounterKeepsItsOldPlace(void);
+TGTestOutcome TGChatBadgeSlotsTestAMentionSitsLeftOfTheCounter(void);
+TGTestOutcome TGChatBadgeSlotsTestAPinOnlyAppearsWhenNothingElseDoes(void);
+TGTestOutcome TGChatBadgeSlotsTestAReactionSitsLeftOfTheMention(void);
+
+#endif
