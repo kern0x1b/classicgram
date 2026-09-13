@@ -25,7 +25,7 @@ endorsed by, or in any way connected to Telegram FZ-LLC or Telegram Messenger In
 | | |
 |---|---|
 | **Primary target** | armv7 (32-bit), iOS 6.0 and later — `make` |
-| **Second target** | arm64, iOS 7 through 12.5.7 — source-compatible, not wired into the Theos build yet |
+| **Second target** | arm64, iOS 7 through 12.5.7 — built into the same fat binary (`ARCHS = armv7 arm64`) |
 | **Toolchain ceiling** | iOS 6 SDK only — nothing from a later SDK is available at compile time |
 
 The armv7 slice is the one the project is written for and the one that gets exercised on real
@@ -34,8 +34,8 @@ models Telegram itself supported, but nothing in the code is specific to them. A
 that runs iOS 6 is a target, and the layout derives every width from the view rather than assuming
 a screen size.
 
-The arm64 slice compiles and links. Whether it has been run on 64-bit hardware depends on who is
-reading this — treat it as a build target you are welcome to test, not as a verified one.
+The arm64 slice is built into the same fat binary as armv7 and links, but it has not been exercised
+on 64-bit hardware — treat it as a build target you are welcome to test, not as a verified one.
 
 A jailbreak is required to install either slice; see [Installing on a device](#installing-on-a-device).
 The build self-signs with `ldid`, so no paid developer account and no App Store distribution is
@@ -53,10 +53,10 @@ itself is capable of:
   sideloaded build can never be handed a token their servers will push to — see the feature table.
   Notifications work, but only while the process is alive.
 - iOS 6's system font stops at Unicode 6.0. Emoji added since then are drawn from a bitmap atlas
-  bundled with the app and composited through CoreText; an optional jailbreak tweak
-  two optional jailbreak packages, kept in their own repository at
-  [kern0x1b/ios6-emoji](https://github.com/kern0x1b/ios6-emoji), go further: one replaces the system emoji font so the whole device can
-  draw modern emoji, the other patches them into the system keyboard's hard-coded category list.
+  bundled with the app and composited through CoreText. Two optional jailbreak packages, kept in
+  their own repository at [kern0x1b/ios6-emoji](https://github.com/kern0x1b/ios6-emoji), go further:
+  one replaces the system emoji font so the whole device can draw modern emoji, the other patches
+  them into the system keyboard's hard-coded category list.
 - No VideoToolbox framework — it arrived in iOS 8 — so video calling falls back to the vendored VP8
   software codec on both the encode and the decode side. That path is wired and reachable but has
   never been measured on an A5; the feature table says so rather than promising it works.
@@ -235,13 +235,13 @@ usually the SDK, the hardware, or a deliberate decision, never "not yet gotten t
 ## Building
 
 Toolchain: a Mac with a current Xcode, plus a legacy `iPhoneOS` SDK snapshot for the armv7 slice,
-fetched by a helper script below (current Xcode no longer ships an armv7 `libSystem` stub). No
-Xcode project exists — the Makefile is the entire build.
+fetched by a helper script below (current Xcode no longer ships an armv7 `libSystem` stub). The
+build is a [Theos](https://theos.dev) application project driven through `make`; no Xcode project exists.
 
 ```bash
 brew install cmake gperf ccache
 git clone --recursive <this repository>
-cd iTgLegacy
+cd telegram-classic
 ```
 
 Before building for real use, register your own Telegram API credentials at
@@ -273,8 +273,9 @@ make package FINALPACKAGE=1       # the same, wrapped as a .deb under packages/
 `make stage` assembles the bundle under `.theos/_/Applications/Telegram.app` without packaging it,
 and that is the path to copy onto a device. `make clean` removes `.theos/` and `packages/`.
 
-The arm64 slice still compiles as source but is not wired into this build; the Theos makefile
-targets armv7 only, which is the hardware the project exists for.
+The build produces a fat binary for both armv7 and arm64 (`ARCHS = armv7 arm64` in the makefile);
+armv7 is the slice the project is written for and the only one exercised on hardware. `machofix`
+repairs the armv7 slice inside the fat binary after the link.
 
 `DEBUG_HARNESS=1 make` additionally compiles in a `telegramdev://` URL-scheme debug harness
 (screenshot capture, memory/stack probes, synthetic taps and scrolls — see
@@ -331,7 +332,7 @@ Four further pieces are optional, not part of the app binary itself, each instal
 ## Repository layout
 
 ```
-iTgLegacy/
+telegram-classic/
 ├── Makefile              # the entire build — there is no Xcode project
 ├── src/                  # everything that compiles into Telegram Classic.app
 │   ├── App/               # application lifecycle, root view controllers, TGCoordinator (navigation seam)
