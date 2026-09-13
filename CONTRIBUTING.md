@@ -48,9 +48,7 @@ a test, a screenshot or a commit.
 - The message explains *why*, since the code may not: what was wrong, what the fix does, and how you
   verified it on hardware or in tests.
 - Say which device and iOS version you tested on, or say plainly that you could not test on hardware.
-- Screenshots for anything that changes the interface. Take them against Telegram's test servers
-  (`TG_TEST_DC=1`, see the README) rather than your own account, so no real conversation ends up in
-  a public image.
+- Screenshots for anything that changes the interface.
 
 ## Reporting a bug
 

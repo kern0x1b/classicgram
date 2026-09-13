@@ -645,7 +645,6 @@ src/TDLibClient/TGRequestExpiry.m
 src/TDLibClient/TGResultIsError.m
 src/TDLibClient/TGRightsDiff.m
 src/TDLibClient/TGStorageCachePolicyLimits.m
-src/TDLibClient/TGTestDCMode.m
 src/Theme/TGGroupedCaption.m
 src/Theme/TGGroupedMetrics.m
 src/Theme/TGHexColour.m

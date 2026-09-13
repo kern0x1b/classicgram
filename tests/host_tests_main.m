@@ -117,7 +117,6 @@ static void TGInstallFatalSignalReporting(void) {
 #import "owned_set_page_merge/tg_owned_set_page_merge_tests.h"
 #import "preference_flags/tg_preference_flags_tests.h"
 #import "internal_link_username/tg_internal_link_username_tests.h"
-#import "test_dc/tg_test_dc_tests.h"
 #import "plain_emoji_text/tg_plain_emoji_text_tests.h"
 #import "single_line_preview/tg_single_line_preview_tests.h"
 #import "story_paging/tg_story_paging_tests.h"
@@ -1275,9 +1274,6 @@ int main(void) {
 				TGPreferenceFlagsTestStickerFlagsDefaultOn},
 			{"internal_link_username_reads_public_chat_links",
 				TGInternalLinkUsernameTestReadsPublicChatLinks},
-			{"test_dc_reads_the_flag", TGTestDCTestReadsTheFlag},
-			{"test_dc_keeps_the_real_account_separate",
-				TGTestDCTestKeepsTheRealAccountSeparate},
 			{"plain_emoji_text_drops_what_the_system_cannot_draw",
 				TGPlainEmojiTextTestDropsWhatTheSystemCannotDraw},
 			{"item_builders_search_result_splits_a_contact_name",

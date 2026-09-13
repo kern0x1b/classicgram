@@ -22,7 +22,6 @@
 #import "AppDelegate+I18nDump.h"
 #import "TGPasscodeLock.h"
 #import "TGVisibleAlerts.h"
-#import "TGTestDCMode.h"
 #import "TGFrameTimeLogger.h"
 #import "TGChatLayoutBridge.h"
 
@@ -123,7 +122,7 @@ static NSString *const TGHarnessCommandPath = @"/tmp/tgcmd";
 		@"i18n", @"mem", @"bgstatus", @"memflush", @"lazyframeworks",
 		@"launchimage", @"regions", @"captureframes", @"perflog",
 		@"bridgecounts", @"stacks", @"stacksatlaunch",
-		@"phone", @"code", @"password", @"testdc", @"tdlog",
+		@"phone", @"code", @"password", @"tdlog",
 	];
 	if (![harnessCommandsExemptFromPasscodeLock containsObject:host ?: @""] &&
 		[[TGPasscodeLock shared] isLocked])
@@ -443,15 +442,6 @@ static NSString *const TGHarnessCommandPath = @"/tmp/tgcmd";
 			}
 			[top performSelector:selector withObject:buttons[scope]];
 		});
-		return YES;
-	}
-
-	if ([host isEqualToString:@"testdc"]) {
-		BOOL wanted = [arg isEqualToString:@"on"];
-		BOOL already = TGTestDCEnabled() == wanted;
-		TGSetTestDCEnabled(wanted);
-		NSLog(@"testdc %@%@", wanted ? @"on" : @"off",
-			already ? @" (unchanged)" : @" - relaunch to apply");
 		return YES;
 	}
 

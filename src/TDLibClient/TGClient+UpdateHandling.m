@@ -3,7 +3,6 @@
 #import "TGUserDisplayName.h"
 #import "TGRequestExpiry.h"
 #import "TGClient+Private.h"
-#import "TGTestDCMode.h"
 #import "TGAuthErrorMessage.h"
 #import "TGFlattenAccount.h"
 #import "TGServiceNotificationAlert.h"
@@ -1504,11 +1503,8 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 }
 
 - (void)sendTdlibParameters {
-	BOOL testDC = TGTestDCEnabled();
-	NSString *accountScope = [TGAccountManager scopeForSlot:[TGAccountManager shared].currentSlot];
-	NSString *scope = testDC ? TGTestDCScopeForScope(accountScope) : accountScope;
-	NSString *db = testDC ? [TGDiskCache databaseDirectoryForScope:scope]
-						  : [TGDiskCache databaseDirectory];
+	NSString *scope = [TGAccountManager scopeForSlot:[TGAccountManager shared].currentSlot];
+	NSString *db = [TGDiskCache databaseDirectory];
 
 	int SETUP_API_ID(apiId) char *SETUP_API_HASH(apiHash)
 
@@ -1528,8 +1524,6 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 	parameters[@"use_chat_info_database"] = @(cachesEnabled);
 	parameters[@"use_message_database"] = @(cachesEnabled);
 	parameters[@"use_secret_chats"] = @YES;
-	if (testDC)
-		parameters[@"use_test_dc"] = @YES;
 	parameters[@"api_id"] = @(apiId);
 	parameters[@"api_hash"] = [NSString stringWithUTF8String:apiHash];
 	parameters[@"system_language_code"] = @"en";

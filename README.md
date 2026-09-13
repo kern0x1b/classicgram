@@ -328,24 +328,6 @@ Four further pieces are optional, not part of the app binary itself, each instal
   the app switcher or killed by jetsam, so backgrounded notifications keep arriving; see
   `daemon/relaunch/README.md` and `daemon/relaunch/install.sh`.
 
-## Screenshots without a real account
-
-Screenshots, a bug report or a look at the interface should never need somebody's own chats. The
-client can talk to Telegram's **test servers** instead of the production ones: same protocol, same
-code path, a separate account and a separate database, and nothing in this repository pretending to
-be a server.
-
-Switch it on one of three ways — an environment variable when launching from a shell
-(`TG_TEST_DC=1`), the `TGUseTestDC` user default, or an empty marker file at
-`Library/Preferences/TGUseTestDC` on a device with no shell environment to set. The test session
-keeps its own database scope, so the production account on the same device is untouched and still
-there when you switch back.
-
-Log in with one of Telegram's reserved test numbers (`+99966XXXXX`); the confirmation code is the
-data-centre digit repeated, and no SMS is involved. Everything the client can do — sending, media,
-stickers, calls — works against that account, so a screenshot shows the real app rather than a
-mock-up.
-
 ## Repository layout
 
 ```

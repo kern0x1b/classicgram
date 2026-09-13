@@ -14,7 +14,7 @@
 
 ## Interface changes
 
-<!-- Screenshots, before and after. Take them on the test servers (TG_TEST_DC=1), not a real account. -->
+<!-- Screenshots, before and after. -->
 
 ## Checklist
 
