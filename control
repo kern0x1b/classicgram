@@ -1,11 +1,12 @@
 Package: com.kern0x1b.telegram
-Name: Telegram Classic
-Version: 1.16.48
+Name: Classicgram
+Version: 1.0
 Architecture: iphoneos-arm
-Description: A Telegram client for 32-bit armv7 iPhones and iPads on iOS 6, wearing the 2013 interface.
+Description: An unofficial Telegram client for 32-bit armv7 iPhones and iPads on iOS 6, wearing the 2013 interface. Uses the Telegram API and is part of the Telegram ecosystem; not affiliated with or endorsed by Telegram FZ-LLC.
 Maintainer: kern0x1b
 Author: kern0x1b
 Section: Social
 Depends: firmware (>= 6.0)
-Icon: file:///Applications/Telegram.app/Icon.png
+Depiction: https://kern0x1b.github.io/cydia/depictions/classicgram.html
+Icon: https://kern0x1b.github.io/cydia/icons/classicgram.png
 Homepage: https://github.com/kern0x1b/telegram-classic

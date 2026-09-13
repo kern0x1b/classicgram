@@ -4,7 +4,7 @@ TARGET := iphone:clang:9.3:6.0
 ARCHS := armv7 arm64
 INSTALL_TARGET_PROCESSES = Telegram
 
-PACKAGE_VERSION ?= 1.16.48
+PACKAGE_VERSION ?= 1.0
 
 SYSROOT ?= $(CURDIR)/build/sdks/iPhoneOS12.4.sdk
 ifeq ($(wildcard $(SYSROOT)),)
