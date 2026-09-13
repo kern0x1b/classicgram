@@ -4,7 +4,7 @@ TARGET := iphone:clang:9.3:6.0
 ARCHS := armv7 arm64
 INSTALL_TARGET_PROCESSES = Telegram
 
-PACKAGE_VERSION ?= 1.0.1
+PACKAGE_VERSION ?= 1.0.2
 
 SYSROOT ?= $(CURDIR)/build/sdks/iPhoneOS12.4.sdk
 ifeq ($(wildcard $(SYSROOT)),)
@@ -116,6 +116,11 @@ before-all::
 after-stage::
 	@cp -f $(ROOT)/src/Resources/Info.plist $(BUNDLE)/Info.plist
 	@cp -rf $(ROOT)/src/Resources/images/* $(BUNDLE)/
+	@if [ -d $(ROOT)/src/Resources/AppIcon ]; then \
+		cp -f $(ROOT)/src/Resources/AppIcon/*.png $(BUNDLE)/; \
+		/usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName Telegram" $(BUNDLE)/Info.plist; \
+		/usr/libexec/PlistBuddy -c "Set :CFBundleName Telegram" $(BUNDLE)/Info.plist; \
+	fi
 	@cp -rf $(ROOT)/src/Resources/Localization/*.lproj $(BUNDLE)/
 	@if [ -f $(ROOT)/build/armv7/tdlib/lib/libtdjson.dylib ] && \
 		[ -f $(ROOT)/build/arm64/tdlib/lib/libtdjson.dylib ]; then \
