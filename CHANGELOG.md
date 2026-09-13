@@ -5,6 +5,13 @@ All notable changes to this project are documented here. The format follows
 publish versioned releases, so changes are grouped under **Unreleased** and dated
 when they land on `main`.
 
+## [1.0.1] - 2026-09-14
+
+Redraw the app icon in a period-correct iOS 6 skeuomorphic style: a saturated
+vertical blue gradient, an embossed white speech-bubble "C" with a drop shadow,
+edge vignetting, and a baked-in glossy top-half sheen (painted in, not left to
+the system). No functional changes.
+
 ## [1.0] - 2026-09-13
 
 First public release as **Classicgram**, an unofficial Telegram client, distributed as a
