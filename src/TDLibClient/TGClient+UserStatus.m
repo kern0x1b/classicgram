@@ -583,14 +583,15 @@ static NSMutableDictionary *TGUSOnlineCache(void) {
 		   completion:(void (^)(NSDictionary *))completion {
 	if (!completion)
 		return;
-	NSDictionary *empty = @{@"isVerified" : @NO, @"isScam" : @NO, @"isFake" : @NO};
+	NSDictionary *empty = @{@"isVerified" : @NO, @"isScam" : @NO, @"isFake" : @NO, @"isPremium" : @NO};
 	__weak typeof(self) weakSelf = self;
 
-	void (^answer)(NSDictionary *) = ^(NSDictionary *verification) {
+	void (^answer)(NSDictionary *, BOOL) = ^(NSDictionary *verification, BOOL isPremium) {
 		completion(@{
 			@"isVerified" : @([TGUSDict(verification)[@"is_verified"] boolValue]),
 			@"isScam" : @([TGUSDict(verification)[@"is_scam"] boolValue]),
 			@"isFake" : @([TGUSDict(verification)[@"is_fake"] boolValue]),
+			@"isPremium" : @(isPremium),
 		});
 	};
 
@@ -607,7 +608,7 @@ static NSMutableDictionary *TGUSOnlineCache(void) {
 				[weakSelf request:@{@"@type" : @"getSupergroup",
 					@"supergroup_id" : type[@"supergroup_id"] ?: @(0)}
 					completion:^(NSDictionary *supergroup) {
-						answer(TGUSDict(TGUSDict(supergroup)[@"verification_status"]));
+						answer(TGUSDict(TGUSDict(supergroup)[@"verification_status"]), NO);
 					}];
 				return;
 			}
@@ -616,7 +617,9 @@ static NSMutableDictionary *TGUSOnlineCache(void) {
 				[weakSelf request:@{@"@type" : @"getUser",
 					@"user_id" : type[@"user_id"] ?: @(0)}
 					completion:^(NSDictionary *user) {
-						answer(TGUSDict(TGUSDict(user)[@"verification_status"]));
+						NSDictionary *userDict = TGUSDict(user);
+						answer(TGUSDict(userDict[@"verification_status"]),
+							[userDict[@"is_premium"] boolValue]);
 					}];
 				return;
 			}

@@ -127,6 +127,7 @@ src/Screens/Chat/TGChatRowText.m
 src/Screens/Chat/TGChatThemeViewController.m
 src/Screens/Chat/TGChatTitleCredibility.m
 src/Screens/Chat/TGChatTitleMute.m
+src/Screens/Chat/TGChatTitlePremium.m
 src/Screens/Chat/TGChatUpgradeMarkerFilter.m
 src/Screens/Chat/TGChatViewController+ActionHandlers.m
 src/Screens/Chat/TGChatViewController+Albums.m

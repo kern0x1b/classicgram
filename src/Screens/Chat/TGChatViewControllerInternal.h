@@ -493,6 +493,7 @@ BOOL TGChatIsPad(void);
 @property (nonatomic, assign) BOOL channelMuted;
 @property (nonatomic, strong) UIImageView *titleMuteIcon;
 @property (nonatomic, strong) UILabel *titleCredibilityLabel;
+@property (nonatomic, strong) UIImageView *titlePremiumIcon;
 @property (nonatomic, strong) UIView *channelActionBarView;
 @property (nonatomic, strong) NSString *secretChatBlockedStatusText;
 @property (nonatomic, assign) BOOL selecting;

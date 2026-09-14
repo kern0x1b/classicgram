@@ -142,6 +142,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "push_extra_line/tg_push_extra_line_tests.h"
 #import "service_notification_alert/tg_service_notification_alert_tests.h"
 #import "chat_title_credibility/tg_chat_title_credibility_tests.h"
+#import "chat_title_premium/tg_chat_title_premium_tests.h"
 #import "bubble_reuse_identifier/tg_bubble_reuse_identifier_tests.h"
 #import "quote_body_text/tg_quote_body_text_tests.h"
 #import "disappearing_media/tg_disappearing_media_tests.h"
@@ -1380,6 +1381,10 @@ int main(void) {
 					TGChatTitleCredibilityTestTheMarkTheHeaderShows},
 			{"chat_title_credibility_the_mark_sits_after_the_name",
 					TGChatTitleCredibilityTestTheMarkSitsAfterTheName},
+			{"chat_title_premium_who_gets_the_star",
+					TGChatTitlePremiumTestWhoGetsTheStar},
+			{"chat_title_premium_the_star_sits_after_the_name",
+					TGChatTitlePremiumTestTheStarSitsAfterTheName},
 			{"bubble_reuse_identifier_every_kind_lands_on_its_own_cell",
 					TGBubbleReuseIdentifierTestEveryKindLandsOnItsOwnCell},
 			{"bubble_reuse_identifier_burning_media_keeps_its_label",

@@ -3,6 +3,7 @@
 #import "TGChatViewController.h"
 #import "TGChatTitleMute.h"
 #import "TGChatTitleCredibility.h"
+#import "TGChatTitlePremium.h"
 #import "TGContactsService.h"
 #import "TGChatViewControllerInternal.h"
 #import "TGClient.h"
@@ -74,6 +75,12 @@ static int64_t TGChatHeaderStatusUserId(TGChatViewController *chat) {
 	credibility.hidden = YES;
 	[header addSubview:credibility];
 	self.titleCredibilityLabel = credibility;
+
+	UIImageView *premium = [[UIImageView alloc]
+		initWithImage:[UIImage imageNamed:@"tgpremiumicon.png"]];
+	premium.hidden = YES;
+	[header addSubview:premium];
+	self.titlePremiumIcon = premium;
 
 	header.userInteractionEnabled = YES;
 	[header addGestureRecognizer:[[UITapGestureRecognizer alloc]
@@ -434,6 +441,8 @@ static int64_t TGChatHeaderStatusUserId(TGChatViewController *chat) {
 			? [UIColor whiteColor]
 			: [UIColor colorWithRed:0xe0 / 255.0f green:0xee / 255.0f blue:0xfd / 255.0f
 							  alpha:1.0f];
+		strongSelf.titlePremiumIcon.hidden =
+			!(strongSelf.titlePremiumIcon.image && TGChatTitleShowsPremium(badges));
 		[strongSelf layoutTitleView];
 	}];
 }
@@ -572,14 +581,18 @@ static int64_t TGChatHeaderStatusUserId(TGChatViewController *chat) {
 	markSize.height = ceilf(markSize.height);
 	CGFloat markRoom = TGChatTitleCredibilityRoom(markSize.width);
 
+	BOOL hasPremium = !self.titlePremiumIcon.hidden && self.titlePremiumIcon.image;
+	CGSize premiumSize = hasPremium ? self.titlePremiumIcon.image.size : CGSizeZero;
+	CGFloat premiumRoom = hasPremium ? TGChatTitlePremiumRoom(premiumSize.width) : 0.0f;
+
 	BOOL muted = self.chatId != 0 && [[TGClient shared] isChatMuted:self.chatId];
 	CGSize muteSize = self.titleMuteIcon.image ? self.titleMuteIcon.image.size : CGSizeZero;
 	CGFloat muteRoom = muted ? muteSize.width + kTGChatTitleMuteIconGap : 0.0f;
-	if (muted || markRoom > 0.0f)
+	if (muted || markRoom > 0.0f || premiumRoom > 0.0f)
 		width = TGChatTitleWidthWithMuteIcon(width, muteSize.width * (muted ? 1.0f : 0.0f) +
-			markRoom, maxWidth);
+			markRoom + premiumRoom, maxWidth);
 
-	self.titleHeader.frame = CGRectMake(0, 0, width + muteRoom + markRoom, height);
+	self.titleHeader.frame = CGRectMake(0, 0, width + muteRoom + markRoom + premiumRoom, height);
 	CGFloat nameY = statusText.length ? 0 : 1;
 	self.titleNameLabel.frame = CGRectMake(0, nameY, width, 21);
 	self.titleStatusLabel.frame = CGRectMake(0, height - 15 - 3 + retinaPixel, width, 15);
@@ -588,10 +601,14 @@ static int64_t TGChatHeaderStatusUserId(TGChatViewController *chat) {
 		self.titleCredibilityLabel.frame = TGChatTitleCredibilityFrame(width, ceilf(nameWidth),
 			markSize, nameY);
 
+	if (hasPremium)
+		self.titlePremiumIcon.frame = TGChatTitlePremiumFrame(width,
+			ceilf(nameWidth) + markRoom, premiumSize, nameY);
+
 	self.titleMuteIcon.hidden = !muted;
 	if (muted)
 		self.titleMuteIcon.frame = TGChatTitleMuteIconFrame(width,
-			ceilf(nameWidth) + markRoom, muteSize, nameY);
+			ceilf(nameWidth) + markRoom + premiumRoom, muteSize, nameY);
 
 	[self.titleHeader.superview setNeedsLayout];
 	[self.navigationController.navigationBar setNeedsLayout];
