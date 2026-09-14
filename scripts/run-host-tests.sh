@@ -87,7 +87,7 @@ pure_app_sources=(
 	"$repo_root/src/Theme/TGGroupedMetrics.m"
 	"$repo_root/src/Screens/Chat/TGChatTitleMute.m"
 	"$repo_root/src/Screens/Chat/TGChatTitleCredibility.m"
-	"$repo_root/src/Screens/Chat/TGChatTitlePremium.m"
+	"$repo_root/src/Views/TGChatTitlePremium.m"
 	"$repo_root/src/Screens/Chat/TGBubbleReuseIdentifier.m"
 	"$repo_root/src/Screens/Chat/TGQuoteBodyText.m"
 	"$repo_root/src/Screens/Chat/TGSelectionActionAvailability.m"

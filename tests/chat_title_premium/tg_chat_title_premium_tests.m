@@ -1,5 +1,5 @@
 #import "tg_chat_title_premium_tests.h"
-#import "../../src/Screens/Chat/TGChatTitlePremium.h"
+#import "../../src/Views/TGChatTitlePremium.h"
 
 TGTestOutcome TGChatTitlePremiumTestWhoGetsTheStar(void) {
 	TGTestOutcome outcome = TGTestOutcomeZero;

@@ -4,6 +4,7 @@
 #import "TGSwipeGestureRecognizer.h"
 #import "TGChatListHelpers.h"
 #import "TGChatBadgeSlots.h"
+#import "TGChatTitlePremium.h"
 
 static const CGFloat kPendingSide = 12.0f;
 static const CGFloat kErrorBadgeWidth = 26.0f;
@@ -151,6 +152,10 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 	self.muteIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"DialogList_Muted.png"]];
 	self.muteIcon.hidden = YES;
 	[self.contentView addSubview:self.muteIcon];
+
+	self.premiumIcon = [[UIImageView alloc] initWithImage:TGChatTitlePremiumImage()];
+	self.premiumIcon.hidden = YES;
+	[self.contentView addSubview:self.premiumIcon];
 
 	self.pendingIndicator = [[UIImageView alloc]
 		   initWithImage:[UIImage imageNamed:@"DialogListPending.png"]
@@ -524,6 +529,8 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 	CGFloat titleWidth = (int)(dateX - 4 - left - 18) - iconWidth;
 	if (!self.muteIcon.hidden)
 		titleWidth -= 12;
+	CGFloat premiumWidth = self.premiumIcon.hidden ? 0 : kTGChatTitlePremiumSide + 4;
+	titleWidth -= premiumWidth;
 	CGFloat tagWidth = 0;
 	if (!self.folderTag.hidden) {
 		CGFloat tagTextWidth = ceilf([self.folderTag.text sizeWithFont:self.folderTag.font].width);
@@ -538,6 +545,13 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 		CGRectMake(titleX, 6, titleWidth, titleHeight), w);
 
 	CGFloat afterTitleX = titleX + titleWidth;
+	if (!self.premiumIcon.hidden) {
+		CGRect premiumFrame = CGRectMake(afterTitleX + 4,
+			6 + (titleHeight - kTGChatTitlePremiumSide) / 2,
+			kTGChatTitlePremiumSide, kTGChatTitlePremiumSide);
+		self.premiumIcon.frame = TGLocalizedMirroredRect(premiumFrame, w);
+		afterTitleX += premiumWidth;
+	}
 	if (!self.folderTag.hidden) {
 		self.folderTag.frame = TGLocalizedMirroredRect(
 			CGRectMake(afterTitleX + 6, 8, tagWidth, 16), w);

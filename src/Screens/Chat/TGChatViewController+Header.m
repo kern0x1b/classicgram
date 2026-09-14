@@ -77,7 +77,7 @@ static int64_t TGChatHeaderStatusUserId(TGChatViewController *chat) {
 	self.titleCredibilityLabel = credibility;
 
 	UIImageView *premium = [[UIImageView alloc]
-		initWithImage:[UIImage imageNamed:@"tgpremiumicon.png"]];
+		initWithImage:TGChatTitlePremiumImage()];
 	premium.hidden = YES;
 	[header addSubview:premium];
 	self.titlePremiumIcon = premium;

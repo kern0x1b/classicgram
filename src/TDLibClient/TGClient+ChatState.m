@@ -159,6 +159,13 @@ NSString *const TGChatProtectedContentDidChangeNotification =
 	return self.chatsById[@(chatId)];
 }
 
+- (BOOL)cachedPremiumForChatId:(int64_t)chatId {
+	NSDictionary *info = self.chatsById[@(chatId)];
+	if (![info[@"isPrivate"] boolValue])
+		return NO;
+	return [self.userRecordsById[@(chatId)][@"is_premium"] boolValue];
+}
+
 - (void)photoFileIdForChat:(int64_t)chatId completion:(void (^)(NSNumber *))completion {
 	NSNumber *known = [self photoFileIdForChat:chatId];
 	if (known && known.longLongValue > 0) {

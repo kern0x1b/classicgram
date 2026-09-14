@@ -97,6 +97,7 @@
 	cell.pendingIndicator.hidden = YES;
 	cell.errorBadge.hidden = YES;
 	cell.groupIcon.hidden = YES;
+	cell.premiumIcon.hidden = YES;
 	cell.folderTag.hidden = YES;
 	cell.pin.hidden = YES;
 	cell.mentionBadge.hidden = YES;
@@ -235,6 +236,7 @@
 
 	cell.muteIcon.hidden = ![c[@"isMuted"] boolValue];
 	cell.groupIcon.hidden = ![c[@"isGroup"] boolValue];
+	cell.premiumIcon.hidden = ![[TGClient shared] cachedPremiumForChatId:[c[@"id"] longLongValue]];
 
 	NSDictionary *tag = [[TGClient shared] primaryFolderTagForChatId:[c[@"id"] longLongValue]];
 	if (tag) {

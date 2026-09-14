@@ -20,6 +20,7 @@
 @property (nonatomic, strong) UIImageView *pendingIndicator;
 @property (nonatomic, strong) UIImageView *errorBadge;
 @property (nonatomic, strong) UIImageView *groupIcon;
+@property (nonatomic, strong) UIImageView *premiumIcon;
 @property (nonatomic, strong) UILabel *folderTag;
 
 @property (nonatomic, assign) long long chatId;
