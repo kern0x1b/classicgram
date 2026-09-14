@@ -1,4 +1,5 @@
 #import "TGClient+ChatManagement.h"
+#import "TGClient+ChatState.h"
 #import "TGGroupMembersViewController.h"
 #import "TGActionSheetIndexBuilder.h"
 #import "TGActionSheet.h"
@@ -304,8 +305,18 @@
 		int64_t userId = TGMembersUserId(member);
 		return userId != 0 ? [NSNumber numberWithLongLong:userId] : nil;
 	};
-	self.avatarPrefetcher.fileIdProvider = ^NSNumber *(int64_t userId) {
-		return [[TGClient shared] photoFileIdForUserId:userId];
+	self.avatarPrefetcher.fileIdProvider = ^NSNumber *(int64_t memberId) {
+		TGGroupMembersViewController *strongSelf = weakSelf;
+		for (NSDictionary *member in [strongSelf rows]) {
+			if (![member isKindOfClass:NSDictionary.class])
+				continue;
+			if (TGMembersUserId(member) != memberId)
+				continue;
+			if ([member[@"isChat"] boolValue])
+				return [[TGClient shared] photoFileIdForChat:memberId];
+			break;
+		}
+		return [[TGClient shared] photoFileIdForUserId:memberId];
 	};
 	self.avatarPrefetcher.downloadProvider = ^(int64_t fileId, void (^completion)(NSString *path)) {
 		[[TGClient shared] downloadFile:fileId completion:completion];
