@@ -145,6 +145,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "chat_title_premium/tg_chat_title_premium_tests.h"
 #import "sender_name_colour/tg_sender_name_colour_tests.h"
 #import "bot_admin_rights/tg_bot_admin_rights_tests.h"
+#import "story_audience/tg_story_audience_tests.h"
 #import "paid_reactors/tg_paid_reactors_tests.h"
 #import "vcard/tg_vcard_tests.h"
 #import "business_open_state/tg_business_open_state_tests.h"
@@ -1395,6 +1396,9 @@ int main(void) {
 					TGSenderNameColourTestTheColourEachSenderKeeps},
 			{"sender_name_colour_a_chosen_colour_wins",
 					TGSenderNameColourTestAChosenColourWins},
+			{"story_audience_who_can_be_left_out", TGStoryAudienceTestWhoCanBeLeftOut},
+			{"story_audience_what_survives_a_change_of_audience",
+					TGStoryAudienceTestWhatSurvivesAChangeOfAudience},
 			{"bot_admin_rights_when_a_link_asks_for_rights",
 					TGBotAdminRightsTestWhenALinkAsksForRights},
 			{"bot_admin_rights_what_the_request_carries",

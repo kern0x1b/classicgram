@@ -1,3 +1,4 @@
+#import "TGStoryAudience.h"
 #import "TGTextFieldStyle.h"
 #import "TGGroupedCaption.h"
 #import "TGListBackground.h"
@@ -97,8 +98,12 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 	[sections addObject:[NSArray arrayWithObject:@"caption"]];
 	if (self.chatTitle.length > 0)
 		[sections addObject:[NSArray arrayWithObject:@"chat"]];
-	if (self.showsPrivacy)
-		[sections addObject:[NSArray arrayWithObject:@"privacy"]];
+	if (self.showsPrivacy) {
+		NSMutableArray *privacyRows = [NSMutableArray arrayWithObject:@"privacy"];
+		if (TGStoryAudienceAllowsExceptions(self.privacy))
+			[privacyRows addObject:@"privacyExcept"];
+		[sections addObject:[privacyRows copy]];
+	}
 	[sections addObject:[NSArray arrayWithObject:@"period"]];
 	[sections addObject:[NSArray arrayWithObject:@"areas"]];
 	[sections addObject:[NSArray arrayWithObject:@"page"]];
@@ -243,9 +248,11 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 							 return;
 						 NSString *chosen = [values objectAtIndex:index];
 						 if (![chosen isEqualToString:@"selected"]) {
+							 NSArray *kept = TGStoryAudienceExceptionsAfterChange(strongSelf.privacy,
+								 chosen, strongSelf.userIds);
 							 strongSelf.privacy = chosen;
-							 strongSelf.userIds = nil;
-							 [strongSelf->_tableView reloadData];
+							 strongSelf.userIds = kept;
+							 [strongSelf rebuildSections];
 							 return;
 						 }
 						 [TGStoryContactPicker presentFrom:strongSelf
@@ -257,11 +264,25 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 															return;
 														innerSelf.privacy = @"selected";
 														innerSelf.userIds = userIds;
-														[innerSelf->_tableView reloadData];
+														[innerSelf rebuildSections];
 													}];
 					 }
 						  target:self];
 	[sheet tg_showFromRect:CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds), 1, 1) inView:self.view];
+}
+
+- (void)changePrivacyExceptions {
+	__weak TGStoryPostOptions *weakSelf = self;
+	[TGStoryContactPicker presentFrom:self
+								title:TGL(@"Story.Privacy.HideFrom", @"Hide From")
+						  preselected:self.userIds
+							   picked:^(NSArray *userIds) {
+								   TGStoryPostOptions *strongSelf = weakSelf;
+								   if (strongSelf == nil)
+									   return;
+								   strongSelf.userIds = userIds.count ? userIds : nil;
+								   [strongSelf rebuildSections];
+							   }];
 }
 
 - (void)changePeriod {
@@ -431,6 +452,12 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 		cell.detailTextLabel.text = [self.privacy isEqualToString:@"selected"]
 			? TGLPlural(@"Story.ContextPrivacy.LabelOnlySelected", (NSInteger)self.userIds.count, @"%@ Person", @"%@ People")
 			: TGStoryPrivacyTitle(self.privacy);
+	} else if ([kind isEqualToString:@"privacyExcept"]) {
+		cell.textLabel.text = TGL(@"Story.Privacy.HideFrom", @"Hide From");
+		cell.detailTextLabel.text = self.userIds.count
+			? TGLPlural(@"Story.ContextPrivacy.LabelOnlySelected", (NSInteger)self.userIds.count,
+				  @"%@ Person", @"%@ People")
+			: TGL(@"GroupInfo.SharedMediaNone", @"None");
 	} else if ([kind isEqualToString:@"areas"]) {
 		cell.textLabel.text = TGL(@"Story.Areas.Title", @"Add to Your Story");
 		cell.detailTextLabel.text = self.areas.count
@@ -450,6 +477,10 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 	NSString *kind = [self kindAt:indexPath];
 	if ([kind isEqualToString:@"privacy"]) {
 		[self changePrivacy];
+		return;
+	}
+	if ([kind isEqualToString:@"privacyExcept"]) {
+		[self changePrivacyExceptions];
 		return;
 	}
 	if ([kind isEqualToString:@"period"]) {

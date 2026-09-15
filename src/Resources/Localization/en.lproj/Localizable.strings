@@ -1763,6 +1763,7 @@ Tap on a sticker to view and add the whole set.";
 "Story.MessageReposted.Personal" = "Message reposted to your stories.";
 "Story.PostFailedToast" = "Could not post story";
 "Story.PostedToast" = "Story posted";
+"Story.Privacy.HideFrom" = "Hide From";
 "Story.Privacy.CategoryCloseFriends" = "Close Friends";
 "Story.Privacy.CategoryContacts" = "Contacts";
 "Story.Privacy.CategoryEveryone" = "Everyone";

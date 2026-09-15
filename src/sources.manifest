@@ -705,6 +705,7 @@ src/Utilities/TGSettingValueText.m
 src/Utilities/TGSingleLinePreview.m
 src/Utilities/TGSnackbar.m
 src/Utilities/TGStorageKindName.m
+src/Utilities/TGStoryAudience.m
 src/Utilities/TGStringTruncation.m
 src/Utilities/TGTextSelectionWordRange.m
 src/Utilities/TGTextWarmup.m
