@@ -10,6 +10,9 @@ SYSROOT ?= $(CURDIR)/build/sdks/iPhoneOS12.4.sdk
 ifeq ($(wildcard $(SYSROOT)),)
 SYSROOT := $(CURDIR)/build/sdks/iPhoneOS9.3.sdk
 endif
+ifeq ($(wildcard $(SYSROOT)),)
+$(error no iPhoneOS SDK under build/sdks - run scripts/fetch-ios-sdk.sh, or point SYSROOT at one)
+endif
 ISYSROOT := $(SYSROOT)
 
 include $(THEOS)/makefiles/common.mk
