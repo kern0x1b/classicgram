@@ -1,6 +1,7 @@
 #import "TGFloodWaitNotice.h"
 #import "TGFloodWaitText.h"
 #import "AppDelegate.h"
+#import "TGBotAddToChat.h"
 #import "TGFriendlyError.h"
 #import "TGVisibleAlerts.h"
 #import "AppDelegate+Private.h"
@@ -996,6 +997,15 @@ static void TGWatchForIncomingCalls(void) {
 	}];
 }
 
+- (void)showBotAddFailure:(NSString *)errorCode {
+	NSString *message = [errorCode isEqualToString:@"noChats"]
+		? TGL(@"Bot.AddToChatNoChats", @"You have no groups or channels to add this bot to.")
+		: TGFriendlyErrorText(errorCode, TGL(@"Login.UnknownError", @"An error occurred, please try again later."));
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[TGSnackbar showInView:self.window.rootViewController.view text:message seconds:3 onCommit:nil];
+	});
+}
+
 - (void)startPendingAppBotLink:(NSString *)link {
 	if (!link.length)
 		return;
@@ -1006,6 +1016,23 @@ static void TGWatchForIncomingCalls(void) {
 			return;
 		if (chatId) {
 			[strongSelf openChatFromNotification:chatId];
+			return;
+		}
+		if ([errorCode isEqualToString:@"pickChat"]) {
+			[TGBotAddToChat presentForLink:link
+							fromController:strongSelf.window.rootViewController
+								completion:^(int64_t addedChatId, NSString *addError) {
+									AppDelegate *delegate = weakSelf;
+									if (!delegate)
+										return;
+									if (addedChatId) {
+										[delegate openChatFromNotification:addedChatId];
+										return;
+									}
+									if (!addError.length || [addError isEqualToString:@"cancelled"])
+										return;
+									[delegate showBotAddFailure:addError];
+								}];
 			return;
 		}
 		if ([errorCode isEqualToString:@"unsupported"]) {

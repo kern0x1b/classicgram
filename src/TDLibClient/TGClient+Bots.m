@@ -1,3 +1,4 @@
+#import "TGBotAdminRights.h"
 #import "TGClient+ChatState.h"
 #import "TGMessageReply.h"
 #import "TGClient+Bots.h"
@@ -467,6 +468,12 @@ static NSNumber *TGBInt64(id value) {
 		}];
 }
 
+static NSDictionary *TGBotAdminRightsForRequest(NSDictionary *rights) {
+	NSMutableDictionary *out = [TGBotAdminRightsNormalised(rights) mutableCopy];
+	out[@"@type"] = @"chatAdministratorRights";
+	return [out copy];
+}
+
 #pragma mark - starting a bot
 
 - (void)startBot:(int64_t)botUserId
@@ -496,7 +503,8 @@ static NSNumber *TGBInt64(id value) {
 				return;
 			NSString *kind = TGBString(TGBDict(result)[@"@type"]);
 			BOOL inGroup = [kind isEqualToString:@"internalLinkTypeBotStartInGroup"];
-			if (!inGroup && ![kind isEqualToString:@"internalLinkTypeBotStart"]) {
+			BOOL inChannel = [kind isEqualToString:@"internalLinkTypeBotAddToChannel"];
+			if (!inGroup && !inChannel && ![kind isEqualToString:@"internalLinkTypeBotStart"]) {
 				completion(nil);
 				return;
 			}
@@ -505,8 +513,114 @@ static NSNumber *TGBInt64(id value) {
 				@"username" : TGBString(result[@"bot_username"]),
 				@"parameter" : TGBString(result[@"start_parameter"]),
 				@"inGroup" : inGroup ? @YES : @NO,
+				@"inChannel" : inChannel ? @YES : @NO,
+				@"administratorRights" : TGBDict(result[@"administrator_rights"]) ?: @{},
 				@"autostart" : autostart ? @YES : @NO,
 			});
+		}];
+}
+
+- (void)chatsAcceptingBots:(BOOL)channelsOnly
+				completion:(void (^)(NSArray *chats))completion {
+	if (!completion)
+		return;
+
+	NSMutableArray *out = [NSMutableArray array];
+	for (id key in self.chatsById) {
+		NSDictionary *chat = TGBDict(self.chatsById[key]);
+		NSDictionary *type = TGBDict(chat[@"type"]);
+		NSString *kind = TGBString(type[@"@type"]);
+		BOOL supergroup = [kind isEqualToString:@"chatTypeSupergroup"];
+		BOOL channel = supergroup && [TGBNumber(type[@"is_channel"]) boolValue];
+		BOOL basicGroup = [kind isEqualToString:@"chatTypeBasicGroup"];
+		if (channelsOnly ? !channel : !(basicGroup || (supergroup && !channel)))
+			continue;
+		int64_t chatId = [TGBNumber(chat[@"id"]) longLongValue];
+		if (chatId == 0)
+			continue;
+		[out addObject:@{@"chatId" : @(chatId), @"title" : TGBString(chat[@"title"])}];
+	}
+	[out sortUsingComparator:^NSComparisonResult(NSDictionary *left, NSDictionary *right) {
+		return [left[@"title"] localizedCaseInsensitiveCompare:right[@"title"]];
+	}];
+	completion([out copy]);
+}
+
+- (void)addBot:(int64_t)botUserId
+			toChat:(int64_t)chatId
+	administratorRights:(NSDictionary *)rights
+		 parameter:(NSString *)parameter
+		completion:(void (^)(int64_t, NSString *))completion {
+	if (botUserId == 0 || chatId == 0) {
+		if (completion)
+			completion(0, @"notFound");
+		return;
+	}
+
+	BOOL wantsRights = TGBotAdminRightsRequested(rights);
+	NSString *startParameter = parameter ?: @"";
+
+	void (^start)(int64_t) = ^(int64_t targetChatId) {
+		[self startBot:botUserId inChat:targetChatId parameter:startParameter
+			completion:^(BOOL ok, NSString *errorMessage) {
+				if (!completion)
+					return;
+				if (!ok) {
+					completion(0, errorMessage.length ? errorMessage : @"sendFailed");
+					return;
+				}
+				completion(targetChatId, nil);
+			}];
+	};
+
+	void (^promote)(int64_t) = ^(int64_t targetChatId) {
+		[self request:@{@"@type" : @"setChatMemberStatus",
+			@"chat_id" : @(targetChatId),
+			@"member_id" : @{@"@type" : @"messageSenderUser", @"user_id" : @(botUserId)},
+			@"status" : @{@"@type" : @"chatMemberStatusAdministrator",
+				@"can_be_edited" : @NO,
+				@"rights" : TGBotAdminRightsForRequest(rights)}}
+			completion:^(NSDictionary *result) {
+				if (TGResultIsError(result)) {
+					if (completion)
+						completion(0, TGResultErrorMessage(result));
+					return;
+				}
+				start(targetChatId);
+			}];
+	};
+
+	if (!wantsRights) {
+		[self request:@{@"@type" : @"addChatMember",
+			@"chat_id" : @(chatId),
+			@"user_id" : @(botUserId),
+			@"forward_limit" : @(0)}
+			completion:^(NSDictionary *result) {
+				if (TGResultIsError(result)) {
+					if (completion)
+						completion(0, TGResultErrorMessage(result));
+					return;
+				}
+				start(chatId);
+			}];
+		return;
+	}
+
+	NSString *chatKind = TGBString(TGBDict(TGBDict(self.chatsById[@(chatId)])[@"type"])[@"@type"]);
+	if (![chatKind isEqualToString:@"chatTypeBasicGroup"]) {
+		promote(chatId);
+		return;
+	}
+
+	[self request:@{@"@type" : @"upgradeBasicGroupChatToSupergroupChat", @"chat_id" : @(chatId)}
+		completion:^(NSDictionary *upgraded) {
+			if (TGResultIsError(upgraded)) {
+				if (completion)
+					completion(0, TGResultErrorMessage(upgraded));
+				return;
+			}
+			int64_t upgradedChatId = [TGBNumber(upgraded[@"id"]) longLongValue];
+			promote(upgradedChatId != 0 ? upgradedChatId : chatId);
 		}];
 }
 
@@ -530,8 +644,8 @@ static NSNumber *TGBInt64(id value) {
 			finish(0, @"notFound");
 			return;
 		}
-		if ([info[@"inGroup"] boolValue]) {
-			finish(0, @"unsupported");
+		if ([info[@"inGroup"] boolValue] || [info[@"inChannel"] boolValue]) {
+			finish(0, @"pickChat");
 			return;
 		}
 		NSString *parameter = TGBString(info[@"parameter"]);

@@ -33,4 +33,38 @@
 								   completion:completion];
 }
 
++ (void)botStartLinkInfo:(NSString *)link
+			  completion:(void (^)(NSDictionary *info))completion {
+	[[TGClient shared] botStartLinkInfo:link completion:completion];
+}
+
++ (void)resolveBotForUsername:(NSString *)username
+				   completion:(void (^)(int64_t botUserId))completion {
+	[[TGClient shared] resolveBotVerificationTargetForUsername:username
+												   completion:^(BOOL found, BOOL isChat,
+													   int64_t targetId,
+													   NSString *__unused displayName) {
+													   if (!completion)
+														   return;
+													   completion(found && !isChat ? targetId : 0);
+												   }];
+}
+
++ (void)chatsAcceptingBots:(BOOL)channelsOnly
+				completion:(void (^)(NSArray *chats))completion {
+	[[TGClient shared] chatsAcceptingBots:channelsOnly completion:completion];
+}
+
++ (void)addBot:(int64_t)botUserId
+			toChat:(int64_t)chatId
+	administratorRights:(NSDictionary *)rights
+		 parameter:(NSString *)parameter
+		completion:(void (^)(int64_t chatId, NSString *errorCode))completion {
+	[[TGClient shared] addBot:botUserId
+					   toChat:chatId
+		  administratorRights:rights
+					parameter:parameter
+				   completion:completion];
+}
+
 @end

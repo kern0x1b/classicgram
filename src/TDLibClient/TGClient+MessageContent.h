@@ -1,11 +1,11 @@
 #import "TGClient.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString *const TGAnimatedEmojiClickedNotification;
 extern NSString *const TGAnimatedEmojiClickedChatIdKey;
 extern NSString *const TGAnimatedEmojiClickedStickerFileIdKey;
 extern NSString *const TGAnimatedEmojiClickedIsAnimatedKey;
-
-NS_ASSUME_NONNULL_BEGIN
 
 extern const NSInteger kSelfDestructViewOnce;
 

@@ -1,3 +1,4 @@
+#import "TGBotAddToChat.h"
 #import "TGChatViewController.h"
 #import "TGFriendlyError.h"
 #import "TGChatViewControllerInternal.h"
@@ -101,6 +102,26 @@
 			return;
 		if (openedChatId) {
 			[strongSelf openChatId:openedChatId title:@"Bot" isGroup:NO];
+			return;
+		}
+		if ([errorCode isEqualToString:@"pickChat"]) {
+			[TGBotAddToChat presentForLink:link
+							fromController:strongSelf
+								completion:^(int64_t addedChatId, NSString *addError) {
+									TGChatViewController *controller = weakSelf;
+									if (!controller)
+										return;
+									if (addedChatId) {
+										[controller openChatId:addedChatId title:@"" isGroup:YES];
+										return;
+									}
+									if (!addError.length || [addError isEqualToString:@"cancelled"])
+										return;
+									NSString *message = [addError isEqualToString:@"noChats"]
+										? TGL(@"Bot.AddToChatNoChats", @"You have no groups or channels to add this bot to.")
+										: TGFriendlyErrorText(addError, TGL(@"Login.UnknownError", @"An error occurred, please try again later."));
+									[TGSnackbar showInView:controller.view text:message seconds:3 onCommit:nil];
+								}];
 			return;
 		}
 		if ([errorCode isEqualToString:@"unsupported"]) {

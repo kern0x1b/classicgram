@@ -107,6 +107,7 @@ src/Screens/Chat/Layout/TGMessageLayoutBuilder.m
 src/Screens/Chat/Layout/TGMessageLayoutCache.m
 src/Screens/Chat/TGAutoDownloadDecision.m
 src/Screens/Chat/TGAutosaveDecision.m
+src/Screens/Chat/TGBotAddToChat.m
 src/Screens/Chat/TGBotCommandsViewController.m
 src/Screens/Chat/TGBubbleReuseIdentifier.m
 src/Screens/Chat/TGBurnLabelLine.m
@@ -662,6 +663,7 @@ src/Theme/TGThemeGeometry.m
 src/Utilities/TGActionSheet.m
 src/Utilities/TGActionSheetIndexBuilder.m
 src/Utilities/TGActionsMenu.m
+src/Utilities/TGBotAdminRights.m
 src/Utilities/TGBusinessOpenState.m
 src/Utilities/TGByteFormat.m
 src/Utilities/TGCacheTrim.m

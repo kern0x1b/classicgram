@@ -19,4 +19,19 @@
 				targetIsChat:(BOOL)targetIsChat
 				   completion:(void (^)(BOOL ok))completion;
 
++ (void)botStartLinkInfo:(NSString *)link
+			  completion:(void (^)(NSDictionary *info))completion;
+
++ (void)resolveBotForUsername:(NSString *)username
+				   completion:(void (^)(int64_t botUserId))completion;
+
++ (void)chatsAcceptingBots:(BOOL)channelsOnly
+				completion:(void (^)(NSArray *chats))completion;
+
++ (void)addBot:(int64_t)botUserId
+			toChat:(int64_t)chatId
+	administratorRights:(NSDictionary *)rights
+		 parameter:(NSString *)parameter
+		completion:(void (^)(int64_t chatId, NSString *errorCode))completion;
+
 @end

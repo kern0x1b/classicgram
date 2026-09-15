@@ -58,6 +58,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)botStartLinkInfo:(NSString *)link completion:(void (^ _Nullable)(NSDictionary *info))completion;
 
+- (void)chatsAcceptingBots:(BOOL)channelsOnly
+				completion:(void (^ _Nullable)(NSArray *chats))completion;
+
+- (void)addBot:(int64_t)botUserId
+			toChat:(int64_t)chatId
+	administratorRights:(nullable NSDictionary *)rights
+		 parameter:(nullable NSString *)parameter
+		completion:(nullable void (^)(int64_t chatId, NSString * _Nullable errorCode))completion;
+
 - (void)openBotStartLink:(NSString *)link
 			   completion:(void (^ _Nullable)(int64_t chatId, NSString * _Nullable errorCode))completion;
 

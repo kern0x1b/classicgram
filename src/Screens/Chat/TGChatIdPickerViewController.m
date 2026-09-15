@@ -22,7 +22,9 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
-	_selected = [NSMutableSet setWithArray:(self.chatIds ?: @[])];
+	_selected = self.singleSelection
+		? [NSMutableSet set]
+		: [NSMutableSet setWithArray:(self.chatIds ?: @[])];
 	_avatarCache = [[TGSimpleAvatarCache alloc] initWithAvatarSide:40];
 	_avatarCache.tableView = self.tableView;
 
@@ -30,11 +32,14 @@
 	self.tableView.separatorColor = [[TGTheme shared] groupedSeparatorColour];
 	[[TGTheme shared] styleNavigationBar:self.navigationController.navigationBar];
 
-	_confirmButton = [TGIcons headerButtonWithTitle:(self.confirmTitle.length ? self.confirmTitle : TGL(@"Contacts.AddContact", @"Add"))
-												bold:YES
-											  target:self
-											  action:@selector(confirmTapped)];
-	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_confirmButton];
+	if (!self.singleSelection) {
+		_confirmButton = [TGIcons headerButtonWithTitle:(self.confirmTitle.length ? self.confirmTitle : TGL(@"Contacts.AddContact", @"Add"))
+													bold:YES
+												  target:self
+												  action:@selector(confirmTapped)];
+		self.navigationItem.rightBarButtonItem =
+			[[UIBarButtonItem alloc] initWithCustomView:_confirmButton];
+	}
 
 	if (!self.titles.count && self.chatIds.count) {
 		__weak typeof(self) weakSelf = self;
@@ -90,6 +95,12 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 	NSNumber *key = self.chatIds[indexPath.row];
+	if (self.singleSelection) {
+		[_selected removeAllObjects];
+		[_selected addObject:key];
+		[self confirmTapped];
+		return;
+	}
 	if ([_selected containsObject:key])
 		[_selected removeObject:key];
 	else
@@ -109,9 +120,22 @@
 		if ([_selected containsObject:key])
 			[picked addObject:key];
 	void (^confirm)(NSArray *) = self.onConfirm;
-	[self.navigationController popViewControllerAnimated:YES];
+	[self dismissPicker];
 	if (confirm)
 		confirm(picked);
+}
+
+- (void)dismissPicker {
+	UINavigationController *navigation = self.navigationController;
+	if (navigation.viewControllers.count > 1) {
+		[navigation popViewControllerAnimated:YES];
+		return;
+	}
+	UIViewController *presented = navigation ?: self;
+	if ([presented respondsToSelector:@selector(dismissViewControllerAnimated:completion:)])
+		[presented dismissViewControllerAnimated:YES completion:nil];
+	else
+		[presented dismissModalViewControllerAnimated:YES];
 }
 
 @end
