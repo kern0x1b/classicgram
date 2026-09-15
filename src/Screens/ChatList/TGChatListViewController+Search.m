@@ -3,6 +3,7 @@
 #import "TGChatSwipeActions.h"
 #import "TGClient+ChatManagement.h"
 #import "TGClient+ChatState.h"
+#import "TGChatTitleCredibility.h"
 #import "TGChatListViewControllerInternal.h"
 #import "TGLocalization.h"
 #import "TGChatViewController.h"
@@ -98,6 +99,7 @@
 	cell.errorBadge.hidden = YES;
 	cell.groupIcon.hidden = YES;
 	cell.premiumIcon.hidden = YES;
+	cell.credibilityLabel.hidden = YES;
 	cell.folderTag.hidden = YES;
 	cell.pin.hidden = YES;
 	cell.mentionBadge.hidden = YES;
@@ -237,6 +239,14 @@
 	cell.muteIcon.hidden = ![c[@"isMuted"] boolValue];
 	cell.groupIcon.hidden = ![c[@"isGroup"] boolValue];
 	cell.premiumIcon.hidden = ![[TGClient shared] cachedPremiumForChatId:[c[@"id"] longLongValue]];
+	NSDictionary *credibility = [[TGClient shared]
+		cachedCredibilityForChatId:[c[@"id"] longLongValue]];
+	NSString *mark = TGChatTitleCredibilityMark(credibility);
+	cell.credibilityLabel.text = mark ?: @"";
+	cell.credibilityLabel.hidden = !mark.length;
+	cell.credibilityLabel.textColor = TGChatTitleCredibilityMarkIsWarning(credibility)
+		? [UIColor colorWithRed:0xC4 / 255.0f green:0x2B / 255.0f blue:0x1E / 255.0f alpha:1.0f]
+		: [UIColor colorWithRed:0x33 / 255.0f green:0x7a / 255.0f blue:0xcc / 255.0f alpha:1.0f];
 
 	NSDictionary *tag = [[TGClient shared] primaryFolderTagForChatId:[c[@"id"] longLongValue]];
 	if (tag) {

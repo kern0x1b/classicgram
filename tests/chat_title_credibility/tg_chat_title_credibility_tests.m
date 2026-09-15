@@ -1,5 +1,5 @@
 #import "tg_chat_title_credibility_tests.h"
-#import "../../src/Screens/Chat/TGChatTitleCredibility.h"
+#import "../../src/Views/TGChatTitleCredibility.h"
 
 TGTestOutcome TGChatTitleCredibilityTestTheMarkTheHeaderShows(void) {
 	TGTestOutcome outcome = TGTestOutcomeZero;

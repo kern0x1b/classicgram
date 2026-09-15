@@ -5,6 +5,7 @@
 #import "TGChatListHelpers.h"
 #import "TGChatBadgeSlots.h"
 #import "TGChatTitlePremium.h"
+#import "TGChatTitleCredibility.h"
 
 static const CGFloat kPendingSide = 12.0f;
 static const CGFloat kErrorBadgeWidth = 26.0f;
@@ -156,6 +157,12 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 	self.premiumIcon = [[UIImageView alloc] initWithImage:TGChatTitlePremiumImage()];
 	self.premiumIcon.hidden = YES;
 	[self.contentView addSubview:self.premiumIcon];
+
+	self.credibilityLabel = [[UILabel alloc] init];
+	self.credibilityLabel.font = [UIFont boldSystemFontOfSize:11];
+	self.credibilityLabel.backgroundColor = [UIColor clearColor];
+	self.credibilityLabel.hidden = YES;
+	[self.contentView addSubview:self.credibilityLabel];
 
 	self.pendingIndicator = [[UIImageView alloc]
 		   initWithImage:[UIImage imageNamed:@"DialogListPending.png"]
@@ -531,6 +538,10 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 		titleWidth -= 12;
 	CGFloat premiumWidth = self.premiumIcon.hidden ? 0 : kTGChatTitlePremiumSide + 4;
 	titleWidth -= premiumWidth;
+	CGFloat credibilityWidth = self.credibilityLabel.hidden
+		? 0
+		: ceilf([self.credibilityLabel.text sizeWithFont:self.credibilityLabel.font].width) + 4;
+	titleWidth -= credibilityWidth;
 	CGFloat tagWidth = 0;
 	if (!self.folderTag.hidden) {
 		CGFloat tagTextWidth = ceilf([self.folderTag.text sizeWithFont:self.folderTag.font].width);
@@ -545,6 +556,13 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 		CGRectMake(titleX, 6, titleWidth, titleHeight), w);
 
 	CGFloat afterTitleX = titleX + titleWidth;
+	if (!self.credibilityLabel.hidden) {
+		CGFloat markHeight = ceilf(self.credibilityLabel.font.lineHeight);
+		CGRect markFrame = CGRectMake(afterTitleX + 4, 6 + (titleHeight - markHeight) / 2,
+			credibilityWidth - 4, markHeight);
+		self.credibilityLabel.frame = TGLocalizedMirroredRect(markFrame, w);
+		afterTitleX += credibilityWidth;
+	}
 	if (!self.premiumIcon.hidden) {
 		CGRect premiumFrame = CGRectMake(afterTitleX + 4,
 			6 + (titleHeight - kTGChatTitlePremiumSide) / 2,

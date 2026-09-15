@@ -1289,11 +1289,28 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 	BOOL isForum = [group[@"is_forum"] boolValue];
 	BOOL isAdministeredDirectMessagesGroup =
 		[group[@"is_administered_direct_messages_group"] boolValue];
+	NSDictionary *verification = [group[@"verification_status"] isKindOfClass:NSDictionary.class]
+		? group[@"verification_status"]
+		: nil;
+	BOOL isVerified = [verification[@"is_verified"] boolValue];
+	BOOL isScam = [verification[@"is_scam"] boolValue];
+	BOOL isFake = [verification[@"is_fake"] boolValue];
 	BOOL knownSame = self.forumSupergroups[groupId] &&
 		[self.forumSupergroups[groupId] boolValue] == isForum &&
 		self.directMessagesSupergroups[groupId] &&
 		[self.directMessagesSupergroups[groupId] boolValue] ==
 			isAdministeredDirectMessagesGroup;
+	if (knownSame) {
+		for (NSMutableDictionary *chat in self.chatsById.allValues) {
+			if (![chat[@"supergroupId"] isEqual:groupId])
+				continue;
+			if ([chat[@"isVerified"] boolValue] != isVerified ||
+				[chat[@"isScam"] boolValue] != isScam ||
+				[chat[@"isFake"] boolValue] != isFake)
+				knownSame = NO;
+			break;
+		}
+	}
 	if (knownSame)
 		return;
 	[self capSupergroupFlagRegistriesIfNeeded];
@@ -1306,6 +1323,9 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 			continue;
 		chat[@"isForum"] = @(isForum);
 		chat[@"isAdministeredDirectMessagesGroup"] = @(isAdministeredDirectMessagesGroup);
+		chat[@"isVerified"] = @(isVerified);
+		chat[@"isScam"] = @(isScam);
+		chat[@"isFake"] = @(isFake);
 		changed = YES;
 	}
 	if (changed)

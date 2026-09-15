@@ -125,7 +125,6 @@ src/Screens/Chat/TGChatPositionKey.m
 src/Screens/Chat/TGChatPresenter.m
 src/Screens/Chat/TGChatRowText.m
 src/Screens/Chat/TGChatThemeViewController.m
-src/Screens/Chat/TGChatTitleCredibility.m
 src/Screens/Chat/TGChatTitleMute.m
 src/Screens/Chat/TGChatUpgradeMarkerFilter.m
 src/Screens/Chat/TGChatViewController+ActionHandlers.m
@@ -710,6 +709,7 @@ src/Views/TGAlertView.m
 src/Views/TGAssetPicker.m
 src/Views/TGChatInputTextView.m
 src/Views/TGChatListHelpers.m
+src/Views/TGChatTitleCredibility.m
 src/Views/TGChatTitlePremium.m
 src/Views/TGChatTitlePremiumImage.m
 src/Views/TGDateLabel.m

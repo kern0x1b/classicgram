@@ -16,6 +16,7 @@ extern NSString *const TGChatProtectedContentDidChangeNotification;
 - (void)photoFileIdForChat:(int64_t)chatId completion:(void (^ _Nullable)(NSNumber *))completion;
 - (NSDictionary *)chatInfoForId:(int64_t)chatId;
 - (BOOL)cachedPremiumForChatId:(int64_t)chatId;
+- (NSDictionary *)cachedCredibilityForChatId:(int64_t)chatId;
 - (void)userInfo:(int64_t)userId completion:(void (^ _Nullable)(NSDictionary *))completion;
 - (void)messageCountInChat:(int64_t)chatId filter:(NSString *)filter
 				completion:(void (^ _Nullable)(NSInteger))completion;

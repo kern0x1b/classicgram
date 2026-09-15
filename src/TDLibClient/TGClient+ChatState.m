@@ -159,6 +159,29 @@ NSString *const TGChatProtectedContentDidChangeNotification =
 	return self.chatsById[@(chatId)];
 }
 
+- (NSDictionary *)cachedCredibilityForChatId:(int64_t)chatId {
+	NSDictionary *info = self.chatsById[@(chatId)];
+	NSDictionary *source = info;
+	if ([info[@"isPrivate"] boolValue]) {
+		NSDictionary *user = self.userRecordsById[@(chatId)];
+		NSDictionary *verification = user[@"verification_status"];
+		if (![verification isKindOfClass:NSDictionary.class])
+			return nil;
+		return @{
+			@"isVerified" : @([verification[@"is_verified"] boolValue]),
+			@"isScam" : @([verification[@"is_scam"] boolValue]),
+			@"isFake" : @([verification[@"is_fake"] boolValue]),
+		};
+	}
+	if (!source)
+		return nil;
+	return @{
+		@"isVerified" : @([source[@"isVerified"] boolValue]),
+		@"isScam" : @([source[@"isScam"] boolValue]),
+		@"isFake" : @([source[@"isFake"] boolValue]),
+	};
+}
+
 - (BOOL)cachedPremiumForChatId:(int64_t)chatId {
 	NSDictionary *info = self.chatsById[@(chatId)];
 	if (![info[@"isPrivate"] boolValue])

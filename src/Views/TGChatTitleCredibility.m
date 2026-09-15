@@ -1,9 +1,9 @@
 #import "TGChatTitleCredibility.h"
 
-#import "TGChatTitleMute.h"
 #import "TGLocalization.h"
 
 static const CGFloat kMarkTopOffset = 3.0f;
+static const CGFloat kCredibilityGap = 4.0f;
 
 static BOOL TGChatTitleBool(id value) {
 	return [value isKindOfClass:NSNumber.class] && [value boolValue];
@@ -30,12 +30,12 @@ BOOL TGChatTitleCredibilityMarkIsWarning(NSDictionary *badges) {
 CGFloat TGChatTitleCredibilityRoom(CGFloat markWidth) {
 	if (markWidth <= 0.0f)
 		return 0.0f;
-	return markWidth + kTGChatTitleMuteIconGap;
+	return markWidth + kCredibilityGap;
 }
 
 CGRect TGChatTitleCredibilityFrame(CGFloat titleWidth, CGFloat nameTextWidth, CGSize markSize,
 	CGFloat nameTop) {
 	CGFloat textWidth = MIN(titleWidth, nameTextWidth);
-	CGFloat left = (titleWidth - textWidth) / 2 + textWidth + kTGChatTitleMuteIconGap;
+	CGFloat left = (titleWidth - textWidth) / 2 + textWidth + kCredibilityGap;
 	return CGRectMake(left, nameTop + kMarkTopOffset, markSize.width, markSize.height);
 }
