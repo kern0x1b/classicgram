@@ -245,6 +245,7 @@ BOOL TGChatIsPad(void);
 @property (nonatomic, copy) NSString *inlineQueryButtonParameter;
 @property (nonatomic, strong) UIView *inputPlate;
 @property (nonatomic, strong) UILabel *inputPlaceholder;
+- (void)refreshSendAsPlaceholder;
 @property (nonatomic, assign) CGFloat composerTextHeight;
 @property (nonatomic, assign) CGFloat composerLineHeight;
 @property (nonatomic, assign) CGFloat keyboardInset;

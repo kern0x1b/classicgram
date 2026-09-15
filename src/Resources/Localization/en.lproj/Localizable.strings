@@ -2274,6 +2274,7 @@ Tap on a sticker to view and add the whole set.";
 "Conversation.InputTextAnonymousPlaceholder" = "Send Anonymously";
 "Conversation.InputTextCaptionPlaceholder" = "Caption";
 "Conversation.InputTextPlaceholder" = "Message";
+"Conversation.SendAsPlaceholder" = "Message as %@";
 "Conversation.InstantPagePreview" = "INSTANT VIEW";
 "Conversation.LinkDialogCopy" = "Copy";
 "Conversation.LinkDialogOpen" = "Open";

@@ -39,7 +39,7 @@
 	self.scheduledSendDate = 0;
 	self.scheduleWhenOnline = NO;
 	[self.sendButton setTitle:TGL(@"MediaPicker.Send", @"Send") forState:UIControlStateNormal];
-	self.inputPlaceholder.text = TGL(@"Conversation.InputTextPlaceholder", @"Message");
+	[self refreshSendAsPlaceholder];
 	[self setComposeBannerShown:NO];
 	[self inputChanged];
 }

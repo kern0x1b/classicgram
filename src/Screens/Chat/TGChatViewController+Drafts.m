@@ -268,6 +268,7 @@
 			return;
 		strongSelf.currentSenderId = senderId;
 		strongSelf.currentSenderIsChat = isChat;
+		[strongSelf refreshSendAsPlaceholder];
 	}];
 }
 
@@ -278,6 +279,16 @@
 		return;
 	self.currentSenderId = [note.userInfo[TGChatMessageSenderIdKey] longLongValue];
 	self.currentSenderIsChat = [note.userInfo[TGChatMessageSenderIsChatKey] boolValue];
+	[self refreshSendAsPlaceholder];
+}
+
+- (void)refreshSendAsPlaceholder {
+	if (!self.inputPlaceholder)
+		return;
+	NSString *name = self.currentSenderIsChat ? [self currentSenderName] : nil;
+	self.inputPlaceholder.text = name.length
+		? [NSString stringWithFormat:TGL(@"Conversation.SendAsPlaceholder", @"Message as %@"), name]
+		: TGL(@"Conversation.InputTextPlaceholder", @"Message");
 }
 
 - (NSString *)currentSenderName {
