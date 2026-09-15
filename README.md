@@ -250,8 +250,8 @@ fetched by a helper script below (current Xcode no longer ships an armv7 `libSys
 build is a [Theos](https://theos.dev) application project driven through `make`; no Xcode project exists.
 
 ```bash
-brew install cmake gperf ccache
-git clone --recursive <this repository>
+brew install cmake gperf ccache conan
+git clone <this repository>
 cd telegram-classic
 ```
 
@@ -265,18 +265,18 @@ cp src/Resources/Config/tg_config.h.example src/Resources/Config/tg_config.h
 and fill in `TG_API_ID` / `TG_API_HASH` in that file. It is git-ignored — keep your own credentials
 out of commits, they identify your application to Telegram.
 
-TDLib is built as its own `libtdjson.dylib` by a standalone script, not by the Makefile, and is
-loaded by the app at runtime with `dlopen` rather than linked statically — a statically linked copy
-pushes the combined `__TEXT` segment past the armv7 Thumb branch's 16 MB reach, which current
-Xcode's linker cannot route around. Building it the first time also fetches an older SDK snapshot
-for the armv7 slice, because current Xcode's `iPhoneOS.sdk` no longer ships an armv7 `libSystem`
-stub at all:
+TDLib and OpenSSL are built through Conan (`packaging/tdlib`, `packaging/openssl`), fetched vanilla
+from upstream rather than vendored, and resolved by the Makefile itself the first time it needs
+them — no separate build step to run by hand. TDLib is loaded by the app at runtime with `dlopen`
+rather than linked statically — a statically linked copy pushes the combined `__TEXT` segment past
+the armv7 Thumb branch's 16 MB reach, which current Xcode's linker cannot route around. The armv7
+slice also needs an older SDK snapshot, because current Xcode's `iPhoneOS.sdk` no longer ships an
+armv7 `libSystem` stub at all:
 
 ```bash
 scripts/fetch-ios-sdk.sh          # once — an armv7-capable SDK snapshot into build/sdks
-scripts/build-tdlib-dylib.sh      # once (or after a TDLib update) — builds build/armv7/tdlib/lib/libtdjson.dylib
 export THEOS=~/theos             # wherever Theos lives
-make FINALPACKAGE=1               # the app bundle, stripped and signed
+make FINALPACKAGE=1 stage         # builds TDLib/OpenSSL via Conan on first run, then the app bundle
 make package FINALPACKAGE=1       # the same, wrapped as a .deb under packages/
 ```
 
@@ -364,8 +364,9 @@ telegram-classic/
 │   └── Resources/          # Info.plist, entitlements, images/, Localization/, Config/
 ├── daemon/relaunch/        # optional jailbreak LaunchDaemon: relaunches the app after a force-quit/jetsam kill
 ├── tweaks/                 # the SpringBoard call-UI tweak: a dylib injected into another process, shipped as .deb
-├── third_party/            # every vendored tree (TDLib, libtgvoip, libvpx, opus, webp, …)
-│                           #   plus prebuilt archives and the tdlib submodule's patches
+├── third_party/            # every vendored tree (libtgvoip, libvpx, opus, webp, …) — TDLib and
+│                           #   OpenSSL are fetched by Conan instead, see packaging/
+├── packaging/              # Conan recipes: tdlib, openssl, and the deps consumer the Makefile installs
 ├── scripts/                # build, device-deployment and lint automation, flat and verb-first
 │   └── ui-automation/      # a SpringBoard driver injected for testing: unlock, tap, screenshot
 │                           #   plus baselines/ — the layer-lint baseline files the hook checks against
@@ -407,11 +408,11 @@ project, originally GPL-2.0-or-later and relicensed here under GPLv3 as that lic
   (Copyright Peter Iakovlev, 2013). Full file-by-file attribution is in [`NOTICE`](NOTICE).
 - **[TDLib](https://github.com/tdlib/td)**: Telegram's own open-source client library, which this
   app talks to via a dynamically loaded `libtdjson.dylib` — it is the entire networking and protocol
-  layer, and this project vendors it as a patched submodule under `third_party/tdlib`.
+  layer, built vanilla from upstream through the Conan recipe under `packaging/tdlib`.
 - **Vendored third-party components** (`third_party/`, each under its own upstream licence): a fork
   of **libtgvoip** for voice/video call transport; **libvpx** (VP8); **Opus**, **libogg** and
-  **opusfile**/**opusenc** for audio; **libwebp** for image decode; **OpenSSL** for TLS; **quirc**
-  for QR code decoding.
+  **opusfile**/**opusenc** for audio; **libwebp** for image decode; **quirc** for QR code decoding.
+  **OpenSSL** for TLS is built the same way as TDLib, through `packaging/openssl`.
 - **This project**: maintained by kern0x1b and contributors.
 
 Classicgram is an independent, unofficial project and is not affiliated with, endorsed by, or sponsored by

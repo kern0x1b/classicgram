@@ -61,21 +61,21 @@ kill every shell, which has already happened on this project:
 
 | Path | What it is | Symlink target |
 |---|---|---|
-| `third_party/tdlib/td` | The `third_party/tdlib/td` git submodule checkout | not auto-populated in a worktree at all; either `git submodule update --init` inside the worktree (cheap, it's source) or symlink the whole directory to the main checkout's if you don't need to touch TDLib itself |
-| `third_party/openssl/prebuilt/lib` | Prebuilt `libcrypto-universal.a` / `libssl-universal.a` (~8 MB) | `ln -s <main checkout>/third_party/openssl/prebuilt/lib third_party/openssl/prebuilt/lib` |
 | `build/sdks` | Extracted iOS SDK headers (~1.2 GB) | `ln -s <main checkout>/build/sdks build/sdks` |
-| `build/armv7/libs` | Armv7-thinned `libcrypto.a`/`libssl.a` linked against directly (no `-L` for the prebuilt universal libs exists) | `ln -s <main checkout>/build/armv7/libs build/armv7/libs`, or the link fails with `library not found for -lcrypto` |
 | `build/armv7/libvpx-obj` | Built `libvpx.a` — its own `configure` mis-resolves the SDK sysroot in a fresh worktree and fails with `Toolchain is unable to link executables` | `ln -s <main checkout>/build/armv7/libvpx-obj build/armv7/libvpx-obj` |
 
-Set these up right after `git worktree add`, before the first build in that worktree. A worktree
-that only edits source and never builds doesn't need any of them.
+TDLib and OpenSSL need none of this: the Makefile resolves both through Conan
+(`packaging/tdlib`, `packaging/openssl`), and Conan's own cache (`~/.conan2`) is already shared
+across every worktree on the machine, so the first build in a new worktree just reuses whatever
+was already built there instead of rebuilding from source.
+
+Set the remaining two up right after `git worktree add`, before the first build in that worktree.
+A worktree that only edits source and never builds doesn't need either of them.
 
 `scripts/worktree-prepare.sh`, run from inside the new worktree, does this automatically: it
-symlinks `build/sdks` and `third_party/tdlib`, copies `build/armv7/libs` and `build/armv7/libvpx-obj`
-(copies rather than symlinks those two, so a worktree's own build never writes into the main
-checkout's object files), and copies `src/Resources/Config/tg_config.h`. It skips anything already
-present, so it's safe to re-run. It does not touch `third_party/openssl/prebuilt/lib` — symlink that
-one by hand per the table above if the worktree needs to link.
+symlinks `build/sdks`, copies `build/armv7/libvpx-obj` (copied rather than symlinked, so a
+worktree's own build never writes into the main checkout's object files), and copies
+`src/Resources/Config/tg_config.h`. It skips anything already present, so it's safe to re-run.
 
 `src/Resources/Config/tg_config.h` is gitignored too and no worktree gets it from `git worktree
 add`; copy it in from the main checkout or the build stops at the first include of it.
