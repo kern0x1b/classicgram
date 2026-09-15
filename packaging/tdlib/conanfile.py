@@ -457,6 +457,9 @@ class TdlibConan(ConanFile):
 
     exports_sources = "compat/*", "fix-armv7-macho.c"
 
+    def requirements(self):
+        self.requires("openssl/3.0.15@itglegacy/stable")
+
     def source(self):
         Git(self).fetch_commit(url=_TDLIB_URL, commit=_TDLIB_COMMIT)
 
@@ -541,7 +544,7 @@ class TdlibConan(ConanFile):
             f'-c "{os.path.join(src, "compat", "weak_import_shims.c")}" -o "{compat_o}"'
         )
 
-        openssl_include, openssl_crypto, openssl_ssl = self._openssl_paths(arch)
+        openssl_include, openssl_crypto, openssl_ssl = self._openssl_paths()
 
         linker_flags = f"-install_name @executable_path/libtdjson.dylib {compat_o}"
         if "ld64" in self.dependencies.build:
@@ -588,21 +591,11 @@ class TdlibConan(ConanFile):
                          f'"{os.path.join(src, "fix-armv7-macho.c")}"')
             self.run(f'"{machofix}" "{dylib}"')
 
-    def _openssl_paths(self, arch):
-        if "openssl" in self.dependencies.host:
-            openssl = self.dependencies.host["openssl"]
-            return (os.path.join(openssl.package_folder, "include"),
-                    os.path.join(openssl.package_folder, "lib", "libcrypto.a"),
-                    os.path.join(openssl.package_folder, "lib", "libssl.a"))
-        root = os.environ.get("ITGLEGACY_ROOT")
-        if not root:
-            raise ConanException(
-                "openssl is not a requires() of this recipe yet and ITGLEGACY_ROOT is not set - "
-                "point it at the iTgLegacy checkout to use its prebuilt OpenSSL libs "
-                "as a stopgap until openssl/x.y.z@ios6/stable exists")
-        return (os.path.join(root, "third_party", "openssl", "prebuilt", "include"),
-                os.path.join(root, "build", arch, "libs", "libcrypto.a"),
-                os.path.join(root, "build", arch, "libs", "libssl.a"))
+    def _openssl_paths(self):
+        openssl = self.dependencies.host["openssl"]
+        return (os.path.join(openssl.package_folder, "include"),
+                os.path.join(openssl.package_folder, "lib", "libcrypto.a"),
+                os.path.join(openssl.package_folder, "lib", "libssl.a"))
 
     def _find_dylib(self, build_dir):
         for dirpath, _, filenames in os.walk(build_dir):
