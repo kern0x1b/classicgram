@@ -16,7 +16,7 @@ Two layers do that:
 
 | layer | where | what it buys |
 | --- | --- | --- |
-| iOS 6 `voip` socket + keep-alive | inside the app (`src/Storage/TGBackgroundSession.m`, `third_party/tdlib/td` patch) | app stays alive and connected while backgrounded, screen locked, indefinitely; the system relaunches it after a reboot |
+| iOS 6 `voip` socket + keep-alive | inside the app (`src/Storage/TGBackgroundSession.m`, TDLib hook added by `packaging/tdlib/conanfile.py`) | app stays alive and connected while backgrounded, screen locked, indefinitely; the system relaunches it after a reboot |
 | `telegramd` watchdog | this directory, a LaunchDaemon | closes the hole the first layer cannot: force-quit from the app switcher, and a jetsam kill |
 
 ---
@@ -34,7 +34,7 @@ ignored.
 that keeps the TCP connection open while the process is suspended;
 `SO_KEEPALIVE` alone does not do it — it only keeps the NAT mapping warm.
 
-TDLib uses raw BSD sockets (`third_party/tdlib/td/tdutils/td/utils/port/SocketFd.cpp`,
+TDLib uses raw BSD sockets (`tdutils/td/utils/port/SocketFd.cpp` in its own source tree,
 `init_socket_options` sets `SO_REUSEADDR`/`SO_KEEPALIVE`/`TCP_NODELAY`/
 `SO_NOSIGPIPE` and nothing else), so nothing in it ever touches CFNetwork. The
 fix is the GCDAsyncSocket recipe (`enableBackgroundingOnSocket`,
@@ -46,7 +46,8 @@ open them, and never read or write through them. The streams exist purely to
 register the fd with CFNetwork as a VoIP stream; TDLib keeps doing its own
 `read()`/`write()` on the same fd.
 
-Getting the fd needs a hook in TDLib, so `third_party/tdlib/td` carries a patch:
+Getting the fd needs a hook in TDLib, so `packaging/tdlib/conanfile.py` adds one when it fetches
+TDLib's source:
 
 - `td/telegram/net/Session.cpp` exports
   `td_ios_set_primary_socket_callback(void (*)(int fd))` and invokes the

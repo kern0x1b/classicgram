@@ -1,4 +1,4 @@
-TDLib (third_party/tdlib/td, the git submodule pinned by .gitmodules) is
+TDLib, fetched by conanfile.py from https://github.com/tdlib/td.git, is
 distributed under the Boost Software License, Version 1.0.
 
 Boost Software License - Version 1.0 - August 17th, 2003
@@ -25,7 +25,6 @@ FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
-third_party/tdlib/patches/tdlib-ios6.patch, third_party/tdlib/compat/ and
-third_party/tdlib/build/ are this project's own changes on top of TDLib, and
-follow this repository's own licence (see /LICENSE at the repository root),
-not TDLib's.
+conanfile.py's own replacement tables and compat/ are this project's own
+changes on top of TDLib, and follow this repository's own licence (see
+/LICENSE at the repository root), not TDLib's.
