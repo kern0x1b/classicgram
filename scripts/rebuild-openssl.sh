@@ -37,6 +37,32 @@ echo "${OPENSSL_SHA256}  ${TARBALL}" | shasum -a 256 -c - || { echo "error: ${TA
 rm -rf "${SRC_DIR}"
 tar -xzf "${TARBALL}" -C "${WORK_DIR}"
 
+# Xcode 27's ld asserts on the named __nl_symbol_ptr atom OpenSSL's ARM asm emits
+# for OPENSSL_armcap_P (it requires GOT atoms to be anonymous). Emit the same
+# pointer as a plain __data word instead: identical load sequence, no GOT atom.
+python3 - "${SRC_DIR}/crypto/perlasm/arm-xlate.pl" <<'XLATE'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+old = ('\t$ret = ".comm\\t_$name,@args[1]\\n";\n'
+       '\t$ret .= ".non_lazy_symbol_pointer\\n";\n'
+       '\t$ret .= "$name:\\n";\n'
+       '\t$ret .= ".indirect_symbol\\t_$name\\n";\n'
+       '\t$ret .= ".long\\t0";\n')
+new = ('\t$ret = ".comm\\t_$name,@args[1]\\n";\n'
+       '\t$ret .= ".data\\n";\n'
+       '\t$ret .= ".align\\t2\\n";\n'
+       '\t$ret .= "$name:\\n";\n'
+       '\t$ret .= ".long\\t_$name\\n";\n'
+       '\t$ret .= ".text";\n')
+if new in s:
+    sys.exit(0)
+if old not in s:
+    sys.stderr.write("arm-xlate.pl: expected ios32 non-lazy block not found\n")
+    sys.exit(1)
+open(p, "w").write(s.replace(old, new, 1))
+XLATE
+
 build_one() {
   local CONFIG_TARGET="$1"
   local ARCH="$2"
