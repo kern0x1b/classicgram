@@ -22,6 +22,9 @@ static const NSTimeInterval kMentionSuggestionDebounce = 0.35;
 }
 
 - (void)updateMentionSuggestions {
+	if ([self updateQuickReplySuggestions])
+		return;
+
 	if ([self updateInlineBotQueryTrigger])
 		return;
 
@@ -101,6 +104,10 @@ static const NSTimeInterval kMentionSuggestionDebounce = 0.35;
 		TGChatViewController *strongSelf = weakSelf;
 		if (!strongSelf)
 			return;
+		if (strongSelf.quickReplySuggestionsActive) {
+			[strongSelf sendQuickReplyCandidate:candidate];
+			return;
+		}
 		[strongSelf insertMentionCandidate:candidate];
 	};
 	strip.onVisibilityChanged = ^(__unused BOOL visible) {

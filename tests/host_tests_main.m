@@ -146,6 +146,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "sender_name_colour/tg_sender_name_colour_tests.h"
 #import "vcard/tg_vcard_tests.h"
 #import "business_open_state/tg_business_open_state_tests.h"
+#import "quick_reply_trigger/tg_quick_reply_trigger_tests.h"
 #import "bubble_reuse_identifier/tg_bubble_reuse_identifier_tests.h"
 #import "quote_body_text/tg_quote_body_text_tests.h"
 #import "disappearing_media/tg_disappearing_media_tests.h"
@@ -1398,6 +1399,10 @@ int main(void) {
 					TGBusinessOpenStateTestWhenAPlaceIsOpen},
 			{"business_open_state_what_the_day_reads",
 					TGBusinessOpenStateTestWhatTheDayReads},
+			{"quick_reply_trigger_when_the_slash_counts",
+					TGQuickReplyTriggerTestWhenTheSlashCounts},
+			{"quick_reply_trigger_which_replies_match",
+					TGQuickReplyTriggerTestWhichRepliesMatch},
 			{"bubble_reuse_identifier_every_kind_lands_on_its_own_cell",
 					TGBubbleReuseIdentifierTestEveryKindLandsOnItsOwnCell},
 			{"bubble_reuse_identifier_burning_media_keeps_its_label",

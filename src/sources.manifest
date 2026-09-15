@@ -156,6 +156,7 @@ src/Screens/Chat/TGChatViewController+MessageActions.m
 src/Screens/Chat/TGChatViewController+Pinned.m
 src/Screens/Chat/TGChatViewController+Playback.m
 src/Screens/Chat/TGChatViewController+Polls.m
+src/Screens/Chat/TGChatViewController+QuickReplyAutocomplete.m
 src/Screens/Chat/TGChatViewController+ReadState.m
 src/Screens/Chat/TGChatViewController+Search.m
 src/Screens/Chat/TGChatViewController+Selection.m
@@ -694,6 +695,7 @@ src/Utilities/TGPopupMenu.m
 src/Utilities/TGPreferenceFlags.m
 src/Utilities/TGPrivacySettingTitle.m
 src/Utilities/TGQRCode.c
+src/Utilities/TGQuickReplyTrigger.m
 src/Utilities/TGResendCountdown.m
 src/Utilities/TGRichText.m
 src/Utilities/TGSettingValueText.m
