@@ -1,4 +1,5 @@
 #import "TGClient+ChatManagement.h"
+#import "TGClient+ChatList.h"
 #import "TGStringTruncation.h"
 #import "TGClient+Contacts.h"
 #import "TGForwardPicker.h"
@@ -73,6 +74,8 @@ static UIImage *TGForwardStretchImage(NSString *name, int leftCap) {
 	UIImage *raw = [UIImage imageNamed:name];
 	return [raw stretchableImageWithLeftCapWidth:leftCap topCapHeight:0];
 }
+
+static const NSUInteger kFrequentRowLimit = 5;
 
 @interface TGForwardPickerCell : UITableViewCell
 @property (nonatomic, strong) UIImageView *avatar;
@@ -270,6 +273,7 @@ static UIImage *TGForwardStretchImage(NSString *name, int leftCap) {
 @property (nonatomic, strong) NSArray *visibleRows;
 @property (nonatomic, strong) NSArray *sections;
 @property (nonatomic, strong) NSArray *sectionIndices;
+@property (nonatomic, strong) NSArray *frequentChatIds;
 @property (nonatomic, copy) NSString *chatsQuery;
 @property (nonatomic, copy) NSString *contactsQuery;
 @property (nonatomic, assign) CGFloat chatsOffset;
@@ -309,10 +313,29 @@ static UIImage *TGForwardStretchImage(NSString *name, int leftCap) {
 	self.chatsQuery = @"";
 	self.contactsQuery = @"";
 	self.sections = [NSArray array];
+	self.frequentChatIds = [NSArray array];
 	self.avatars = [[NSMutableDictionary alloc] init];
 	self.avatarsRequested = [[NSMutableSet alloc] init];
 	self.pickedChatIds = [[NSMutableArray alloc] init];
 	self.pickedUserIds = [[NSMutableArray alloc] init];
+
+	__weak typeof(self) weakPicker = self;
+	[[TGClient shared] topChatsWithCompletion:^(NSArray *chats) {
+		TGForwardPicker *strongSelf = weakPicker;
+		if (!strongSelf)
+			return;
+		NSMutableArray *ids = [NSMutableArray array];
+		for (id chat in chats ?: @[]) {
+			if (![chat isKindOfClass:NSDictionary.class])
+				continue;
+			id chatId = ((NSDictionary *)chat)[@"id"];
+			if ([chatId isKindOfClass:NSNumber.class] && ids.count < kFrequentRowLimit)
+				[ids addObject:chatId];
+		}
+		strongSelf.frequentChatIds = ids;
+		[strongSelf rebuildSections];
+		[strongSelf.tableView reloadData];
+	}];
 
 	self.tableView.rowHeight = kChatRowHeight;
 	self.tableView.backgroundColor = [[TGTheme shared] listBackgroundColour];
@@ -622,12 +645,41 @@ static UIImage *TGForwardStretchImage(NSString *name, int leftCap) {
 	[self fetchMissingAvatars];
 }
 
+- (NSArray *)sectionsWithFrequentFirst:(NSArray *)rows {
+	NSString *query = [self.query stringByTrimmingCharactersInSet:
+			[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if (query.length || !self.frequentChatIds.count)
+		return [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:rows forKey:@"rows"]];
+
+	NSMutableArray *frequent = [NSMutableArray array];
+	for (NSNumber *chatId in self.frequentChatIds) {
+		for (NSDictionary *row in rows) {
+			if ([row[@"id"] isEqual:chatId]) {
+				[frequent addObject:row];
+				break;
+			}
+		}
+	}
+	if (frequent.count < 2)
+		return [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:rows forKey:@"rows"]];
+
+	NSMutableArray *rest = [NSMutableArray arrayWithCapacity:rows.count];
+	for (NSDictionary *row in rows)
+		if (![frequent containsObject:row])
+			[rest addObject:row];
+
+	NSMutableArray *sections = [NSMutableArray array];
+	[sections addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+			TGL(@"DialogList.SearchSectionRecent", @"Recent"), @"letter", frequent, @"rows", nil]];
+	if (rest.count)
+		[sections addObject:[NSDictionary dictionaryWithObject:rest forKey:@"rows"]];
+	return sections;
+}
+
 - (void)rebuildSections {
 	NSArray *rows = self.visibleRows ?: [NSArray array];
 	if (self.mode == 0 || rows.count == 0) {
-		self.sections = rows.count
-			? [NSArray arrayWithObject:[NSDictionary dictionaryWithObject:rows forKey:@"rows"]]
-			: [NSArray array];
+		self.sections = rows.count ? [self sectionsWithFrequentFirst:rows] : [NSArray array];
 		self.sectionIndices = nil;
 		return;
 	}
