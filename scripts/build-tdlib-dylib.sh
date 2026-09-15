@@ -12,16 +12,29 @@ XCODE_DEV="$(xcode-select -p 2>/dev/null || true)"
 SDK_PATH="${ROOT_DIR}/build/sdks/iPhoneOS12.4.sdk"
 [ -d "${SDK_PATH}" ] || SDK_PATH="${XCODE_DEV}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
 [ -d "${SDK_PATH}" ] || { echo "[-] no iOS SDK found at ${SDK_PATH} - run scripts/fetch-ios-sdk.sh or install the iOS platform in Xcode"; exit 1; }
-TOOLCHAIN="${XCODE_DEV}/Toolchains/XcodeDefault.xctoolchain/usr/bin"
+TOOLCHAIN_CLANG="${XCODE_DEV}/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+[ -x "${TOOLCHAIN_CLANG}" ] || TOOLCHAIN_CLANG="$(xcrun -f clang 2>/dev/null || true)"
+[ -x "${TOOLCHAIN_CLANG}" ] || TOOLCHAIN_CLANG="$(command -v clang || true)"
+[ -x "${TOOLCHAIN_CLANG}" ] || { echo "[-] no clang found"; exit 1; }
+TOOLCHAIN="$(dirname "${TOOLCHAIN_CLANG}")"
 
-XCODE_SDK="${XCODE_DEV}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
-CXX_STDLIB_INC="-isystem ${XCODE_SDK}/usr/include/c++/v1"
+CXX_STDLIB_SDK="${ROOT_DIR}/build/sdks/iPhoneOS16.5.sdk/usr/include/c++/v1"
+[ -d "${CXX_STDLIB_SDK}" ] || CXX_STDLIB_SDK="${ROOT_DIR}/build/sdks/iPhoneOS15.6.sdk/usr/include/c++/v1"
+[ -d "${CXX_STDLIB_SDK}" ] || CXX_STDLIB_SDK="${XCODE_DEV}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/c++/v1"
+CXX_STDLIB_INC="-isystem ${CXX_STDLIB_SDK}"
 
 [ -f "${TDLIB_SRC}/CMakeLists.txt" ] || { echo "[-] ${TDLIB_SRC} is empty - run git submodule update --init third_party/tdlib/td"; exit 1; }
 
 for tool in cmake gperf ccache; do
 	command -v "$tool" >/dev/null || { echo "[-] $tool not found (brew install $tool)"; exit 1; }
 done
+
+PATCH="${ROOT_DIR}/third_party/tdlib/patches/tdlib-ios6.patch"
+if ! git -C "${TDLIB_SRC}" apply --reverse --check "${PATCH}" 2>/dev/null; then
+	git -C "${TDLIB_SRC}" apply --check "${PATCH}" || { echo "[-] ${PATCH} does not apply to ${TDLIB_SRC} at its current commit - the submodule pin and the patch have drifted apart"; exit 1; }
+	echo "[+] applying ${PATCH}"
+	git -C "${TDLIB_SRC}" apply "${PATCH}"
+fi
 
 echo "[+] TDLib -> libtdjson.dylib (armv7)"
 echo "    src : ${TDLIB_SRC}"
@@ -31,7 +44,10 @@ if [ ! -d "${ROOT_DIR}/third_party/tdlib/native-build" ]; then
 	echo "[+] pregenerating sources"
 	mkdir -p "${ROOT_DIR}/third_party/tdlib/native-build"
 	cd "${ROOT_DIR}/third_party/tdlib/native-build"
-	cmake -DTD_GENERATE_SOURCE_FILES=ON "${TDLIB_SRC}"
+	cmake -DTD_GENERATE_SOURCE_FILES=ON \
+		-DCMAKE_C_FLAGS="-I${ROOT_DIR}/third_party/tdlib" \
+		-DCMAKE_CXX_FLAGS="-I${ROOT_DIR}/third_party/tdlib" \
+		"${TDLIB_SRC}"
 	cmake --build . --target prepare_cross_compiling
 fi
 

@@ -10,7 +10,7 @@ if [ "$worktree" = "$main" ]; then
 	exit 0
 fi
 
-mkdir -p "$worktree/build/armv7"
+mkdir -p "$worktree/build/armv7" "$worktree/build/arm64"
 
 for shared in sdks tdlib; do
 	if [ -d "$main/build/$shared" ] && [ ! -e "$worktree/build/$shared" ]; then
@@ -19,10 +19,12 @@ for shared in sdks tdlib; do
 	fi
 done
 
-if [ -d "$main/build/armv7/libs" ] && [ ! -d "$worktree/build/armv7/libs" ]; then
-	cp -R "$main/build/armv7/libs" "$worktree/build/armv7/libs"
-	echo "worktree-prepare: copied build/armv7/libs"
-fi
+for arch in armv7 arm64; do
+	if [ -d "$main/build/$arch/libs" ] && [ ! -d "$worktree/build/$arch/libs" ]; then
+		cp -R "$main/build/$arch/libs" "$worktree/build/$arch/libs"
+		echo "worktree-prepare: copied build/$arch/libs"
+	fi
+done
 
 if [ -f "$main/build/armv7/libvpx-obj/libvpx.a" ] && [ ! -f "$worktree/build/armv7/libvpx-obj/libvpx.a" ]; then
 	cp -R "$main/build/armv7/libvpx-obj" "$worktree/build/armv7/libvpx-obj"
