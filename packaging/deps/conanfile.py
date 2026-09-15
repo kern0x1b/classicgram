@@ -14,3 +14,10 @@ class ItgLegacyDepsConan(ConanFile):
     def requirements(self):
         self.requires("tdlib/1.8.0@ios6/stable")
         self.requires("openssl/3.0.15@itglegacy/stable")
+        self.requires("ogg/unpinned@itglegacy/stable")
+        self.requires("quirc/unpinned@itglegacy/stable")
+        self.requires("opusenc/unpinned@itglegacy/stable")
+        self.requires("opusfile/unpinned@itglegacy/stable")
+        self.requires("opus/1.3.1@itglegacy/stable")
+        self.requires("libvpx/1.13.1@itglegacy/stable")
+        self.requires("libtgvoip/2.4.4-itglegacy@itglegacy/stable")
