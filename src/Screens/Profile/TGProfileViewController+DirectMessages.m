@@ -1,4 +1,5 @@
 #import "TGListBackground.h"
+#import "TGBusinessOpenState.h"
 #import "TGProfileViewController.h"
 #import "TGProfileViewControllerInternal.h"
 #import "TGProfileButtonsCell.h"
@@ -920,6 +921,8 @@
 		weakSelf.personalPhoto = TGProfileBool(info[@"hasPersonalPhoto"]);
 		weakSelf.canCall = TGProfileBool(info[@"canCall"]);
 		weakSelf.canVideoCall = TGProfileBool(info[@"canVideoCall"]);
+		id hours = info[@"businessHours"];
+		weakSelf.businessHours = [hours isKindOfClass:NSDictionary.class] ? hours : nil;
 		weakSelf.fullProfileLoaded = YES;
 		[weakSelf rebuildDetailRows];
 	}];
@@ -938,8 +941,33 @@
 		[self loadAvatarFile:[photoId longLongValue]];
 }
 
+- (NSString *)businessHoursText {
+	NSArray *days = self.businessHours[@"days"];
+	if (![days isKindOfClass:NSArray.class] || days.count < 7)
+		return nil;
+	NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+	NSString *zoneId = TGProfileText(self.businessHours[@"timeZoneId"]);
+	NSTimeZone *zone = zoneId.length ? [NSTimeZone timeZoneWithName:zoneId] : nil;
+	if (zone)
+		calendar.timeZone = zone;
+	NSDateComponents *now = [calendar components:
+			(NSWeekdayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit)
+										fromDate:[NSDate date]];
+	NSInteger weekday = (now.weekday + 5) % 7;
+	NSInteger minute = now.hour * 60 + now.minute;
+	NSString *interval = TGBusinessDayIntervalText(days, weekday);
+	if (!TGBusinessIsOpenAt(days, weekday, minute))
+		return TGL(@"BusinessHoursSetup.DayClosed", @"Closed");
+	if (!interval.length)
+		return TGL(@"BusinessHours.Open24", @"Open 24 hours");
+	return [NSString stringWithFormat:TGL(@"BusinessHours.OpenNow", @"Open now, %@"), interval];
+}
+
 - (void)rebuildDetailRows {
 	NSMutableArray *more = [(self.baseDetailRows ?: @[]) mutableCopy];
+	NSString *businessText = [self businessHoursText];
+	if (businessText.length)
+		[more addObject:@[ @"chat", businessText ]];
 	if (self.restrictionReason.length)
 		[more insertObject:@[ @"restricted", self.restrictionReason ] atIndex:0];
 	NSString *bio = self.profileBio;

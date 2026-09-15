@@ -229,6 +229,8 @@ on your other device";
 "Business.OpeningHours" = "Opening Hours";
 "Business.OpeningHoursInfo" = "Show to your customers when you are open for business.";
 "BusinessHoursSetup.DayClosed" = "Closed";
+"BusinessHours.OpenNow" = "Open now, %@";
+"BusinessHours.Open24" = "Open 24 hours";
 "BusinessHoursSetup.DayIntervalEnd" = "Closes At";
 "BusinessHoursSetup.DayIntervalStart" = "Opens At";
 "BusinessHoursSetup.OvernightNotSupported" = "An overnight schedule for a single day can't be edited here. Choose a closing time later than the opening time.";

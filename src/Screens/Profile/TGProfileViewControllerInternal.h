@@ -374,6 +374,8 @@ extern const CGFloat kOverlayPagerHeight;
 - (void)appendPhoneRowTo:(NSMutableArray *)rows fromUser:(NSDictionary *)user;
 - (void)applyFallbackNameFromUser;
 - (void)appendUsernameRowTo:(NSMutableArray *)rows fromUser:(NSDictionary *)user;
+@property (nonatomic, strong) NSDictionary *businessHours;
+- (NSString *)businessHoursText;
 - (void)loadFullUserProfile;
 - (void)loadAvatarFromUserRecord:(NSDictionary *)user;
 - (void)rebuildDetailRows;

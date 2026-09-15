@@ -1,4 +1,5 @@
 #import "TGClient+ChatState.h"
+#import "TGFlattenBusiness.h"
 #import "TGChatPositions.h"
 #import "TGTDLibInt64.h"
 #import "TGClient+ChatManagement.h"
@@ -1943,6 +1944,8 @@ NSString *TGDraftText(id draftMessage) {
 					@"canCall" : full[@"can_be_called"] ?: @NO,
 					@"canVideoCall" : full[@"supports_video_calls"] ?: @NO,
 					@"hasPersonalPhoto" : @([full[@"personal_photo"] isKindOfClass:[NSDictionary class]]),
+					@"businessHours" : TGBizOpeningHoursFrom(
+							full[@"business_info"][@"opening_hours"]) ?: [NSNull null],
 				});
 		}];
 }
