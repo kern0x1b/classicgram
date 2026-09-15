@@ -23,7 +23,7 @@ CXX_STDLIB_SDK="${ROOT_DIR}/build/sdks/iPhoneOS16.5.sdk/usr/include/c++/v1"
 [ -d "${CXX_STDLIB_SDK}" ] || CXX_STDLIB_SDK="${XCODE_DEV}/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/c++/v1"
 CXX_STDLIB_INC="-isystem ${CXX_STDLIB_SDK}"
 
-[ -f "${TDLIB_SRC}/CMakeLists.txt" ] || { echo "[-] ${TDLIB_SRC} is empty - run git submodule update --init third_party/tdlib/td"; exit 1; }
+[ -f "${TDLIB_SRC}/CMakeLists.txt" ] || { echo "[-] TDLib is no longer vendored as a git submodule - build it with 'conan create packaging/tdlib -pr:h ios6-armv7 -pr:b default --build=missing'"; exit 1; }
 
 for tool in cmake gperf ccache; do
 	command -v "$tool" >/dev/null || { echo "[-] $tool not found (brew install $tool)"; exit 1; }
