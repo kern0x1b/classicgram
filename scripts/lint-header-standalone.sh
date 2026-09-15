@@ -37,6 +37,12 @@ print-%:
 EOF
 
 CLANG="$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+if [ ! -x "$CLANG" ]; then
+	CLANG="$(xcrun -f clang 2>/dev/null || true)"
+fi
+if [ ! -x "$CLANG" ]; then
+	CLANG="$(command -v clang || true)"
+fi
 SYSROOT=$(THEOS=${THEOS:-$HOME/theos} make -f "$PRINT_MK" print-SYSROOT 2>/dev/null | tail -1)
 INCLUDES=$(THEOS=${THEOS:-$HOME/theos} make -f "$PRINT_MK" print-SRC_INCLUDES 2>/dev/null | tail -1)
 
