@@ -245,10 +245,7 @@ BOOL TGChatIsPad(void);
 @property (nonatomic, copy) NSString *inlineQueryButtonParameter;
 @property (nonatomic, strong) UIView *inputPlate;
 @property (nonatomic, strong) UILabel *inputPlaceholder;
-- (void)refreshSendAsPlaceholder;
 @property (nonatomic, assign) BOOL quickReplySuggestionsActive;
-- (BOOL)updateQuickReplySuggestions;
-- (void)sendQuickReplyCandidate:(NSDictionary *)candidate;
 @property (nonatomic, assign) CGFloat composerTextHeight;
 @property (nonatomic, assign) CGFloat composerLineHeight;
 @property (nonatomic, assign) CGFloat keyboardInset;
@@ -618,8 +615,6 @@ BOOL TGChatIsPad(void);
 @property (nonatomic, assign) UIViewAnimationCurve keyboardCurve;
 
 - (void)installMessageHandler;
-- (void)installAnimatedEmojiHandler;
-- (void)playAnimatedEmojiSticker:(long long)stickerFileId animated:(BOOL)isAnimated;
 - (void)installPollHandler;
 @end
 
@@ -791,6 +786,9 @@ BOOL TGChatIsPad(void);
 
 @interface TGChatViewController (Taps)
 
+- (void)installAnimatedEmojiHandler;
+- (void)playAnimatedEmojiSticker:(long long)stickerFileId animated:(BOOL)isAnimated;
+
 - (void)showRecordingFailure;
 - (void)runFailedMessageOption:(NSString *)chosen;
 - (void)showAlertTitle:(NSString *)title message:(NSString *)message;
@@ -925,6 +923,8 @@ BOOL TGChatIsPad(void);
 
 @interface TGChatViewController (Drafts)
 
+- (void)refreshSendAsPlaceholder;
+
 - (void)showSelfDestructTimerPicker;
 - (void)runSendAsPickerIndex:(NSInteger)index;
 - (void)runSendOption:(NSString *)title;
@@ -1018,6 +1018,13 @@ BOOL TGChatIsPad(void);
 - (void)followBankCardNumber:(NSString *)cardNumber;
 - (void)showHeldLinkSheetFor:(NSString *)url;
 - (NSString *)urlInLabel:(UILabel *)label atPoint:(CGPoint)point;
+
+@end
+
+@interface TGChatViewController (QuickReplyAutocomplete)
+
+- (BOOL)updateQuickReplySuggestions;
+- (void)sendQuickReplyCandidate:(NSDictionary *)candidate;
 
 @end
 
