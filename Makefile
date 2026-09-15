@@ -24,7 +24,26 @@ APPLICATION_NAME = Telegram
 
 ROOT := $(THEOS_PROJECT_DIR)
 
-SRC_INCLUDES := $(addprefix -I$(ROOT)/,\
+$(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env: \
+		$(ROOT)/packaging/deps/conanfile.py $(ROOT)/packaging/tdlib/conanfile.py $(ROOT)/packaging/openssl/conanfile.py
+	conan install $(ROOT)/packaging/deps -pr:h ios6-armv7 -pr:b default --build=missing
+
+$(ROOT)/packaging/deps/build/conan/armv8/ios6-deps.env: \
+		$(ROOT)/packaging/deps/conanfile.py $(ROOT)/packaging/tdlib/conanfile.py $(ROOT)/packaging/openssl/conanfile.py
+	conan install $(ROOT)/packaging/deps -pr:h $(ROOT)/packaging/profiles/arm64 -pr:b default --build=missing
+
+include $(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env
+IOS6_HOST_TDLIB_armv7 := $(IOS6_HOST_TDLIB)
+IOS6_HOST_OPENSSL_armv7 := $(IOS6_HOST_OPENSSL)
+
+include $(ROOT)/packaging/deps/build/conan/armv8/ios6-deps.env
+IOS6_HOST_TDLIB_arm64 := $(IOS6_HOST_TDLIB)
+IOS6_HOST_OPENSSL_arm64 := $(IOS6_HOST_OPENSSL)
+
+IOS6_HOST_TDLIB = $(IOS6_HOST_TDLIB_$(THEOS_CURRENT_ARCH))
+IOS6_HOST_OPENSSL = $(IOS6_HOST_OPENSSL_$(THEOS_CURRENT_ARCH))
+
+SRC_INCLUDES = $(addprefix -I$(ROOT)/,\
 	src/Resources/Config app src/App src/TDLibClient src/Model src/Layout src/Theme \
 	src/Storage src/Calls src/Wire src/Wire/Types src/Wire/Flatten src/Wire/Decode \
 	src/Wire/Encode src/Media src/Stores src/Services src/Companions src/Utilities \
@@ -43,11 +62,10 @@ SRC_INCLUDES := $(addprefix -I$(ROOT)/,\
 	src/Screens/Media src/Screens/Media/Cells src/Screens/Media/Items \
 	src/Screens/Storage src/Screens/Storage/Cells src/Screens/Storage/Items \
 	src/Screens/Payments src/Screens/Misc \
-	third_party third_party/openssl/prebuilt/include third_party/webp/prebuilt third_party/ogg third_party/ogg/ogg \
+	third_party third_party/webp/prebuilt third_party/ogg third_party/ogg/ogg \
 	third_party/opus/prebuilt/include third_party/opus/prebuilt/include/opus \
-	third_party/opusenc third_party/opusfile third_party/libvpx third_party/libtgvoip \
-	third_party/tdlib/td) \
-	-I$(ROOT)/build/$(THEOS_CURRENT_ARCH)/tdlib/include
+	third_party/opusenc third_party/opusfile third_party/libvpx third_party/libtgvoip) \
+	-I$(IOS6_HOST_OPENSSL)/include
 
 CXX_STDLIB_SDK := $(firstword $(wildcard $(ROOT)/build/sdks/iPhoneOS16.5.sdk/usr/include/c++/v1) \
 	$(wildcard $(ROOT)/build/sdks/iPhoneOS15.6.sdk/usr/include/c++/v1) \
@@ -97,7 +115,7 @@ Telegram_FRAMEWORKS = UIKit Foundation CoreGraphics QuartzCore AudioToolbox Core
 	CoreText CFNetwork SystemConfiguration Security MapKit CoreLocation
 
 Telegram_LDFLAGS = -Wl,-dead_strip -ObjC -Wl,-pagezero_size,0x1000 \
-	-L$(ROOT)/build/$(THEOS_CURRENT_ARCH)/libs -L$(ROOT)/build/$(THEOS_CURRENT_ARCH)/tdlib/lib \
+	-L$(IOS6_HOST_OPENSSL)/lib \
 	-L$(ROOT)/third_party/opus/prebuilt/lib -L$(ROOT)/build/$(THEOS_CURRENT_ARCH)/libvpx-obj \
 	-F$(ROOT)/third_party/webp/prebuilt -framework WebP \
 	-lvpx -lopus -lstdc++ -lz -lcrypto -lpthread
@@ -128,16 +146,16 @@ after-stage::
 		/usr/libexec/PlistBuddy -c "Set :CFBundleName Telegram" $(BUNDLE)/Info.plist; \
 	fi
 	@cp -rf $(ROOT)/src/Resources/Localization/*.lproj $(BUNDLE)/
-	@if [ -f $(ROOT)/build/armv7/tdlib/lib/libtdjson.dylib ] && \
-		[ -f $(ROOT)/build/arm64/tdlib/lib/libtdjson.dylib ]; then \
-		lipo -create $(ROOT)/build/armv7/tdlib/lib/libtdjson.dylib \
-			$(ROOT)/build/arm64/tdlib/lib/libtdjson.dylib \
+	@if [ -f $(IOS6_HOST_TDLIB_armv7)/lib/libtdjson.dylib ] && \
+		[ -f $(IOS6_HOST_TDLIB_arm64)/lib/libtdjson.dylib ]; then \
+		lipo -create $(IOS6_HOST_TDLIB_armv7)/lib/libtdjson.dylib \
+			$(IOS6_HOST_TDLIB_arm64)/lib/libtdjson.dylib \
 			-output $(BUNDLE)/libtdjson.dylib 2>/dev/null \
-		|| cp -f $(ROOT)/build/armv7/tdlib/lib/libtdjson.dylib $(BUNDLE)/; \
-	elif [ -f $(ROOT)/build/armv7/tdlib/lib/libtdjson.dylib ]; then \
-		cp -f $(ROOT)/build/armv7/tdlib/lib/libtdjson.dylib $(BUNDLE)/; \
+		|| cp -f $(IOS6_HOST_TDLIB_armv7)/lib/libtdjson.dylib $(BUNDLE)/; \
+	elif [ -f $(IOS6_HOST_TDLIB_armv7)/lib/libtdjson.dylib ]; then \
+		cp -f $(IOS6_HOST_TDLIB_armv7)/lib/libtdjson.dylib $(BUNDLE)/; \
 	else \
-		echo "$(ECHO_PREFIX) no libtdjson.dylib yet - run scripts/build-tdlib-dylib.sh"; \
+		echo "$(ECHO_PREFIX) no libtdjson.dylib - conan install packaging/deps failed to produce one"; \
 	fi
 ifeq ($(DEBUG_HARNESS),1)
 	@cp -f $(ROOT)/src/Resources/CustomKeys.txt $(BUNDLE)/

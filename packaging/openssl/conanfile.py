@@ -2,45 +2,40 @@ import os
 
 from conan import ConanFile
 from conan.errors import ConanException
-from conan.tools.files import download, check_sha256, unzip, copy, replace_in_file
+from conan.tools.files import copy, replace_in_file
+from conan.tools.scm import Git
 
 
 class OpenSSLConan(ConanFile):
     name = "openssl"
-    user = "ios6"
+    user = "itglegacy"
     channel = "stable"
-    version = "1.1.1w"
+    version = "3.0.15"
     package_type = "static-library"
-    description = "OpenSSL 1.1.1w for the iOS 6 / armv7 and armv8 profiles this port targets"
-    license = "OpenSSL"
+    description = "OpenSSL 3.0.15 for the iOS 6 / armv7 and armv8 profiles this port targets"
+    license = "Apache-2.0"
     homepage = "https://www.openssl.org"
 
     python_requires = "ios6-base/1.0@ios6/stable"
     python_requires_extend = "ios6-base.Ios6Port"
 
     _armcap_old = (
-        '\t$ret = ".comm\\t_$name,@args[1]\\n";\n'
         '\t$ret .= ".non_lazy_symbol_pointer\\n";\n'
         '\t$ret .= "$name:\\n";\n'
         '\t$ret .= ".indirect_symbol\\t_$name\\n";\n'
-        '\t$ret .= ".long\\t0";\n'
+        '\t$ret .= ".long\\t0";'
     )
     _armcap_new = (
-        '\t$ret = ".comm\\t_$name,@args[1]\\n";\n'
         '\t$ret .= ".data\\n";\n'
         '\t$ret .= ".align\\t2\\n";\n'
         '\t$ret .= "$name:\\n";\n'
         '\t$ret .= ".long\\t_$name\\n";\n'
-        '\t$ret .= ".text";\n'
+        '\t$ret .= ".text";'
     )
 
     def source(self):
         data = self.conan_data["sources"][self.version]
-        tarball = os.path.join(self.source_folder, "openssl.tar.gz")
-        download(self, data["url"], tarball)
-        check_sha256(self, tarball, data["sha256"])
-        unzip(self, tarball, strip_root=True)
-        os.remove(tarball)
+        Git(self).fetch_commit(url=data["url"], commit=data["commit"])
         replace_in_file(self, os.path.join(self.source_folder, "crypto", "perlasm", "arm-xlate.pl"),
                          self._armcap_old, self._armcap_new)
 
@@ -57,10 +52,12 @@ class OpenSSLConan(ConanFile):
 
         if arch == "armv7":
             config_target = "ios-cross"
+            no_libatomic = "-DBROKEN_CLANG_ATOMICS"
         elif arch == "armv8":
             config_target = "ios64-cross"
+            no_libatomic = ""
         else:
-            raise ConanException(f"openssl/1.1.1w has no iOS Configure target for arch {arch!r}")
+            raise ConanException(f"openssl/{self.version} has no iOS Configure target for arch {arch!r}")
 
         env = {
             "CROSS_COMPILE": "",
@@ -70,8 +67,8 @@ class OpenSSLConan(ConanFile):
         }
         exports = " ".join(f'{k}="{v}"' for k, v in env.items())
 
-        self.run(f'{exports} ./Configure {config_target} no-shared no-dso '
-                  f'-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 '
+        self.run(f'{exports} ./Configure {config_target} no-shared no-dso no-tests no-engine no-async '
+                  f'-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 {no_libatomic} '
                   f'-isysroot "{sdk}" -mios-version-min={min_version}',
                   cwd=self.source_folder)
         self.run(f'{exports} make -j{os.cpu_count()} build_libs', cwd=self.source_folder)
@@ -81,7 +78,7 @@ class OpenSSLConan(ConanFile):
             copy(self, lib, self.source_folder, os.path.join(self.package_folder, "lib"), keep_path=False)
         copy(self, "*.h", os.path.join(self.source_folder, "include", "openssl"),
              os.path.join(self.package_folder, "include", "openssl"))
-        copy(self, "LICENSE", self.source_folder, os.path.join(self.package_folder, "licenses"))
+        copy(self, "LICENSE.txt", self.source_folder, os.path.join(self.package_folder, "licenses"))
 
     def package_info(self):
         self.cpp_info.libs = ["ssl", "crypto"]

@@ -1,4 +1,4 @@
 sources:
-  "1.1.1w":
-    url: "https://github.com/openssl/openssl/releases/download/OpenSSL_1_1_1w/openssl-1.1.1w.tar.gz"
-    sha256: "cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8"
+  "3.0.15":
+    url: "https://github.com/openssl/openssl.git"
+    commit: "c523121f902fde2929909dc7f76b13ceb4961efe"
