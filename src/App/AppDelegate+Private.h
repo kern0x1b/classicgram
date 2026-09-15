@@ -19,6 +19,7 @@ extern void TGEmojiPurgeImages(void);
 
 - (void)handleBotStartLinkURL:(NSURL *)url;
 - (void)startPendingAppBotLink:(NSString *)link;
+- (void)addBotFromLink:(NSString *)link;
 - (void)handleChatFolderInviteLinkURL:(NSURL *)url;
 - (BOOL)handleAppURL:(NSURL *)url;
 - (BOOL)handleDebugHarnessURL:(NSURL *)url;

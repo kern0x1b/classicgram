@@ -1026,6 +1026,7 @@ BOOL TGChatIsPad(void);
 - (void)presentQuoteOutdatedAlertForMessageIds:(NSArray *)messageIds;
 - (void)joinChatByInviteLinkRetrying:(NSString *)invite;
 - (void)startPendingBotLink:(NSString *)link;
+- (void)addBotFromLink:(NSString *)link;
 - (void)confirmJoinChatByInviteLink:(NSString *)invite info:(NSDictionary *)info;
 - (NSString *)textInAlert:(UIAlertView *)alertView;
 - (void)presentAiSuggestion:(NSString *)suggestion original:(NSString *)original title:(NSString *)title;

@@ -92,6 +92,27 @@
 	[self sendCurrentLocation];
 }
 
+- (void)addBotFromLink:(NSString *)link {
+	__weak typeof(self) weakSelf = self;
+	[TGBotAddToChat presentForLink:link
+					fromController:self
+						completion:^(int64_t addedChatId, NSString *addError) {
+							TGChatViewController *strongSelf = weakSelf;
+							if (!strongSelf)
+								return;
+							if (addedChatId) {
+								[strongSelf openChatId:addedChatId title:@"" isGroup:YES];
+								return;
+							}
+							if (!addError.length || [addError isEqualToString:@"cancelled"])
+								return;
+							NSString *message = [addError isEqualToString:@"noChats"]
+								? TGL(@"Bot.AddToChatNoChats", @"You have no groups or channels to add this bot to.")
+								: TGFriendlyErrorText(addError, TGL(@"Login.UnknownError", @"An error occurred, please try again later."));
+							[TGSnackbar showInView:strongSelf.view text:message seconds:3 onCommit:nil];
+						}];
+}
+
 - (void)startPendingBotLink:(NSString *)link {
 	if (!link.length)
 		return;
@@ -105,23 +126,7 @@
 			return;
 		}
 		if ([errorCode isEqualToString:@"pickChat"]) {
-			[TGBotAddToChat presentForLink:link
-							fromController:strongSelf
-								completion:^(int64_t addedChatId, NSString *addError) {
-									TGChatViewController *controller = weakSelf;
-									if (!controller)
-										return;
-									if (addedChatId) {
-										[controller openChatId:addedChatId title:@"" isGroup:YES];
-										return;
-									}
-									if (!addError.length || [addError isEqualToString:@"cancelled"])
-										return;
-									NSString *message = [addError isEqualToString:@"noChats"]
-										? TGL(@"Bot.AddToChatNoChats", @"You have no groups or channels to add this bot to.")
-										: TGFriendlyErrorText(addError, TGL(@"Login.UnknownError", @"An error occurred, please try again later."));
-									[TGSnackbar showInView:controller.view text:message seconds:3 onCommit:nil];
-								}];
+			[strongSelf addBotFromLink:link];
 			return;
 		}
 		if ([errorCode isEqualToString:@"unsupported"]) {

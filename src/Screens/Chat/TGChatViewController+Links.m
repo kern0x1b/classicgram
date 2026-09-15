@@ -54,8 +54,8 @@
 			[strongSelf resolveAndOpenLink:url];
 			return;
 		}
-		if ([info[@"inGroup"] boolValue]) {
-			[TGSnackbar showInView:strongSelf.view text:TGL(@"Toast.CouldNotOpenLink", @"Could not open this link") seconds:2 onCommit:nil];
+		if ([info[@"inGroup"] boolValue] || [info[@"inChannel"] boolValue]) {
+			[strongSelf addBotFromLink:url];
 			return;
 		}
 		if ([info[@"autostart"] boolValue]) {

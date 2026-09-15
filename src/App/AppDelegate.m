@@ -976,8 +976,8 @@ static void TGWatchForIncomingCalls(void) {
 		NSString *username = info[@"username"];
 		if (!username.length)
 			return;
-		if ([info[@"inGroup"] boolValue]) {
-			[strongSelf showLinkCouldNotBeOpenedToast];
+		if ([info[@"inGroup"] boolValue] || [info[@"inChannel"] boolValue]) {
+			[strongSelf addBotFromLink:link];
 			return;
 		}
 		if ([info[@"autostart"] boolValue]) {
@@ -995,6 +995,24 @@ static void TGWatchForIncomingCalls(void) {
 		ask.tag = kAppBotStartAlertTag;
 		[ask show];
 	}];
+}
+
+- (void)addBotFromLink:(NSString *)link {
+	__weak typeof(self) weakSelf = self;
+	[TGBotAddToChat presentForLink:link
+					fromController:self.window.rootViewController
+						completion:^(int64_t addedChatId, NSString *addError) {
+							AppDelegate *strongSelf = weakSelf;
+							if (!strongSelf)
+								return;
+							if (addedChatId) {
+								[strongSelf openChatFromNotification:addedChatId];
+								return;
+							}
+							if (!addError.length || [addError isEqualToString:@"cancelled"])
+								return;
+							[strongSelf showBotAddFailure:addError];
+						}];
 }
 
 - (void)showBotAddFailure:(NSString *)errorCode {
@@ -1019,20 +1037,7 @@ static void TGWatchForIncomingCalls(void) {
 			return;
 		}
 		if ([errorCode isEqualToString:@"pickChat"]) {
-			[TGBotAddToChat presentForLink:link
-							fromController:strongSelf.window.rootViewController
-								completion:^(int64_t addedChatId, NSString *addError) {
-									AppDelegate *delegate = weakSelf;
-									if (!delegate)
-										return;
-									if (addedChatId) {
-										[delegate openChatFromNotification:addedChatId];
-										return;
-									}
-									if (!addError.length || [addError isEqualToString:@"cancelled"])
-										return;
-									[delegate showBotAddFailure:addError];
-								}];
+			[strongSelf addBotFromLink:link];
 			return;
 		}
 		if ([errorCode isEqualToString:@"unsupported"]) {
