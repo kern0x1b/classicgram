@@ -2864,6 +2864,7 @@ Tap on a sticker to view and add the whole set.";
 "Profile.EditContact" = "Edit contact";
 "Profile.EncryptionKey" = "Encryption Key";
 "Profile.ShareContactButton" = "Share contact";
+"Profile.ExportVCard" = "Export vCard";
 "PeerInfo.Topics.EnableTopics" = "Turn On";
 "PeerInfo.VerifyAccounts" = "Verify Accounts";
 "Profile.WhichTabDoesThisChannelS" = "Which tab does this channel's profile open on?";

@@ -1,4 +1,5 @@
 #import "TGClient+ChatManagement.h"
+#import "TGVCard.h"
 #import "TGProfileViewController.h"
 #import "TGProfileViewControllerInternal.h"
 #import "TGProfileButtonsCell.h"
@@ -62,6 +63,8 @@
 		[items addObject:@{@"title" : TGL(@"PeerInfo.Gifts.SendGift", @"Send Gift"), @"icon" : @"chat"}];
 	if (self.userId && self.recipientAcceptsPremiumGift)
 		[items addObject:@{@"title" : TGL(@"PeerInfo.GiftPremium", @"Gift Premium"), @"icon" : @"chat"}];
+	if (self.userId)
+		[items addObject:@{@"title" : TGL(@"Profile.ExportVCard", @"Export vCard"), @"icon" : @"chat"}];
 	if (self.userId)
 		[items addObject:@{@"title" : TGL(@"ReportPeer.Report", @"Report"), @"icon" : @"privacy"}];
 	if (self.chatId)
@@ -168,6 +171,11 @@
 
 	if ([title isEqualToString:@"Share contact"]) {
 		[self pushContactForwardPicker];
+		return;
+	}
+
+	if ([title isEqualToString:TGL(@"Profile.ExportVCard", @"Export vCard")]) {
+		[self exportContactVCard];
 		return;
 	}
 
@@ -309,6 +317,26 @@
 				   otherButtonTitles:TGL(@"PeerInfo.AlertLeaveAction", @"Leave"), nil];
 	confirm.tag = 72;
 	[confirm show];
+}
+
+- (void)exportContactVCard {
+	id handle = self.activeUsernames.firstObject;
+	NSString *card = TGVCardForContact(self.firstName, self.lastName, self.phoneNumber,
+		[handle isKindOfClass:NSString.class] ? handle : nil);
+	if (!card.length || !self.view.window)
+		return;
+	NSString *fileName = TGVCardFileNameForContact(
+		self.firstName.length ? self.firstName : self.name, self.lastName);
+	NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
+	if (![card writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:NULL])
+		return;
+	UIDocumentInteractionController *interaction = [UIDocumentInteractionController
+		interactionControllerWithURL:[NSURL fileURLWithPath:path]];
+	if (!interaction)
+		return;
+	self.documentInteraction = interaction;
+	if (![interaction presentOpenInMenuFromRect:self.view.bounds inView:self.view animated:YES])
+		self.documentInteraction = nil;
 }
 
 - (void)pushContactForwardPicker {

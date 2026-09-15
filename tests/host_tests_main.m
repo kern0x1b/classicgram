@@ -144,6 +144,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "chat_title_credibility/tg_chat_title_credibility_tests.h"
 #import "chat_title_premium/tg_chat_title_premium_tests.h"
 #import "sender_name_colour/tg_sender_name_colour_tests.h"
+#import "vcard/tg_vcard_tests.h"
 #import "bubble_reuse_identifier/tg_bubble_reuse_identifier_tests.h"
 #import "quote_body_text/tg_quote_body_text_tests.h"
 #import "disappearing_media/tg_disappearing_media_tests.h"
@@ -1390,6 +1391,8 @@ int main(void) {
 					TGSenderNameColourTestTheColourEachSenderKeeps},
 			{"sender_name_colour_a_chosen_colour_wins",
 					TGSenderNameColourTestAChosenColourWins},
+			{"vcard_what_a_card_says", TGVCardTestWhatACardSays},
+			{"vcard_what_the_file_is_called", TGVCardTestWhatTheFileIsCalled},
 			{"bubble_reuse_identifier_every_kind_lands_on_its_own_cell",
 					TGBubbleReuseIdentifierTestEveryKindLandsOnItsOwnCell},
 			{"bubble_reuse_identifier_burning_media_keeps_its_label",

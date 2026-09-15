@@ -47,6 +47,7 @@ extern const CGFloat kOverlayPagerHeight;
 @property (nonatomic, assign) BOOL muted;
 @property (nonatomic, assign) BOOL translatable;
 @property (nonatomic, strong) NSString *phoneNumber;
+@property (nonatomic, strong) UIDocumentInteractionController *documentInteraction;
 @property (nonatomic, assign) BOOL usernameIsCollectible;
 @property (nonatomic, copy) NSString *collectibleUsername;
 @property (nonatomic, strong) UIImage *avatarImage;

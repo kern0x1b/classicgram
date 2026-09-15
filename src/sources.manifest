@@ -702,6 +702,7 @@ src/Utilities/TGStorageKindName.m
 src/Utilities/TGStringTruncation.m
 src/Utilities/TGTextSelectionWordRange.m
 src/Utilities/TGTextWarmup.m
+src/Utilities/TGVCard.m
 src/Utilities/UIView+SafeTint.m
 src/Utilities/tlv_polyfill.c
 src/Views/Cells/TGContactRowMetrics.m
