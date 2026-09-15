@@ -24,24 +24,27 @@ APPLICATION_NAME = Telegram
 
 ROOT := $(THEOS_PROJECT_DIR)
 
-$(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env: \
-		$(ROOT)/packaging/deps/conanfile.py $(ROOT)/packaging/tdlib/conanfile.py $(ROOT)/packaging/openssl/conanfile.py
-	conan install $(ROOT)/packaging/deps -pr:h ios6-armv7 -pr:b default --build=missing
+IOS6_DEPS_CONANFILES := $(ROOT)/packaging/deps/conanfile.py $(ROOT)/packaging/tdlib/conanfile.py \
+	$(ROOT)/packaging/openssl/conanfile.py $(ROOT)/packaging/ogg/conanfile.py \
+	$(ROOT)/packaging/quirc/conanfile.py $(ROOT)/packaging/opusenc/conanfile.py \
+	$(ROOT)/packaging/opusfile/conanfile.py $(ROOT)/packaging/opus/conanfile.py \
+	$(ROOT)/packaging/libvpx/conanfile.py $(ROOT)/packaging/libtgvoip/conanfile.py
 
-$(ROOT)/packaging/deps/build/conan/armv8/ios6-deps.env: \
-		$(ROOT)/packaging/deps/conanfile.py $(ROOT)/packaging/tdlib/conanfile.py $(ROOT)/packaging/openssl/conanfile.py
-	conan install $(ROOT)/packaging/deps -pr:h $(ROOT)/packaging/profiles/arm64 -pr:b default --build=missing
+$(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env: $(IOS6_DEPS_CONANFILES)
+	ITGLEGACY_ROOT=$(ROOT) conan install $(ROOT)/packaging/deps -pr:h ios6-armv7 -pr:b default --build=missing
+
+$(ROOT)/packaging/deps/build/conan/armv8/ios6-deps.env: $(IOS6_DEPS_CONANFILES)
+	ITGLEGACY_ROOT=$(ROOT) conan install $(ROOT)/packaging/deps -pr:h $(ROOT)/packaging/profiles/arm64 -pr:b default --build=missing
+
+IOS6_DEPS := TDLIB OPENSSL OGG QUIRC OPUSENC OPUSFILE OPUS LIBVPX LIBTGVOIP
 
 include $(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env
-IOS6_HOST_TDLIB_armv7 := $(IOS6_HOST_TDLIB)
-IOS6_HOST_OPENSSL_armv7 := $(IOS6_HOST_OPENSSL)
+$(foreach d,$(IOS6_DEPS),$(eval IOS6_HOST_$(d)_armv7 := $(IOS6_HOST_$(d))))
 
 include $(ROOT)/packaging/deps/build/conan/armv8/ios6-deps.env
-IOS6_HOST_TDLIB_arm64 := $(IOS6_HOST_TDLIB)
-IOS6_HOST_OPENSSL_arm64 := $(IOS6_HOST_OPENSSL)
+$(foreach d,$(IOS6_DEPS),$(eval IOS6_HOST_$(d)_arm64 := $(IOS6_HOST_$(d))))
 
-IOS6_HOST_TDLIB = $(IOS6_HOST_TDLIB_$(THEOS_CURRENT_ARCH))
-IOS6_HOST_OPENSSL = $(IOS6_HOST_OPENSSL_$(THEOS_CURRENT_ARCH))
+$(foreach d,$(IOS6_DEPS),$(eval IOS6_HOST_$(d) = $$(IOS6_HOST_$(d)_$$(THEOS_CURRENT_ARCH))))
 
 SRC_INCLUDES = $(addprefix -I$(ROOT)/,\
 	src/Resources/Config app src/App src/TDLibClient src/Model src/Layout src/Theme \
@@ -62,10 +65,15 @@ SRC_INCLUDES = $(addprefix -I$(ROOT)/,\
 	src/Screens/Media src/Screens/Media/Cells src/Screens/Media/Items \
 	src/Screens/Storage src/Screens/Storage/Cells src/Screens/Storage/Items \
 	src/Screens/Payments src/Screens/Misc \
-	third_party third_party/webp/prebuilt third_party/ogg third_party/ogg/ogg \
-	third_party/opus/prebuilt/include third_party/opus/prebuilt/include/opus \
-	third_party/opusenc third_party/opusfile third_party/libvpx third_party/libtgvoip) \
-	-I$(IOS6_HOST_OPENSSL)/include
+	third_party/webp/prebuilt) \
+	-I$(IOS6_HOST_OPENSSL)/include \
+	-I$(IOS6_HOST_OGG)/include \
+	-I$(IOS6_HOST_QUIRC)/include \
+	-I$(IOS6_HOST_OPUSENC)/include -I$(IOS6_HOST_OPUSENC)/include/opusenc \
+	-I$(IOS6_HOST_OPUSFILE)/include \
+	-I$(IOS6_HOST_OPUS)/include -I$(IOS6_HOST_OPUS)/include/opus \
+	-I$(IOS6_HOST_LIBVPX)/include \
+	-I$(IOS6_HOST_LIBTGVOIP)/include
 
 CXX_STDLIB_SDK := $(firstword $(wildcard $(ROOT)/build/sdks/iPhoneOS16.5.sdk/usr/include/c++/v1) \
 	$(wildcard $(ROOT)/build/sdks/iPhoneOS15.6.sdk/usr/include/c++/v1) \
@@ -79,27 +87,10 @@ APP_SRC_M := $(filter-out $(ROOT)/src/App/AppDelegate+I18nDump.m,$(APP_SRC_M))
 endif
 APP_SRC_C := $(shell find $(ROOT)/src -name '*.c' -not -path '$(ROOT)/src/Resources/*' | sort)
 
-THIRD_PARTY_SRC_C := $(addprefix third_party/,\
-	quirc/quirc.c quirc/identify.c quirc/decode.c quirc/version_db.c \
-	opusfile/internal.c opusfile/opusfile.c opusfile/info.c opusfile/stream.c \
-	ogg/ogg/framing.c ogg/ogg/bitwise.c opusenc/opus_header.c)
-
-VOIP_SRC := $(addprefix third_party/libtgvoip/,\
-	VoIPController.cpp VoIPServerConfig.cpp logging.cpp json11.cpp \
-	video/ScreamCongestionController.cpp video/VideoSource.cpp video/TGVP8Codec.cpp \
-	os/darwin/TGCallVideoSource.cpp os/darwin/TGCallVideoRenderer.cpp \
-	JitterBuffer.cpp OpusEncoder.cpp OpusDecoder.cpp NetworkSocket.cpp \
-	CongestionControl.cpp EchoCanceller.cpp MessageThread.cpp Buffers.cpp \
-	BlockingQueue.cpp MediaStreamItf.cpp PacketReassembler.cpp \
-	audio/AudioIO.cpp audio/AudioInput.cpp audio/AudioOutput.cpp audio/Resampler.cpp \
-	os/darwin/AudioUnitIO.cpp os/darwin/AudioInputAudioUnit.cpp \
-	os/darwin/AudioOutputAudioUnit.cpp os/posix/NetworkSocketPosix.cpp \
-	os/darwin/DarwinSpecific.mm os/darwin/TGVTDynamic.mm)
-
 VOIP_SRC_MM := src/Calls/TGCall.mm src/Utilities/TGDateUtils.mm \
 	src/Media/TGVideoCapture.mm src/Media/TGVideoLoopback.mm
 
-Telegram_FILES = $(APP_SRC_M) $(APP_SRC_C) $(THIRD_PARTY_SRC_C) $(VOIP_SRC) $(VOIP_SRC_MM)
+Telegram_FILES = $(APP_SRC_M) $(APP_SRC_C) $(VOIP_SRC_MM)
 
 Telegram_CFLAGS = -O2 -fPIC -fno-modules -DTHEOS_LEAN_AND_MEAN $(SRC_INCLUDES) \
 	-DTGVOIP_NO_DSP -DWEBRTC_POSIX -DTGVOIP_USE_CUSTOM_CRYPTO \
@@ -116,9 +107,11 @@ Telegram_FRAMEWORKS = UIKit Foundation CoreGraphics QuartzCore AudioToolbox Core
 
 Telegram_LDFLAGS = -Wl,-dead_strip -ObjC -Wl,-pagezero_size,0x1000 \
 	-L$(IOS6_HOST_OPENSSL)/lib \
-	-L$(ROOT)/third_party/opus/prebuilt/lib -L$(ROOT)/build/$(THEOS_CURRENT_ARCH)/libvpx-obj \
+	-L$(IOS6_HOST_OGG)/lib -L$(IOS6_HOST_QUIRC)/lib -L$(IOS6_HOST_OPUSENC)/lib \
+	-L$(IOS6_HOST_OPUSFILE)/lib -L$(IOS6_HOST_OPUS)/lib -L$(IOS6_HOST_LIBVPX)/lib \
+	-L$(IOS6_HOST_LIBTGVOIP)/lib \
 	-F$(ROOT)/third_party/webp/prebuilt -framework WebP \
-	-lvpx -lopus -lstdc++ -lz -lcrypto -lpthread
+	-ltgvoip -lopusfile -lopusenc -lquirc -lopus -lvpx -logg -lstdc++ -lz -lcrypto -lpthread
 
 Telegram_INSTALL_PATH = /Applications
 Telegram_CODESIGN_FLAGS = -S$(ROOT)/src/Resources/entitlements.plist
@@ -134,8 +127,6 @@ $(MACHOFIX): scripts/fix-armv7-macho.c
 
 before-all::
 	@$(MAKE) --no-print-directory $(MACHOFIX)
-	@scripts/build-libvpx.sh armv7
-	@$(foreach a,$(filter-out armv7,$(ARCHS)),scripts/build-libvpx.sh $(a);)
 
 after-stage::
 	@cp -f $(ROOT)/src/Resources/Info.plist $(BUNDLE)/Info.plist
