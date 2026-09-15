@@ -1083,6 +1083,11 @@ static void TGMCSendEditCaptionRequest(TGClient *client, int64_t messageId, int6
 	}];
 }
 
+NSString *const TGAnimatedEmojiClickedNotification = @"TGAnimatedEmojiClickedNotification";
+NSString *const TGAnimatedEmojiClickedChatIdKey = @"chatId";
+NSString *const TGAnimatedEmojiClickedStickerFileIdKey = @"stickerFileId";
+NSString *const TGAnimatedEmojiClickedIsAnimatedKey = @"isAnimated";
+
 - (void)clickAnimatedEmojiInMessage:(int64_t)messageId
 							 inChat:(int64_t)chatId
 						 completion:(void (^)(long long, BOOL))completion {

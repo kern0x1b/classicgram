@@ -1,4 +1,5 @@
 #import "TGFloodWaitNotice.h"
+#import "TGClient+MessageContent.h"
 #import "TGCacheTrim.h"
 #import "TGUserDisplayName.h"
 #import "TGRequestExpiry.h"
@@ -725,6 +726,30 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 
 	if ([type isEqualToString:@"updateChatAction"]) {
 		[self handleUpdateChatAction:obj];
+		return;
+	}
+
+	if ([type isEqualToString:@"updateAnimatedEmojiMessageClicked"]) {
+		NSDictionary *sticker = [obj[@"sticker"] isKindOfClass:NSDictionary.class]
+			? obj[@"sticker"]
+			: nil;
+		NSDictionary *file = [sticker[@"sticker"] isKindOfClass:NSDictionary.class]
+			? sticker[@"sticker"]
+			: nil;
+		long long fileId = [file[@"id"] longLongValue];
+		if (fileId <= 0)
+			return;
+		BOOL isAnimated = [[sticker[@"format"] isKindOfClass:NSDictionary.class]
+				? sticker[@"format"][@"@type"]
+				: @"" isEqualToString:@"stickerFormatTgs"];
+		[[NSNotificationCenter defaultCenter]
+			postNotificationName:TGAnimatedEmojiClickedNotification
+						  object:nil
+						userInfo:@{
+							TGAnimatedEmojiClickedChatIdKey : obj[@"chat_id"] ?: @(0),
+							TGAnimatedEmojiClickedStickerFileIdKey : @(fileId),
+							TGAnimatedEmojiClickedIsAnimatedKey : @(isAnimated),
+						}];
 		return;
 	}
 

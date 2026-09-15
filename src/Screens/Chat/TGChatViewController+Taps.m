@@ -485,26 +485,53 @@
 	});
 }
 
+- (void)playAnimatedEmojiSticker:(long long)stickerFileId animated:(BOOL)isAnimated {
+	if (stickerFileId <= 0)
+		return;
+	__weak typeof(self) weakSelf = self;
+	[TGFileDownloadService downloadFile:stickerFileId completion:^(NSString *path) {
+		TGChatViewController *innerSelf = weakSelf;
+		if (!innerSelf || !path.length)
+			return;
+		if (isAnimated) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				TGChatViewController *host = weakSelf;
+				[host presentAnimatedEmojiLottieEffectAtPath:path];
+			});
+			return;
+		}
+		[innerSelf presentAnimatedEmojiStaticEffectAtPath:path];
+	}];
+}
+
+- (void)installAnimatedEmojiHandler {
+	if (self.animatedEmojiObserverToken)
+		return;
+	__weak typeof(self) weakSelf = self;
+	self.animatedEmojiObserverToken = [[NSNotificationCenter defaultCenter]
+		addObserverForName:TGAnimatedEmojiClickedNotification
+					object:nil
+					 queue:[NSOperationQueue mainQueue]
+				usingBlock:^(NSNotification *note) {
+		TGChatViewController *strongSelf = weakSelf;
+		if (!strongSelf)
+			return;
+		if ([note.userInfo[TGAnimatedEmojiClickedChatIdKey] longLongValue] != strongSelf.chatId)
+			return;
+		[strongSelf playAnimatedEmojiSticker:
+				[note.userInfo[TGAnimatedEmojiClickedStickerFileIdKey] longLongValue]
+								   animated:[note.userInfo[TGAnimatedEmojiClickedIsAnimatedKey] boolValue]];
+	}];
+}
+
 - (void)playAnimatedEmojiEffectFor:(int64_t)messageId {
 	__weak typeof(self) weakSelf = self;
 	TGClient *client = [TGClient shared];
 	[client clickAnimatedEmojiInMessage:messageId inChat:self.chatId completion:^(long long stickerFileId, BOOL isAnimated) {
 		TGChatViewController *strongSelf = weakSelf;
-		if (!strongSelf || stickerFileId <= 0)
+		if (!strongSelf)
 			return;
-		[TGFileDownloadService downloadFile:stickerFileId completion:^(NSString *path) {
-			TGChatViewController *innerSelf = weakSelf;
-			if (!innerSelf || !path.length)
-				return;
-			if (isAnimated) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					TGChatViewController *host = weakSelf;
-					[host presentAnimatedEmojiLottieEffectAtPath:path];
-				});
-				return;
-			}
-			[innerSelf presentAnimatedEmojiStaticEffectAtPath:path];
-		}];
+		[strongSelf playAnimatedEmojiSticker:stickerFileId animated:isAnimated];
 	}];
 }
 

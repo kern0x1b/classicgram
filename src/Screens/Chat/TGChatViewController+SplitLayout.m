@@ -194,6 +194,8 @@
 		[[NSNotificationCenter defaultCenter] removeObserver:self.chatActionObserverToken];
 	if (self.messageObserverToken)
 		[[NSNotificationCenter defaultCenter] removeObserver:self.messageObserverToken];
+	if (self.animatedEmojiObserverToken)
+		[[NSNotificationCenter defaultCenter] removeObserver:self.animatedEmojiObserverToken];
 	if (self.pollObserverToken)
 		[[NSNotificationCenter defaultCenter] removeObserver:self.pollObserverToken];
 	if (self.protectedContentObserver)

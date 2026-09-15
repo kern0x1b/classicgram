@@ -352,6 +352,7 @@ BOOL TGChatIsPad(void);
 @property (nonatomic, strong) id customEmojiObserverToken;
 @property (nonatomic, strong) id chatActionObserverToken;
 @property (nonatomic, strong) id messageObserverToken;
+@property (nonatomic, strong) id animatedEmojiObserverToken;
 @property (nonatomic, strong) id pollObserverToken;
 @property (nonatomic, strong) id fileProgressObserverToken;
 @property (nonatomic, strong) id keyboardWillShowObserverToken;
@@ -613,6 +614,8 @@ BOOL TGChatIsPad(void);
 @property (nonatomic, assign) UIViewAnimationCurve keyboardCurve;
 
 - (void)installMessageHandler;
+- (void)installAnimatedEmojiHandler;
+- (void)playAnimatedEmojiSticker:(long long)stickerFileId animated:(BOOL)isAnimated;
 - (void)installPollHandler;
 @end
 

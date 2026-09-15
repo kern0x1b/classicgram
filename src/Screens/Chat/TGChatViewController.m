@@ -666,6 +666,7 @@ NSString *TGFormatByteCount(long long bytes) {
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	[self installMessageHandler];
+	[self installAnimatedEmojiHandler];
 	[self installPollHandler];
 	[TGAssetPicker warmAvailability];
 	[[TGMusicPlayer shared] chatOpened:self.chatId];
