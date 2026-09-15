@@ -12,5 +12,6 @@
 @property (nonatomic, copy) NSString *tagLabel;
 @property (nonatomic, assign) BOOL chosen;
 @property (nonatomic, assign) BOOL custom;
+@property (nonatomic, assign) BOOL paid;
 
 @end

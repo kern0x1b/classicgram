@@ -665,6 +665,23 @@ static NSString *TGReactionSenderName(TGClient *client, int64_t senderId) {
 	return out;
 }
 
+- (void)paidReactorsForMessage:(int64_t)messageId
+						inChat:(int64_t)chatId
+					completion:(void (^)(NSArray *reactors))completion {
+	if (!completion)
+		return;
+	[self request:@{@"@type" : @"getMessage",
+		@"chat_id" : @(chatId),
+		@"message_id" : @(messageId)}
+		completion:^(NSDictionary *result) {
+			if (TGResultIsError(result)) {
+				completion(@[]);
+				return;
+			}
+			completion([TGClient paidReactorsFromMessage:result]);
+		}];
+}
+
 - (void)reactionUsageForMessage:(int64_t)messageId
 						 inChat:(int64_t)chatId
 					 completion:(void (^)(NSArray *chosenEmoji,

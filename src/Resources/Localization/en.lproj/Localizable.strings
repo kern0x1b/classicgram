@@ -1539,6 +1539,7 @@ Learn more at telegram.org";
 "QuickReply.CreateShortcutTitle" = "New Quick Reply";
 "QuickReply.ShortcutExistsInlineError" = "A quick reply with this name already exists.";
 "QuickReply.ShortcutInvalidInlineError" = "This isn't a valid name for a quick reply.";
+"Reactions.TopPaidReactors" = "Top Reactors";
 "Reactions.UnknownReactor" = "Unknown";
 "Resolve.ChannelErrorNotFound" = "Sorry, this channel doesn't seem to exist.";
 "Resolve.ErrorNotFound" = "Sorry, this user doesn't seem to exist.";

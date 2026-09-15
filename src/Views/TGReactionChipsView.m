@@ -2,6 +2,7 @@
 #import "TGReactionPickerViewInternal.h"
 #import "TGReactionChipView.h"
 #import "TGReactionListViewController.h"
+#import "TGPaidReactorsViewController.h"
 #import "TGReactionService.h"
 #import "TGTheme.h"
 #import "TGLocalization.h"
@@ -149,6 +150,7 @@
 		view.emoji = emoji;
 		view.chosen = chosen;
 		view.custom = custom;
+		view.paid = [[chip objectForKey:@"paid"] boolValue];
 		view.emojiLabel.text = emoji;
 		view.countLabel.text = [NSString stringWithFormat:@"%d", (int)MAX(1, count)];
 		view.tagLabel = label;
@@ -241,6 +243,13 @@
 - (void)chipLongPressed:(UILongPressGestureRecognizer *)recognizer {
 	if (recognizer.state != UIGestureRecognizerStateBegan)
 		return;
+	TGReactionChipView *chip = [recognizer.view isKindOfClass:[TGReactionChipView class]]
+		? (TGReactionChipView *)recognizer.view
+		: nil;
+	if (chip.paid) {
+		[self showPaidReactors];
+		return;
+	}
 	[self showReactionList];
 }
 
@@ -278,10 +287,36 @@
 		[owner presentModalViewController:navigation animated:YES];
 }
 
+- (void)showPaidReactors {
+	if (_chatId == 0 || _messageId == 0)
+		return;
+
+	UIViewController *owner = TGReactionOwningController(self);
+	if (owner == nil)
+		return;
+
+	TGPaidReactorsViewController *board = [[TGPaidReactorsViewController alloc]
+		initWithMessage:_messageId
+				 chatId:_chatId];
+	UINavigationController *navigation =
+		[[UINavigationController alloc] initWithRootViewController:board];
+	[[TGTheme shared] styleNavigationBar:navigation.navigationBar];
+
+	if ([owner respondsToSelector:@selector(presentViewController:animated:completion:)])
+		[owner presentViewController:navigation animated:YES completion:nil];
+	else
+		[owner presentModalViewController:navigation animated:YES];
+}
+
 - (void)chipTapped:(TGReactionChipView *)view {
 	NSString *emoji = view.emoji;
 	if (emoji.length == 0)
 		return;
+
+	if (view.paid) {
+		[self showPaidReactors];
+		return;
+	}
 
 	if (view.custom) {
 		[self showReactionList];

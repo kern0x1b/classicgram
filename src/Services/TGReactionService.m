@@ -92,6 +92,12 @@
 									 completion:completion];
 }
 
++ (void)paidReactorsForMessage:(int64_t)messageId
+						inChat:(int64_t)chatId
+					completion:(void (^)(NSArray *reactors))completion {
+	[[TGClient shared] paidReactorsForMessage:messageId inChat:chatId completion:completion];
+}
+
 + (NSArray *)resolvedReactorRows:(NSArray *)rows {
 	return [TGClient resolvedChips:rows];
 }

@@ -687,6 +687,7 @@ src/Utilities/TGListStateText.m
 src/Utilities/TGLocalization.m
 src/Utilities/TGMentionTrigger.m
 src/Utilities/TGMirroredRect.m
+src/Utilities/TGPaidReactors.m
 src/Utilities/TGPerfLogging.m
 src/Utilities/TGPhoneFormat.m
 src/Utilities/TGPlainEmojiText.m
@@ -728,6 +729,7 @@ src/Views/TGMediaPageView.m
 src/Views/TGMediaTileView.m
 src/Views/TGMentionSuggestionStrip.m
 src/Views/TGMusicPlayerBar.m
+src/Views/TGPaidReactorsViewController.m
 src/Views/TGPlaceholderView.m
 src/Views/TGProfileChartView.m
 src/Views/TGProfileSectionMetrics.m

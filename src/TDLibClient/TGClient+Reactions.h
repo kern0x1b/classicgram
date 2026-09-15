@@ -76,6 +76,10 @@ extern NSString *const TGReactionCustomEmojiResolvedNotification;
 
 + (NSArray *)paidReactorsFromMessage:(NSDictionary *)message;
 
+- (void)paidReactorsForMessage:(int64_t)messageId
+						inChat:(int64_t)chatId
+					completion:(void (^ _Nullable)(NSArray *reactors))completion;
+
 - (void)reactionUsageForMessage:(int64_t)messageId
 						 inChat:(int64_t)chatId
 					 completion:(void (^ _Nullable)(NSArray *chosenEmoji,

@@ -144,6 +144,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "chat_title_credibility/tg_chat_title_credibility_tests.h"
 #import "chat_title_premium/tg_chat_title_premium_tests.h"
 #import "sender_name_colour/tg_sender_name_colour_tests.h"
+#import "paid_reactors/tg_paid_reactors_tests.h"
 #import "vcard/tg_vcard_tests.h"
 #import "business_open_state/tg_business_open_state_tests.h"
 #import "quick_reply_trigger/tg_quick_reply_trigger_tests.h"
@@ -1393,6 +1394,9 @@ int main(void) {
 					TGSenderNameColourTestTheColourEachSenderKeeps},
 			{"sender_name_colour_a_chosen_colour_wins",
 					TGSenderNameColourTestAChosenColourWins},
+			{"paid_reactors_who_leads_the_board", TGPaidReactorsTestWhoLeadsTheBoard},
+			{"paid_reactors_what_the_board_adds_up_to",
+					TGPaidReactorsTestWhatTheBoardAddsUpTo},
 			{"vcard_what_a_card_says", TGVCardTestWhatACardSays},
 			{"vcard_what_the_file_is_called", TGVCardTestWhatTheFileIsCalled},
 			{"business_open_state_when_a_place_is_open",

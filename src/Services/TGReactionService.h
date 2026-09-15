@@ -54,6 +54,10 @@
 					  completion:(void (^)(NSArray *reactors, NSString *nextOffset,
 									 NSInteger totalCount))completion;
 
++ (void)paidReactorsForMessage:(int64_t)messageId
+						inChat:(int64_t)chatId
+					completion:(void (^)(NSArray *reactors))completion;
+
 + (NSArray *)resolvedReactorRows:(NSArray *)rows;
 
 + (id)addCustomEmojiResolvedObserver:(void (^)(void))handler;
