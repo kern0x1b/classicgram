@@ -46,7 +46,10 @@ SRC_INCLUDES := $(addprefix -I$(ROOT)/,\
 	third_party/tdlib/td) \
 	-I$(ROOT)/build/$(THEOS_CURRENT_ARCH)/tdlib/include
 
-CXX_STDLIB_INC := -isystem $(shell xcode-select -p)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/c++/v1
+CXX_STDLIB_SDK := $(firstword $(wildcard $(ROOT)/build/sdks/iPhoneOS16.5.sdk/usr/include/c++/v1) \
+	$(wildcard $(ROOT)/build/sdks/iPhoneOS15.6.sdk/usr/include/c++/v1) \
+	$(wildcard $(shell xcode-select -p)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/c++/v1))
+CXX_STDLIB_INC := -isystem $(CXX_STDLIB_SDK)
 
 APP_SRC_M := $(shell find $(ROOT)/src -name '*.m' -not -path '$(ROOT)/src/Resources/*' | sort)
 ifneq ($(DEBUG_HARNESS),1)
