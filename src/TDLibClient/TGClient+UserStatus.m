@@ -713,6 +713,13 @@ static NSMutableArray *TGProfileAccentColorAvailableIdsCache(void) {
 	return @(builtIn[index]);
 }
 
+- (NSNumber *)cachedAccentRgbForSenderId:(int64_t)senderId {
+	id accentId = TGUSDict(self.userRecordsById[@(senderId)])[@"accent_color_id"];
+	if (![accentId isKindOfClass:NSNumber.class])
+		return nil;
+	return [TGClient rgbForAccentColorId:[accentId integerValue]];
+}
+
 + (NSArray *)profileGradientForColorId:(NSInteger)colorId {
 	if (colorId < 0)
 		return nil;

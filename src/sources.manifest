@@ -743,6 +743,7 @@ src/Views/TGReplySwipeRecognizer.m
 src/Views/TGReusableView.m
 src/Views/TGSeenByStatusText.m
 src/Views/TGSeenByViewController.m
+src/Views/TGSenderNameColour.m
 src/Views/TGStickerPanelView+Geometry.m
 src/Views/TGStickerPanelView+Loading.m
 src/Views/TGStickerPanelView+Preview.m

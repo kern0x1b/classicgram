@@ -1,4 +1,6 @@
 #import "TGClient+ChatManagement.h"
+#import "TGClient+UserStatus.h"
+#import "TGSenderNameColour.h"
 #import "TGDurationText.h"
 #import "TGChatViewController.h"
 #import "TGChatViewControllerInternal.h"
@@ -456,22 +458,11 @@ UIColor *TGMessageDateColour(void) {
 }
 
 UIColor *TGSenderColour(int64_t userId) {
-	static NSArray *palette = nil;
-	if (!palette) {
-		static const NSUInteger hexes[8] = {
-			0xee4928, 0x41a903, 0xe09602, 0x0f94ed,
-			0x8f3bf7, 0xfc4380, 0x00a1c4, 0xeb7002};
-		NSMutableArray *built = [NSMutableArray arrayWithCapacity:8];
-		for (NSInteger i = 0; i < 8; i++) {
-			NSUInteger hex = hexes[i];
-			[built addObject:[UIColor colorWithRed:((hex >> 16) & 0xff) / 255.0f
-											 green:((hex >> 8) & 0xff) / 255.0f
-											  blue:(hex & 0xff) / 255.0f
-											 alpha:1.0f]];
-		}
-		palette = built;
-	}
-	return palette[(NSUInteger)llabs(userId) % palette.count];
+	NSInteger rgb = TGSenderNameRgb([[TGClient shared] cachedAccentRgbForSenderId:userId], userId);
+	return [UIColor colorWithRed:((rgb >> 16) & 0xff) / 255.0f
+						   green:((rgb >> 8) & 0xff) / 255.0f
+							blue:(rgb & 0xff) / 255.0f
+						   alpha:1.0f];
 }
 
 @end

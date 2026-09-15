@@ -76,6 +76,8 @@ extern NSString *const TGAccentColorCatalogDidChangeNotification;
 
 + (NSNumber *)rgbForAccentColorId:(NSInteger)colorId;
 
+- (NSNumber *)cachedAccentRgbForSenderId:(int64_t)senderId;
+
 + (nullable NSArray *)profileGradientForColorId:(NSInteger)colorId;
 
 + (NSArray *)pickableAccentColorIds;
