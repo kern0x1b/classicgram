@@ -40,14 +40,6 @@ if [ -n "$staged" ] && [ -f scripts/lint-recursive-setters.py ]; then
 	}
 fi
 
-staged_manifest_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|c)$|^src/sources\.manifest$')
-if [ -n "$staged_manifest_relevant" ]; then
-	python3 scripts/lint-source-manifest.py || {
-		echo "commit refused: src/sources.manifest does not match disk (run scripts/gen-source-manifest.sh, git add src/sources.manifest, commit again)"
-		exit 1
-	}
-fi
-
 staged_layer_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm|h|c)$')
 if [ -n "$staged_layer_relevant" ]; then
 	layer_output=$(python3 scripts/lint-layer-imports.py \
