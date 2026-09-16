@@ -1,7 +1,7 @@
 import os
 
 from conan import ConanFile
-from conan.errors import ConanException, ConanInvalidConfiguration
+from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import apply_conandata_patches, copy
 from conan.tools.scm import Git
 
@@ -11,7 +11,7 @@ class OpenSSLConan(ConanFile):
     user = "itglegacy"
     channel = "stable"
     package_type = "static-library"
-    description = ("OpenSSL, the newest release, configured through its own ios-cross and ios64-cross "
+    description = ("OpenSSL, the newest release, configured through its own ios-xcrun and ios64-xcrun "
                    "targets; armv7 carries a perlasm translator fix for OPENSSL_armcap_P, which upstream's "
                    "armv4 assembly can no longer reach on Mach-O since 3.1.3 (openssl/openssl#26510)")
     license = "Apache-2.0"
@@ -22,7 +22,7 @@ class OpenSSLConan(ConanFile):
 
     exports_sources = "patches/*"
 
-    _configure_targets = {"armv7": "ios-cross", "armv8": "ios64-cross"}
+    _configure_targets = {"armv7": "ios-xcrun", "armv8": "ios64-xcrun"}
 
     def validate(self):
         super().validate()
@@ -34,22 +34,15 @@ class OpenSSLConan(ConanFile):
         Git(self).fetch_commit(url=data["url"], commit=data["commit"])
         apply_conandata_patches(self)
 
-    def _cross_environment(self):
-        sdk = os.path.normpath(self.sdk_path)
-        cross_top, cross_sdk = os.path.dirname(os.path.dirname(sdk)), os.path.basename(sdk)
-        if not os.path.isdir(os.path.join(cross_top, "SDKs", cross_sdk)):
-            raise ConanException(f"OpenSSL's iOS targets read the SDK as $(CROSS_TOP)/SDKs/$(CROSS_SDK); "
-                                 f"{sdk} is not laid out that way")
-        commit_time = Git(self, folder=self.source_folder).run("log -1 --format=%ct")
-        return {"CROSS_TOP": cross_top, "CROSS_SDK": cross_sdk, "SOURCE_DATE_EPOCH": commit_time}
-
     def build(self):
         arch = str(self.settings.arch)
         atomics = ["-DBROKEN_CLANG_ATOMICS"] if arch == "armv7" else []
-        environment = " ".join(f'{key}="{value}"' for key, value in self._cross_environment().items())
+        commit_time = Git(self, folder=self.source_folder).run("log -1 --format=%ct")
+        env = {"SDKROOT": self.sdk_path, "SOURCE_DATE_EPOCH": commit_time}
+        environment = " ".join(f'{key}="{value}"' for key, value in env.items())
         options = ["no-shared", "no-dso", "no-tests", "no-docs", "no-apps", "no-engine", "no-async",
                    *atomics, f"-mios-version-min={self.settings.os.version}"]
-        self.run(f'{environment} ./Configure {self._configure_targets[arch]} {" ".join(options)}',
+        self.run(f'{environment} ./Configure {self._configure_targets[arch]} CC=cc {" ".join(options)}',
                  cwd=self.source_folder)
         self.run(f"{environment} make -j{os.cpu_count()} build_libs", cwd=self.source_folder)
 
