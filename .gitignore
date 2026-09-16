@@ -56,3 +56,4 @@ tests/fuzz/corpus/
 tests/fuzz/crash-*
 tests/fuzz/leak-*
 tests/fuzz/oom-*
+.xmake/
