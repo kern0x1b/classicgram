@@ -646,14 +646,14 @@ NSString *TGFormatByteCount(long long bytes) {
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
 	CGRect frame = self.table.frame;
-	if (fabsf(frame.size.width - self.view.bounds.size.width) > 0.5f) {
+	if (fabs(frame.size.width - self.view.bounds.size.width) > 0.5f) {
 		frame.size.width = self.view.bounds.size.width;
 		self.table.frame = frame;
 	}
 	[self centreEmptyPlate];
 	[self layoutFloatingButtons];
 	CGFloat width = self.table.bounds.size.width;
-	if (width < 1 || fabsf(width - self.laidOutWidth) < 0.5f) {
+	if (width < 1 || fabs(width - self.laidOutWidth) < 0.5f) {
 		[self updateShortContentInset];
 		return;
 	}

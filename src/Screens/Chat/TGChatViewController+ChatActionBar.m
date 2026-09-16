@@ -132,7 +132,7 @@ static const CGFloat kChatActionBarHeight = 40.0f;
 
 	NSMutableArray *actions = [NSMutableArray array];
 	CGFloat available = width - kActionBarCloseWidth;
-	CGFloat buttonWidth = floorf(available / count);
+	CGFloat buttonWidth = floor(available / count);
 	UIColor *destructiveColour = [UIColor colorWithRed:0.85f green:0.16f blue:0.14f alpha:1.0f];
 	for (NSInteger i = 0; i < count; i++) {
 		NSDictionary *spec = specs[i];

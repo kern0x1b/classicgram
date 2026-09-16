@@ -1,0 +1,21 @@
+patches:
+  1.8.67:
+  - patch_description: export td_ios_set_primary_socket_callback and hand it the main
+      primary connection's socket, so the app can mark that one socket for VoIP background
+      keep-alive
+    patch_file: patches/voip-primary-socket-callback.patch
+    patch_type: portability
+sources:
+  1.8.67:
+    compiler-rt-builtins:
+      files:
+        emutls.c: f5044bff3092ab8213807685c58447ecebff752eb51d159950739676cf12c25b
+        int_endianness.h: ec5175561075845b7b16a92ad5ecdfd42a284de2736dd07e4ca7011b75c37709
+        int_lib.h: a5735bf1bfacecd6cf5785ed19ae62a981ff2f0923c38caa99f4af47f2be57b5
+        int_types.h: 198552b25faf8a75b077ea145591cd7f6762b7f2712321b18f5e38fee8cc2a1e
+        int_util.h: 63d06198ab720a75c20bfd84be895c2746581b129168bae6201e7384bbb0473b
+      tag: llvmorg-23.1.1
+      url: https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.1/compiler-rt/lib/builtins
+    tdlib:
+      commit: d1085f9cebc5a62379991ae1652673954f229c1f
+      url: https://github.com/tdlib/td.git

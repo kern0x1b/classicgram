@@ -240,7 +240,7 @@ static BOOL TGStickerSuggestionExtractQuery(NSString *text, NSString **outQuery)
 }
 
 - (void)layoutTiles {
-	CGFloat y = floorf((self.bounds.size.height - kStickerSuggestionTileSide) / 2.0f);
+	CGFloat y = floor((self.bounds.size.height - kStickerSuggestionTileSide) / 2.0f);
 	CGFloat x = kStickerSuggestionSpacing * 2.0f;
 	for (TGStickerSuggestionTile *tile in self.tiles) {
 		tile.frame = CGRectMake(x, y, kStickerSuggestionTileSide,

@@ -76,8 +76,8 @@ static const NSInteger kLinkLimitFallback = 5;
 									   constrainedToSize:CGSizeMake(self.view.bounds.size.width - 48, 1000)
 										   lineBreakMode:NSLineBreakByWordWrapping];
 		self.emptyLabel.frame = CGRectMake(24,
-			floorf((self.view.bounds.size.height - size.height) / 2),
-			self.view.bounds.size.width - 48, ceilf(size.height));
+			floor((self.view.bounds.size.height - size.height) / 2),
+			self.view.bounds.size.width - 48, ceil(size.height));
 	}
 }
 

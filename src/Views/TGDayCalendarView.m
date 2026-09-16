@@ -113,9 +113,9 @@ static UIImage *TGCalendarChevronImage(BOOL pointsLeft, BOOL faded) {
 	CGFloat pixel = 1.0f / [[UIScreen mainScreen] scale];
 	CGContextSetFillColorWithColor(ctx, TGCalendarRuleColour().CGColor);
 	for (NSInteger column = 1; column < kCalendarColumns; column++)
-		CGContextFillRect(ctx, CGRectMake(floorf(column * _cellWidth), 0, pixel, self.bounds.size.height));
+		CGContextFillRect(ctx, CGRectMake(floor(column * _cellWidth), 0, pixel, self.bounds.size.height));
 	for (NSInteger row = 1; row < kCalendarRows; row++)
-		CGContextFillRect(ctx, CGRectMake(0, floorf(row * _cellHeight), self.bounds.size.width, pixel));
+		CGContextFillRect(ctx, CGRectMake(0, floor(row * _cellHeight), self.bounds.size.width, pixel));
 }
 
 @end
@@ -583,14 +583,14 @@ static UIWindow *sPreviousKeyWindow = nil;
 
 	CGSize size = self.bounds.size;
 	CGFloat widest = MIN(kCalendarPanelMaxWidth, size.width - 2 * kCalendarPanelMargin);
-	CGFloat cellWidth = floorf((widest - 2) / kCalendarColumns);
+	CGFloat cellWidth = floor((widest - 2) / kCalendarColumns);
 	if (cellWidth < 24)
 		cellWidth = 24;
 	CGFloat panelWidth = cellWidth * kCalendarColumns + 2;
 
 	CGFloat chrome = kCalendarHeaderHeight + kCalendarWeekdayHeight;
 	CGFloat roomForGrid = size.height - 2 * kCalendarPanelMargin - chrome;
-	CGFloat cellHeight = floorf(roomForGrid / kCalendarRows);
+	CGFloat cellHeight = floor(roomForGrid / kCalendarRows);
 	if (cellHeight > kCalendarCellHeight)
 		cellHeight = kCalendarCellHeight;
 	if (cellHeight < 22)
@@ -598,8 +598,8 @@ static UIWindow *sPreviousKeyWindow = nil;
 	CGFloat gridHeight = cellHeight * kCalendarRows;
 	CGFloat panelHeight = chrome + gridHeight;
 
-	CGRect frame = CGRectMake(floorf((size.width - panelWidth) / 2),
-		floorf((size.height - panelHeight) / 2),
+	CGRect frame = CGRectMake(floor((size.width - panelWidth) / 2),
+		floor((size.height - panelHeight) / 2),
 		panelWidth, panelHeight);
 	if (frame.origin.y < kCalendarPanelMargin)
 		frame.origin.y = kCalendarPanelMargin;

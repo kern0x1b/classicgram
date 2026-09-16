@@ -24,15 +24,15 @@ TGMessageLayoutComputed TGMessageLayoutBuildCall(TGMessageItem *item,
 	CGFloat forwardH = item.forwardDisplayName.length ? 18 : 0;
 	CGFloat reactionsH = TGMessageLayoutReactionsBlockHeight(item, NO);
 
-	CGFloat titleW = ceilf([title sizeWithFont:[UIFont boldSystemFontOfSize:15]].width);
+	CGFloat titleW = ceil([title sizeWithFont:[UIFont boldSystemFontOfSize:15]].width);
 	CGFloat detailW = item.callDetailText.length
-		? ceilf([item.callDetailText sizeWithFont:[UIFont systemFontOfSize:13]].width)
+		? ceil([item.callDetailText sizeWithFont:[UIFont systemFontOfSize:13]].width)
 		: 0;
 	CGFloat textW = MAX(titleW, detailW);
 
 	CGFloat contentW = kCallGlyphSide + kCallGlyphGap + textW;
 	if (hasSender) {
-		CGFloat nameW = ceilf([item.senderDisplayName
+		CGFloat nameW = ceil([item.senderDisplayName
 							sizeWithFont:[UIFont boldSystemFontOfSize:13]]
 								.width) +
 			4;

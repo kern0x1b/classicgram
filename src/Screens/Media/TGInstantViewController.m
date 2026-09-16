@@ -330,7 +330,7 @@ static NSArray *TGIVStyledEntitiesForBlock(NSDictionary *block, NSString *kind) 
 							   lineBreakMode:NSLineBreakByWordWrapping];
 			captionH = s.height + 6;
 		}
-		return ceilf(picture) + captionH + 11;
+		return ceil(picture) + captionH + 11;
 	}
 	if (![self kindIsText:kind])
 		return 66;
@@ -353,12 +353,12 @@ static NSArray *TGIVStyledEntitiesForBlock(NSDictionary *block, NSString *kind) 
 															 maxLines:0
 															alignment:NSTextAlignmentLeft
 													   expandedBlocks:nil];
-		return ceilf(layout.size.height) + 11 + top;
+		return ceil(layout.size.height) + 11 + top;
 	}
 	CGSize s = [text sizeWithFont:[self fontForKind:kind]
 				constrainedToSize:CGSizeMake(textWidth, 20000)
 					lineBreakMode:NSLineBreakByWordWrapping];
-	return ceilf(s.height) + 11 + top;
+	return ceil(s.height) + 11 + top;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

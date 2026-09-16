@@ -237,9 +237,9 @@
 		CGFloat content = cell.contentView.bounds.size.width;
 		if (content < 1)
 			return;
-		inset = MAX(0, floorf((width - content) / 2) - 1);
+		inset = MAX(0, floor((width - content) / 2) - 1);
 	}
-	if (inset < 0 || fabsf(inset - self.groupedInset) < 0.5f)
+	if (inset < 0 || fabs(inset - self.groupedInset) < 0.5f)
 		return;
 	self.groupedInset = inset;
 	[self layoutHeaderForInset:inset];
@@ -270,7 +270,7 @@
 	if (!self.measuredRowHeights)
 		self.measuredRowHeights = [NSMutableDictionary dictionary];
 	NSNumber *known = self.measuredRowHeights[label];
-	if (known && fabsf([known floatValue] - height) < 0.5f)
+	if (known && fabs([known floatValue] - height) < 0.5f)
 		return;
 	self.measuredRowHeights[label] = @(height);
 	__weak typeof(self) weakSelf = self;

@@ -1,4 +1,0 @@
-include(ios-arm64)
-
-[settings]
-os.version=9.0

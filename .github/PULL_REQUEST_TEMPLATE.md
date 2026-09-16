@@ -8,7 +8,7 @@
 
 ## How it was verified
 
-- [ ] `make FINALPACKAGE=1` reaches its `machofix: Thumb bit restored …` line
+- [ ] `charon build` finishes with its binary checks passing
 - [ ] `./scripts/run-host-tests.sh` passes
 - [ ] Tested on hardware — device and iOS version: <!-- e.g. iPad 2, iOS 6.1.3 --> <!-- or: not tested on hardware -->
 

@@ -642,7 +642,7 @@ NSString *TGStickersCacheKey(long long fileId, CGFloat side) {
 		: TGStickersPlateHeight(@"GroupedActionButtonGreen.png", 43.0f);
 	CGFloat buttonWidth = width - kStickersGroupedInset * 2;
 	self.bottomButton.frame = CGRectMake(kStickersGroupedInset,
-		floorf((kBottomBarHeight - buttonHeight) / 2), buttonWidth, buttonHeight);
+		floor((kBottomBarHeight - buttonHeight) / 2), buttonWidth, buttonHeight);
 
 	UIEdgeInsets insets = self.table.contentInset;
 	insets.bottom = self.bottomBar.hidden ? 0 : kBottomBarHeight;
@@ -714,7 +714,7 @@ NSString *TGStickersCacheKey(long long fileId, CGFloat side) {
 	CGFloat width = self.view.bounds.size.width;
 	CGFloat height = self.view.bounds.size.height;
 
-	self.spinner.center = CGPointMake(floorf(width / 2), floorf(height / 2));
+	self.spinner.center = CGPointMake(floor(width / 2), floor(height / 2));
 
 	if (!self.placeholder.hidden) {
 		CGFloat containerWidth = 232;
@@ -729,8 +729,8 @@ NSString *TGStickersCacheKey(long long fileId, CGFloat side) {
 		self.placeholderBody.frame = CGRectMake(0, titleSize.height + 8,
 			containerWidth, bodySize.height);
 		CGFloat containerHeight = titleSize.height + 8 + bodySize.height;
-		self.placeholder.frame = CGRectMake(floorf((width - containerWidth) / 2),
-			floorf((height - containerHeight) / 2), containerWidth, containerHeight);
+		self.placeholder.frame = CGRectMake(floor((width - containerWidth) / 2),
+			floor((height - containerHeight) / 2), containerWidth, containerHeight);
 	}
 
 	[self layoutBottomBar];

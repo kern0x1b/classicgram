@@ -2,7 +2,7 @@
 #import "TGLazyFramework.h"
 #import "TGCall.h"
 #import <AVFoundation/AVFoundation.h>
-#include "opusenc.h"
+#include <opusenc.h>
 #include <math.h>
 
 NSString *const TGVoiceRecorderErrorDomain = @"TGVoiceRecorderErrorDomain";
@@ -332,10 +332,11 @@ static NSData *TGPackWaveform(NSArray *amplitudes) {
 	OggOpusComments *comments = ope_comments_create();
 	OggOpusEnc *enc = ope_encoder_create_file(out.UTF8String, comments, 48000, 1, 0, &error);
 	if (!enc) {
-		NSLog(@"TGVoiceRecorder: encoder create failed (%d)", error);
+		NSLog(@"TGVoiceRecorder: encoder create failed (%s)", ope_strerror(error));
 		ope_comments_destroy(comments);
 		return nil;
 	}
+	ope_encoder_ctl(enc, OPUS_SET_BITRATE(16 * 1024));
 
 	const short *samples = (const short *)(bytes + offset);
 	NSInteger total = dataLength / sizeof(short);

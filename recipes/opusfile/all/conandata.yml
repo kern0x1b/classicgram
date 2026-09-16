@@ -1,0 +1,4 @@
+sources:
+  0.12+59.g6dfd29e:
+    commit: 6dfd29e7adb87f2e193575fc3fa88cbf1a0b27df
+    url: https://github.com/xiph/opusfile.git

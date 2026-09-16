@@ -74,23 +74,20 @@ pipe through the missing ones — use `ls -t` and read output directly instead o
 
 ## Deploy procedure
 
-1. `make FINALPACKAGE=1 stage` (or the iPad equivalent target) builds straight to
-   `.theos/_/Applications/Telegram.app/Telegram` — no need for full `.ipa` packaging during iteration.
-   See the `build-and-verify` skill for reading the build log correctly.
-2. `ldid -S/tmp/entitlements.plist .theos/_/Applications/Telegram.app/Telegram` — ad-hoc resign; the
-   device is jailbroken so no real provisioning is needed. `ldid` rewrites the binary in place, so
-   a size mismatch against the local pre-sign copy proves nothing about whether resigning worked.
-   If `ldid` aborts on an assert, `/tmp/entitlements.plist` is missing on the Mac side — copy
-   `src/Resources/entitlements.plist` there first.
-3. `rm` the installed binary, then `scp` the new one over (see the inode rule above), then `ldid`
-   the copy that is now on the device if resigning after transfer rather than before.
+1. `charon build --variant harness` builds the armv7 bundle with the debug harness to
+   `build/harness/Telegram.app`, signed with `src/Resources/entitlements.plist`. See the
+   `build-and-verify` skill for what a finished build has already checked.
+2. `ldid -S/tmp/entitlements.plist build/harness/Telegram.app/Telegram` - resign with an
+   entitlements file whose `application-identifier` and `keychain-access-groups` name the bundle
+   identifier installed on *that* device; the two devices differ. `ldid` rewrites the binary in
+   place, so a size mismatch against the local pre-sign copy proves nothing about whether resigning
+   worked.
+3. `rm` the installed binary, then `scp` the new one over (see the inode rule above). The bundle's
+   `Frameworks/` folder - `libtdjson.dylib`, `libc++.1.dylib`, `libc++abi.1.dylib` - has to be on the
+   device too: copy it the same way (`rm` each file first) whenever those libraries changed. The
+   executable loads the C++ runtime from there, not from the system.
 4. Stop and relaunch: `killall Telegram; sleep 3; killall -9 Telegram` (only if still alive), then
    relaunch via `uiopen telegramdev://` over SSH, or by tapping the icon.
-
-`scripts/deploy-and-watch.sh` in the repo automates a USB/`idevice*`-tool version of build+install+launch+
-syslog-collection for a directly-cabled Mac; it is a different transport (usbmuxd, not WiFi SSH)
-and assumes `idevice_id`/`ideviceinstaller`/`idevicedebug` are present. Use the manual SSH
-procedure above when only WiFi access is set up, which is the common case on this project.
 
 ## The telegramdev:// debug harness
 
@@ -130,7 +127,7 @@ never a smoothed resize.
   `cat` the file directly; the human-readable Apple crash text is inside the `description` string
   key, no plist parsing needed. `ls -t` the directory for the newest one.
 - Symbolicate against the **exact binary that was deployed at crash time**:
-  `atos -arch armv7 -o .theos/_/Applications/Telegram.app/Telegram -l <loadBase> <addr1> <addr2> ...`.
+  `atos -arch armv7 -o build/harness/Telegram.app/Telegram -l <loadBase> <addr1> <addr2> ...`.
   `loadBase` and each frame's absolute address are printed directly in the crash log's backtrace
   lines. A rebuild since the crash — even a no-op recompile — changes code layout and silently
   produces wrong-but-plausible symbol names; confirm the crash log postdates the last deploy, or

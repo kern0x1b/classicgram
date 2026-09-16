@@ -236,7 +236,7 @@ static NSAttributedString *TGEmojiPlaceholderWithMetrics(NSString *key, CGFloat 
 		return nil;
 	box->ascent = ascent;
 	box->descent = descent;
-	box->width = ceilf(ascent + descent);
+	box->width = ceil(ascent + descent);
 
 	CTRunDelegateCallbacks callbacks;
 	memset(&callbacks, 0, sizeof(callbacks));
@@ -274,7 +274,7 @@ static NSAttributedString *TGEmojiPlaceholder(NSString *key, UIFont *font,
 		return nil;
 	box->ascent = font.ascender;
 	box->descent = -font.descender;
-	box->width = ceilf(font.ascender - font.descender);
+	box->width = ceil(font.ascender - font.descender);
 
 	CTRunDelegateCallbacks callbacks;
 	memset(&callbacks, 0, sizeof(callbacks));
@@ -578,7 +578,7 @@ static CGSize TGEmojiMeasure(NSString *text, UIFont *font, CGSize limit,
 		widest = limit.width;
 	if (limit.height > 0 && height > limit.height)
 		height = limit.height;
-	return CGSizeMake(ceilf(widest), ceilf(height));
+	return CGSizeMake(ceil(widest), ceil(height));
 }
 
 static unsigned long long TGEmojiMeasureKey(NSString *text, UIFont *font, CGSize limit,
@@ -769,7 +769,7 @@ static void TGEmojiDrawLines(NSArray *lines, UIFont *font, CGRect rect,
 
 	CGFloat lineHeight = font.lineHeight;
 	CGFloat total = lines.count * lineHeight;
-	CGFloat top = rect.origin.y + floorf((rect.size.height - total) / 2);
+	CGFloat top = rect.origin.y + floor((rect.size.height - total) / 2);
 	if (top < rect.origin.y)
 		top = rect.origin.y;
 
@@ -785,7 +785,7 @@ static void TGEmojiDrawLines(NSArray *lines, UIFont *font, CGRect rect,
 		CGFloat width = (CGFloat)CTLineGetTypographicBounds(line, NULL, NULL, NULL);
 		CGFloat x = rect.origin.x;
 		if (alignment == NSTextAlignmentCenter)
-			x += floorf((rect.size.width - width) / 2);
+			x += floor((rect.size.width - width) / 2);
 		else if (alignment == NSTextAlignmentRight)
 			x += rect.size.width - width;
 		if (x < rect.origin.x)
@@ -879,9 +879,9 @@ void TGEmojiLogHealthOnce(void) {
 	NSString *tone = TGEmojiProbeVerdict(@"\U0001F44D\U0001F3FD");
 	NSString *flag = TGEmojiProbeVerdict(@"\U0001F1FA\U0001F1E6");
 
-	NSLog(@"[emoji] font=%@ atlas=%u substituted=%u drawn=%u "
+	NSLog(@"[emoji] font=%@ atlas=%u substituted=%ld drawn=%ld "
 		  @"plain=%@ zwj=%@ tone=%@ flag=%@",
-		face ?: @"UNRESOLVED", (unsigned)atlas, substituted, drawn,
+		face ?: @"UNRESOLVED", (unsigned)atlas, (long)substituted, (long)drawn,
 		plain, zwj, tone, flag);
 
 	if (!font)

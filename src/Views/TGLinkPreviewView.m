@@ -126,7 +126,7 @@ static const CGFloat kMediaRadius = 6.0f;
 		height += 8 + kInstantHeight;
 
 	CGFloat width = (large || smallThumb) ? maxWidth : columnX + textW;
-	return CGSizeMake(width, ceilf(height));
+	return CGSizeMake(width, ceil(height));
 }
 
 - (void)configureWithPreview:(NSDictionary *)preview

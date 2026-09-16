@@ -1185,8 +1185,8 @@
 	CGFloat scale = MIN(1.0f, MIN(limit / MAX(size.width, 1.0f), limit / MAX(size.height, 1.0f)));
 	UIImage *sized = image;
 	if (scale < 1.0f || image.imageOrientation != UIImageOrientationUp) {
-		CGSize target = CGSizeMake(floorf(size.width * scale),
-			floorf(size.height * scale));
+		CGSize target = CGSizeMake(floor(size.width * scale),
+			floor(size.height * scale));
 		UIGraphicsBeginImageContextWithOptions(target, YES, 1.0f);
 		[image drawInRect:CGRectMake(0, 0, target.width, target.height)];
 		sized = UIGraphicsGetImageFromCurrentImageContext() ?: image;

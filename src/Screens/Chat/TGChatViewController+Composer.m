@@ -156,7 +156,7 @@ static CGFloat TGComposerChrome(void) {
 	[self.input setText:@""];
 	CGFloat line = two - one;
 	if (line < 4.0f || line > 60.0f)
-		line = ceilf([self.input.font lineHeight]);
+		line = ceil([self.input.font lineHeight]);
 	self.composerLineHeight = line;
 }
 
@@ -436,7 +436,7 @@ static UIImage *TGChatVideoNoteGlyph(UIColor *colour, CGFloat side) {
 	CGFloat line = (self.composerLineHeight > 1) ? self.composerLineHeight : 19.0f;
 	CGFloat room = b.size.height - self.keyboardInset - TGComposerChrome() -
 		kComposerBaseTextHeight - kComposerHistoryFloor;
-	NSInteger fits = 1 + (NSInteger)floorf(room / line);
+	NSInteger fits = 1 + (NSInteger)floor(room / line);
 	if (fits < 1)
 		fits = 1;
 	return MIN(wanted, fits);
@@ -446,7 +446,7 @@ static UIImage *TGChatVideoNoteGlyph(UIColor *colour, CGFloat side) {
 	CGFloat line = (self.composerLineHeight > 1) ? self.composerLineHeight : 19.0f;
 	NSInteger lines = 1;
 	if (content > kComposerBaseTextHeight)
-		lines += (NSInteger)floorf((content - kComposerBaseTextHeight) / line + 0.5f);
+		lines += (NSInteger)floor((content - kComposerBaseTextHeight) / line + 0.5f);
 	if (lines < 1)
 		lines = 1;
 	NSInteger cap = [self composerMaxLines];
@@ -493,7 +493,7 @@ static UIImage *TGChatVideoNoteGlyph(UIColor *colour, CGFloat side) {
 	if (!scrolls)
 		self.input.contentOffset = CGPointZero;
 
-	if (fabsf(wanted - self.composerTextHeight) < 0.5f) {
+	if (fabs(wanted - self.composerTextHeight) < 0.5f) {
 		[self layoutComposerSubviews];
 		return;
 	}

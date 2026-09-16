@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-import glob
 import os
+import subprocess
 import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
-SCHEME_UNDER_ROOT = os.path.join("third_party", "tdlib", "td", "td", "generate", "scheme",
-                                 "td_api.tl")
 
 
 def main_checkout():
@@ -27,36 +25,26 @@ def main_checkout():
 
 def packaged_scheme():
     for root in (ROOT, main_checkout()):
-        if not root:
+        if not root or not os.path.isfile(os.path.join(root, "charon.toml")):
             continue
-        for env in glob.glob(os.path.join(root, "packaging", "deps", "build", "conan", "*",
-                                          "ios6-deps.env")):
-            for line in open(env, encoding="utf-8"):
-                if line.startswith("IOS6_HOST_TDLIB="):
-                    candidate = os.path.join(line.split("=", 1)[1].strip(), "res", "td_api.tl")
-                    if os.path.isfile(candidate):
-                        return candidate
+        try:
+            answer = subprocess.run(["charon", "--root", root, "where", "pkg:tdlib", "--variant", "armv7"],
+                                    capture_output=True, text=True, check=False)
+        except FileNotFoundError:
+            return None
+        lines = answer.stdout.strip().splitlines()
+        if answer.returncode == 0 and lines:
+            candidate = os.path.join(lines[-1].strip(), "res", "td_api.tl")
+            if os.path.isfile(candidate):
+                return candidate
     return None
 
 
-def scheme_path():
-    here = os.path.join(ROOT, SCHEME_UNDER_ROOT)
-    if os.path.isfile(here):
-        return here
-    packaged = packaged_scheme()
-    if packaged:
-        return packaged
-    checkout = main_checkout()
-    if checkout:
-        shared = os.path.join(checkout, SCHEME_UNDER_ROOT)
-        if os.path.isfile(shared):
-            return shared
-    return here
 
 
-SCHEME = scheme_path()
+SCHEME = packaged_scheme()
 
-SKIP_DIRS = ("libvpx", "libtgvoip", "opus", "opusenc", "opusfile", "ogg", "quirc", "Resources")
+SKIP_DIRS = ("Resources",)
 
 TYPE_LINE_RE = re.compile(r"^([a-zA-Z]\w*)((?:\s+\w+:[\w<>\.]+)*)\s*=\s*[\w<>]+;")
 FIELD_RE = re.compile(r"(\w+):[\w<>\.]+")
@@ -66,9 +54,9 @@ METHOD_START_RE = re.compile(r"^[-+]\s*\(")
 
 
 def schema():
-    if not os.path.isfile(SCHEME):
-        print(f"lint-tdlib-request-fields: skipped, no td_api.tl at {SCHEME} "
-              f"(the tdlib submodule is not checked out in this tree)")
+    if not SCHEME:
+        print("lint-tdlib-request-fields: skipped, charon where pkg:tdlib names no packaged td_api.tl "
+              "(charon is not on PATH, or tdlib is not built yet)")
         sys.exit(0)
     functions = {}
     names = set()

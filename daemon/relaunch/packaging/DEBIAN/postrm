@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+purge)
+    rm -f /var/log/telegramd.log /var/log/telegramd.log.1 /var/log/telegramd.out /var/log/telegramd.err
+    ;;
+esac
+
+exit 0

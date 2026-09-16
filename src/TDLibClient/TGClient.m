@@ -178,7 +178,7 @@ static TGClient *gSharedInstanceOverride = nil;
 		return [self spawnClient];
 
 	NSString *path = [[NSBundle mainBundle].bundlePath
-		stringByAppendingPathComponent:@"libtdjson.dylib"];
+		stringByAppendingPathComponent:@"Frameworks/libtdjson.dylib"];
 
 	TGMemMark(@"before dlopen tdjson");
 	self.handle = dlopen(path.UTF8String, RTLD_NOW | RTLD_LOCAL);

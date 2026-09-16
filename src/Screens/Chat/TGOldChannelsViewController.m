@@ -63,7 +63,7 @@
 											 fromDate:[NSDate date]];
 
 	if (nowParts.year == thenParts.year && nowParts.month == thenParts.month) {
-		NSInteger weeks = (NSInteger)roundf((nowParts.day - thenParts.day) / 7.0f);
+		NSInteger weeks = (NSInteger)round((nowParts.day - thenParts.day) / 7.0f);
 		return TGLPlural(@"OldChannels.InactiveWeek", weeks, @"inactive %@ week", @"inactive %@ weeks");
 	}
 	if (nowParts.year == thenParts.year) {

@@ -9,7 +9,7 @@ static CGFloat TGAvatarCornerRadius(CGFloat side) {
 		return 4;
 	if (fabs(side - 30) < 0.5f)
 		return 3;
-	return roundf(side * 0.09f);
+	return round(side * 0.09f);
 }
 
 static BOOL TGInitialsAreName(NSString *initials) {

@@ -380,7 +380,7 @@
 		return;
 
 	CGFloat width = _stripView.bounds.size.width - kStoryStripInset * 2.0f;
-	CGFloat segment = floorf((width - kStoryStripGap * (count - 1)) / count);
+	CGFloat segment = floor((width - kStoryStripGap * (count - 1)) / count);
 	if (segment < 1.0f)
 		segment = 1.0f;
 
@@ -424,7 +424,7 @@
 			portion = [_seen containsObject:[_storyIds objectAtIndex:i]] ? 1.0f : 0.0f;
 		else
 			portion = (CGFloat)MIN(1.0, _elapsed / [self currentStoryDuration]);
-		fill.frame = CGRectMake(0, 0, floorf(bar.bounds.size.width * portion),
+		fill.frame = CGRectMake(0, 0, floor(bar.bounds.size.width * portion),
 			bar.bounds.size.height);
 	}
 }

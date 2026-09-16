@@ -1,0 +1,14 @@
+patches:
+  4.0.2:
+  - patch_description: on the ios32 flavour, give each hidden external data symbol
+      a local .data word holding its address, so armv4 assembly's PC-relative OPENSSL_armcap_P
+      reference is a defined local label instead of an undefined subtraction Mach-O
+      cannot relocate
+    patch_file: patches/arm-xlate-ios32-hidden-extern-data.patch
+    patch_source: https://github.com/openssl/openssl/issues/26510
+    patch_type: portability
+sources:
+  4.0.2:
+    commit: f089acdf4bc7ba94a79f4bf6eb7362c3e7d14aa9
+    tag: openssl-4.0.2
+    url: https://github.com/openssl/openssl.git

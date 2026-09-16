@@ -253,10 +253,10 @@ static NSString *TGStoryAreaChipText(NSDictionary *area) {
 	CGRect area = self.bounds;
 	CGSize size = CGSizeMake(9.0f, 16.0f);
 	CGFloat scale = MIN(area.size.width / size.width, area.size.height / size.height);
-	CGFloat drawWidth = floorf(size.width * scale);
-	CGFloat drawHeight = floorf(size.height * scale);
-	return CGRectMake(floorf((area.size.width - drawWidth) / 2.0f),
-		floorf((area.size.height - drawHeight) / 2.0f),
+	CGFloat drawWidth = floor(size.width * scale);
+	CGFloat drawHeight = floor(size.height * scale);
+	return CGRectMake(floor((area.size.width - drawWidth) / 2.0f),
+		floor((area.size.height - drawHeight) / 2.0f),
 		drawWidth, drawHeight);
 }
 
@@ -324,7 +324,7 @@ static NSString *TGStoryAreaChipText(NSDictionary *area) {
 
 	_spinner.center = CGPointMake(CGRectGetMidX(frame), CGRectGetMidY(frame));
 	_statusLabel.frame = CGRectMake(frame.origin.x,
-		floorf(CGRectGetMidY(frame) - 20.0f),
+		floor(CGRectGetMidY(frame) - 20.0f),
 		frame.size.width, 40.0f);
 
 	CGFloat plateBottom = MIN(CGRectGetMaxY(frame), area.size.height - _captionBottomInset);

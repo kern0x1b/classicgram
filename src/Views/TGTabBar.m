@@ -52,9 +52,9 @@ static const CGFloat kTabBarPadLabelFontSize = 13.0f;
 		return 0;
 
 	if ([self isPadLayout])
-		return MIN(kTabBarPadItemWidth, floorf(width / count));
+		return MIN(kTabBarPadItemWidth, floor(width / count));
 
-	float indicatorWidth = floorf(width / count);
+	float indicatorWidth = floor(width / count);
 	if (((int)indicatorWidth) % 2 != 0)
 		indicatorWidth -= 1;
 	return indicatorWidth;
@@ -62,7 +62,7 @@ static const CGFloat kTabBarPadLabelFontSize = 13.0f;
 
 - (CGFloat)groupLeft {
 	NSInteger count = self.buttonViews.count;
-	return floorf((self.frame.size.width - [self itemWidth] * count) / 2);
+	return floor((self.frame.size.width - [self itemWidth] * count) / 2);
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -403,10 +403,10 @@ static const CGFloat kTabBarPadLabelFontSize = 13.0f;
 			CGSize imageSize = iconView.image.size;
 			if (imageSize.height > 0) {
 				CGFloat scale = kTabBarPadIconHeight / imageSize.height;
-				frame.size = CGSizeMake(floorf(imageSize.width * scale), floorf(imageSize.height * scale));
+				frame.size = CGSizeMake(floor(imageSize.width * scale), floor(imageSize.height * scale));
 			}
 		}
-		frame.origin.x = paddingLeft + index * indicatorWidth + floorf((indicatorWidth - frame.size.width) / 2);
+		frame.origin.x = paddingLeft + index * indicatorWidth + floor((indicatorWidth - frame.size.width) / 2);
 		frame.origin.y = pad ? 1 : 4;
 		iconView.frame = frame;
 
@@ -419,8 +419,8 @@ static const CGFloat kTabBarPadLabelFontSize = 13.0f;
 
 		UILabel *labelView = self.labelViews[index];
 		CGRect labelFrame = labelView.frame;
-		labelFrame.origin.x = paddingLeft + index * indicatorWidth + floorf((indicatorWidth - labelFrame.size.width) / 2);
-		labelFrame.origin.y = pad ? floorf(viewSize.height - labelFrame.size.height - 2) : 35;
+		labelFrame.origin.x = paddingLeft + index * indicatorWidth + floor((indicatorWidth - labelFrame.size.width) / 2);
+		labelFrame.origin.y = pad ? floor(viewSize.height - labelFrame.size.height - 2) : 35;
 		labelView.frame = labelFrame;
 	}
 }

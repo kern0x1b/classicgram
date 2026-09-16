@@ -48,8 +48,8 @@
 	BOOL isSelecting = self.selecting;
 	BOOL isGroup = self.group;
 
-	BOOL changed = fabsf(width - self.layoutContextWidth) > 0.5f ||
-		fabsf(fontSize - self.layoutContextFontSize) > 0.01f ||
+	BOOL changed = fabs(width - self.layoutContextWidth) > 0.5f ||
+		fabs(fontSize - self.layoutContextFontSize) > 0.01f ||
 		isGroup != self.layoutContextIsGroup ||
 		isWide != self.layoutContextIsWide ||
 		isSelecting != self.layoutContextIsSelecting;

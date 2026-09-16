@@ -477,7 +477,7 @@ static inline
 	CGSize bounded = [text sizeWithFont:[UIFont systemFontOfSize:14]
 					  constrainedToSize:CGSizeMake(width - 20, 400)
 						  lineBreakMode:NSLineBreakByWordWrapping];
-	return ceilf(bounded.height);
+	return ceil(bounded.height);
 }
 
 - (CGFloat)hintHeightForSection:(NSInteger)section {

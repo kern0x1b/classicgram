@@ -58,13 +58,13 @@
 	_plateView.frame = CGRectMake(0, 0, size.width, size.height);
 
 	_emojiLabel.frame = CGRectMake(kChipPadding, 0, kChipGlyphSlot, size.height);
-	_iconView.frame = CGRectMake(kChipPadding + floorf((kChipGlyphSlot - kChipGlyphSide) / 2),
-		floorf((size.height - kChipGlyphSide) / 2),
+	_iconView.frame = CGRectMake(kChipPadding + floor((kChipGlyphSlot - kChipGlyphSide) / 2),
+		floor((size.height - kChipGlyphSide) / 2),
 		kChipGlyphSide, kChipGlyphSide);
 
 	CGFloat countX = kChipPadding + kChipGlyphSlot + kChipCountGap;
 	if (_tagLabel.length) {
-		CGFloat countWidth = ceilf([_countLabel.text sizeWithFont:_countLabel.font].width);
+		CGFloat countWidth = ceil([_countLabel.text sizeWithFont:_countLabel.font].width);
 		_countLabel.frame = CGRectMake(countX, 0, countWidth, size.height);
 		CGFloat labelX = countX + countWidth + kChipCountGap;
 		_tagLabelView.frame = CGRectMake(labelX, 0, MAX(0.0f, size.width - labelX - kChipPadding), size.height);

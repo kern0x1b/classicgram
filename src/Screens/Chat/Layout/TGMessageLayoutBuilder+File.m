@@ -30,10 +30,10 @@ TGMessageLayoutComputed TGMessageLayoutBuildFile(TGMessageItem *item,
 	CGFloat textX = kMessageLayoutPadH + tile + 10;
 
 	CGFloat clockW = isAudio
-		? (kAudioClockGap + ceilf([item.audioClockTemplate sizeWithFont:metaFont].width))
+		? (kAudioClockGap + ceil([item.audioClockTemplate sizeWithFont:metaFont].width))
 		: 0;
-	CGFloat textW = MAX(ceilf([item.fileTitleText sizeWithFont:titleFont].width),
-		ceilf([item.fileMetaText sizeWithFont:metaFont].width) + clockW);
+	CGFloat textW = MAX(ceil([item.fileTitleText sizeWithFont:titleFont].width),
+		ceil([item.fileMetaText sizeWithFont:metaFont].width) + clockW);
 	textW = MAX(textW, 84.0f);
 
 	CGFloat wanted = textX + textW + kMessageLayoutPadH +
@@ -55,7 +55,7 @@ TGMessageLayoutComputed TGMessageLayoutBuildFile(TGMessageItem *item,
 				 sizeWithFont:TGMessageLayoutBodyFont(item, context)
 			constrainedToSize:CGSizeMake(width - 2 * kMessageLayoutPadH, 10000)
 				lineBreakMode:NSLineBreakByWordWrapping];
-		captionMeasuredHeight = ceilf(measured.height);
+		captionMeasuredHeight = ceil(measured.height);
 		captionBlockHeight = captionMeasuredHeight + 4;
 	}
 
@@ -118,7 +118,7 @@ TGMessageLayoutComputed TGMessageLayoutBuildFile(TGMessageItem *item,
 	CGFloat pairTop = top + MAX((CGFloat)0, (tile - pairs) / 2);
 	CGFloat metaW = textW;
 	if (isAudio)
-		metaW = MAX(20.0f, textW - kAudioClockGap - ceilf([item.audioClockTemplate sizeWithFont:metaFont].width));
+		metaW = MAX(20.0f, textW - kAudioClockGap - ceil([item.audioClockTemplate sizeWithFont:metaFont].width));
 
 	computed.bubble.body = CGRectMake(textX, pairTop, textW, 20);
 	computed.parts |= TGMessageLayoutPartBody;
@@ -127,7 +127,7 @@ TGMessageLayoutComputed TGMessageLayoutBuildFile(TGMessageItem *item,
 
 	if (isAudio) {
 		CGFloat right = width - kMessageLayoutPadH;
-		CGFloat clockW = ceilf([item.audioClockTemplate sizeWithFont:metaFont].width);
+		CGFloat clockW = ceil([item.audioClockTemplate sizeWithFont:metaFont].width);
 		if (clockW > right - textX - kAudioClockGap)
 			clockW = MAX((CGFloat)0, right - textX - kAudioClockGap);
 		computed.bubble.audioClock = CGRectMake(right - clockW, pairTop + 19, clockW, 17);

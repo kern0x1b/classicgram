@@ -40,35 +40,35 @@
 	self.grid.frame = CGRectMake(0, gridTop, bounds.size.width,
 		MAX(0.0f, gridBottom - gridTop));
 
-	CGFloat centreY = floorf(self.grid.frame.origin.y + self.grid.frame.size.height / 2.0f);
-	self.spinner.frame = CGRectMake(floorf((bounds.size.width - 20) / 2.0f), centreY - 10, 20, 20);
+	CGFloat centreY = floor(self.grid.frame.origin.y + self.grid.frame.size.height / 2.0f);
+	self.spinner.frame = CGRectMake(floor((bounds.size.width - 20) / 2.0f), centreY - 10, 20, 20);
 	self.statusLabel.frame = CGRectMake(20, centreY - 34, bounds.size.width - 40, 40);
-	self.retryButton.frame = CGRectMake(floorf((bounds.size.width - 120) / 2.0f), centreY + 12, 120, 43);
+	self.retryButton.frame = CGRectMake(floor((bounds.size.width - 120) / 2.0f), centreY + 12, 120, 43);
 
 	CGFloat pixel = 1.0f / [UIScreen mainScreen].scale;
 	CGFloat available = bounds.size.width - kStickerPanelSideInset * 2.0f;
-	NSInteger columns = (NSInteger)floorf(available / kStickerPanelTileSide);
+	NSInteger columns = (NSInteger)floor(available / kStickerPanelTileSide);
 	if (columns < kStickerPanelMinColumns)
 		columns = kStickerPanelMinColumns;
 
-	CGFloat tileSide = MIN(floorf(available / columns), kStickerPanelTileSide);
+	CGFloat tileSide = MIN(floor(available / columns), kStickerPanelTileSide);
 	if (tileSide < 1.0f)
 		tileSide = kStickerPanelTileSide;
 	CGFloat spacing = (columns > 1)
-		? floorf((available - tileSide * columns) / (columns - 1) / pixel) * pixel
+		? floor((available - tileSide * columns) / (columns - 1) / pixel) * pixel
 		: 0.0f;
 	if (spacing < 0.0f)
 		spacing = 0.0f;
 	CGFloat contentWidth = tileSide * columns + spacing * (columns - 1);
-	CGFloat sideInset = floorf((bounds.size.width - contentWidth) / 2.0f);
+	CGFloat sideInset = floor((bounds.size.width - contentWidth) / 2.0f);
 	if (sideInset < 0.0f)
 		sideInset = 0.0f;
 	self.rowSpacing = kStickerPanelRowSpacing;
 
 	BOOL metricsChanged = (columns != self.columns ||
-		fabsf(tileSide - self.tileSide) > 0.01f ||
-		fabsf(spacing - self.tileSpacing) > 0.01f);
-	BOOL widthChanged = fabsf(bounds.size.width - self.laidOutWidth) > 0.01f;
+		fabs(tileSide - self.tileSide) > 0.01f ||
+		fabs(spacing - self.tileSpacing) > 0.01f);
+	BOOL widthChanged = fabs(bounds.size.width - self.laidOutWidth) > 0.01f;
 	self.columns = columns;
 	self.tileSide = tileSide;
 	self.tileSpacing = spacing;
@@ -135,7 +135,7 @@
 			UIButton *add = [self addButtonForSectionIndex:index];
 			CGFloat addWidth = 52.0f;
 			add.frame = CGRectMake(width - self.sideInset - 5.0f - addWidth,
-				floorf((kStickerPanelHeaderHeight - 19.0f) / 2.0f), addWidth, 19.0f);
+				floor((kStickerPanelHeaderHeight - 19.0f) / 2.0f), addWidth, 19.0f);
 			label.frame = CGRectMake(self.sideInset + 5.0f, 0,
 				MAX(20.0f, width - (self.sideInset + 5.0f) * 2 - addWidth - 6.0f),
 				kStickerPanelHeaderHeight);
@@ -157,7 +157,7 @@
 		CGFloat restored = [self.sections[anchorIndex][@"y"] floatValue] + anchorDelta;
 		CGFloat maxOffset = MAX(0.0f, self.grid.contentSize.height - self.grid.bounds.size.height);
 		restored = MAX(0.0f, MIN(restored, maxOffset));
-		if (fabsf(restored - previousOffset) > 0.5f)
+		if (fabs(restored - previousOffset) > 0.5f)
 			self.grid.contentOffset = CGPointMake(0, restored);
 	}
 
@@ -288,7 +288,7 @@
 	CGFloat x = self.sideInset + column * (self.tileSide + self.tileSpacing);
 	CGFloat y = sectionY + kStickerPanelHeaderHeight + self.rowSpacing +
 		row * (self.tileSide + self.rowSpacing);
-	return CGRectMake(floorf(x), floorf(y), self.tileSide, self.tileSide);
+	return CGRectMake(floor(x), floor(y), self.tileSide, self.tileSide);
 }
 
 @end

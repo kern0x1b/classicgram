@@ -28,7 +28,7 @@ static NSString *const kFileStatusSpinKey = @"tgFileStatusSpin";
 
 - (void)setKind:(TGFileStatusKind)kind progress:(CGFloat)progress {
 	CGFloat clamped = MAX(0.027f, MIN(1.0f, progress));
-	BOOL sameRing = (_kind == kind) && fabsf(_progress - clamped) < 0.004f;
+	BOOL sameRing = (_kind == kind) && fabs(_progress - clamped) < 0.004f;
 	_kind = kind;
 	_progress = clamped;
 	if (!sameRing)

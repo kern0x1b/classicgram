@@ -236,7 +236,7 @@
 	_scrollView.scrollEnabled = NO;
 
 	[self buildPlainCardOfWidth:width];
-	_spinner.center = CGPointMake(floorf(width / 2), floorf(kStripHeight / 2));
+	_spinner.center = CGPointMake(floor(width / 2), floor(kStripHeight / 2));
 }
 
 - (void)setEmoji:(NSArray *)emoji reason:(NSString *)reason {

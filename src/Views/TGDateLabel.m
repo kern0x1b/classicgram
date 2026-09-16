@@ -111,7 +111,7 @@ typedef enum {
 	[self measureTextSize];
 
 	if (self.textAlignment == NSTextAlignmentCenter)
-		CGContextTranslateCTM(context, floorf((self.frame.size.width - _measuredTextSize.width) / 2), 0);
+		CGContextTranslateCTM(context, floor((self.frame.size.width - _measuredTextSize.width) / 2), 0);
 
 	if (self.shadowColor != nil)
 		CGContextSetShadowWithColor(context, self.shadowOffset, 0.0f, self.shadowColor.CGColor);

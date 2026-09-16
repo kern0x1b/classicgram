@@ -369,10 +369,10 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 	[self.view addSubview:self.curtain];
 
 	CGFloat wrapperSide = kNoteCircleSide + kNoteShadowInset * 2;
-	CGFloat wrapperY = floorf((CGRectGetMinY(row) - wrapperSide) / 2);
+	CGFloat wrapperY = floor((CGRectGetMinY(row) - wrapperSide) / 2);
 	if (wrapperY < 4.0f)
 		wrapperY = 4.0f;
-	CGRect wrapperFrame = CGRectMake(floorf((bounds.size.width - wrapperSide) / 2), wrapperY,
+	CGRect wrapperFrame = CGRectMake(floor((bounds.size.width - wrapperSide) / 2), wrapperY,
 		wrapperSide, wrapperSide);
 	self.circleWrapper = [[UIView alloc] initWithFrame:wrapperFrame];
 	self.circleWrapper.backgroundColor = [UIColor clearColor];
@@ -402,8 +402,8 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 
 	self.noteRing = [CAShapeLayer layer];
 	self.noteRing.frame = CGRectMake(
-		floorf((wrapperSide - kNoteRingSide) / 2),
-		floorf((wrapperSide - kNoteRingSide) / 2),
+		floor((wrapperSide - kNoteRingSide) / 2),
+		floor((wrapperSide - kNoteRingSide) / 2),
 		kNoteRingSide, kNoteRingSide);
 	CGRect ringRect = CGRectInset(CGRectMake(0, 0, kNoteRingSide, kNoteRingSide),
 		kNoteRingWidth / 2, kNoteRingWidth / 2);
@@ -419,7 +419,7 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 
 	self.muteBadge = [[UIImageView alloc] initWithImage:TGNoteMuteBadgeImage()];
 	self.muteBadge.frame = CGRectMake(
-		floorf(CGRectGetMidX(self.circle.bounds) - kNoteMuteSide / 2),
+		floor(CGRectGetMidX(self.circle.bounds) - kNoteMuteSide / 2),
 		CGRectGetMaxY(self.circle.bounds) - kNoteMuteSide - 8.0f,
 		kNoteMuteSide, kNoteMuteSide);
 	self.muteBadge.hidden = YES;
@@ -474,13 +474,13 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 
 	CGFloat height = row.size.height;
 
-	CGRect dotFrame = CGRectMake(11.0f, floorf((height - 9.0f) / 2), 9.0f, 9.0f);
+	CGRect dotFrame = CGRectMake(11.0f, floor((height - 9.0f) / 2), 9.0f, 9.0f);
 	self.noteDot = [[UIView alloc] initWithFrame:dotFrame];
 	self.noteDot.backgroundColor = TGNoteRecordColour();
 	self.noteDot.layer.cornerRadius = 4.5f;
 	[self.controlsRow addSubview:self.noteDot];
 
-	CGRect clockFrame = CGRectMake(26.0f, floorf((height - 20.0f) / 2), 76.0f, 20.0f);
+	CGRect clockFrame = CGRectMake(26.0f, floor((height - 20.0f) / 2), 76.0f, 20.0f);
 	self.noteClock = [[UILabel alloc] initWithFrame:clockFrame];
 	self.noteClock.backgroundColor = [UIColor clearColor];
 	self.noteClock.font = [UIFont systemFontOfSize:15];
@@ -495,8 +495,8 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 	self.noteSlide.text = TGL(@"Conversation.SlideToCancel", @"‹ Slide to cancel");
 	[self.noteSlide sizeToFit];
 	self.noteSlide.frame = CGRectMake(
-		floorf((row.size.width - self.noteSlide.frame.size.width) / 2),
-		floorf((height - self.noteSlide.frame.size.height) / 2),
+		floor((row.size.width - self.noteSlide.frame.size.width) / 2),
+		floor((height - self.noteSlide.frame.size.height) / 2),
 		self.noteSlide.frame.size.width, self.noteSlide.frame.size.height);
 	[self.controlsRow addSubview:self.noteSlide];
 
@@ -512,8 +512,8 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 						  forState:UIControlStateHighlighted];
 	[self.noteCancel sizeToFit];
 	self.noteCancel.frame = CGRectMake(
-		floorf((row.size.width - self.noteCancel.frame.size.width) / 2),
-		floorf((height - self.noteCancel.frame.size.height) / 2),
+		floor((row.size.width - self.noteCancel.frame.size.width) / 2),
+		floor((height - self.noteCancel.frame.size.height) / 2),
 		self.noteCancel.frame.size.width, self.noteCancel.frame.size.height);
 	self.noteCancel.alpha = 0.0f;
 	[self.noteCancel addTarget:self action:@selector(cancelPressed)
@@ -523,7 +523,7 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 	self.noteStop = [UIButton buttonWithType:UIButtonTypeCustom];
 	self.noteStop.exclusiveTouch = YES;
 	self.noteStop.frame = CGRectMake(row.size.width - kNoteControlSide - 4.0f,
-		floorf((height - kNoteControlSide) / 2),
+		floor((height - kNoteControlSide) / 2),
 		kNoteControlSide, kNoteControlSide);
 	[self.noteStop setImage:TGNoteStopImage(NO) forState:UIControlStateNormal];
 	[self.noteStop setImage:TGNoteStopImage(YES) forState:UIControlStateHighlighted];
@@ -537,13 +537,13 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 	self.noteDiscard = [self plateButtonWithTitle:TGL(@"Common.Cancel", @"Cancel")
 											 tint:TGNoteDiscardColour()
 										   action:@selector(cancelPressed)];
-	self.noteDiscard.frame = CGRectMake(5.0f, floorf((height - 29.0f) / 2), 62.0f, 29.0f);
+	self.noteDiscard.frame = CGRectMake(5.0f, floor((height - 29.0f) / 2), 62.0f, 29.0f);
 	[self.controlsRow addSubview:self.noteDiscard];
 
 	self.noteSend = [self plateButtonWithTitle:TGL(@"MediaPicker.Send", @"Send") tint:nil
 										action:@selector(sendPressed)];
 	self.noteSend.frame = CGRectMake(row.size.width - 67.0f,
-		floorf((height - 29.0f) / 2), 62.0f, 29.0f);
+		floor((height - 29.0f) / 2), 62.0f, 29.0f);
 	[self.controlsRow addSubview:self.noteSend];
 }
 

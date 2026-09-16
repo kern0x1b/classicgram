@@ -50,8 +50,8 @@
 					 paddingLeft:7
 					paddingRight:7
 						minWidth:self.currentStep == TGLoginStepRegistration ? 51 : 52];
-	self.spinner.frame = CGRectMake(floorf((self.nextButton.frame.size.width - self.spinner.frame.size.width) / 2),
-		floorf((self.nextButton.frame.size.height - self.spinner.frame.size.height) / 2),
+	self.spinner.frame = CGRectMake(floor((self.nextButton.frame.size.width - self.spinner.frame.size.width) / 2),
+		floor((self.nextButton.frame.size.height - self.spinner.frame.size.height) / 2),
 		self.spinner.frame.size.width, self.spinner.frame.size.height);
 }
 

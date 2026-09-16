@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+PKG="com.kern0x1b.telegramsystemcall"
+PKGDIR="/var/lib/telegramsystemcall"
+
+say() { echo "$PKG: $*"; }
+
+case "$1" in
+remove)
+    if [ -n "${CYDIA:-}" ]; then
+        eval "echo 'finish:respring' >&${CYDIA%% *}"
+    else
+        say "restart SpringBoard to unload the tweak"
+    fi
+    ;;
+purge)
+    rm -f "$PKGDIR/disabled"
+    rmdir "$PKGDIR" 2>/dev/null || true
+    ;;
+upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    ;;
+esac
+
+exit 0

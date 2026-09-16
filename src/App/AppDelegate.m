@@ -138,6 +138,7 @@ void TGMemZoneReport(NSString *tag) {
 static thread_t TGMainThreadPort = MACH_PORT_NULL;
 volatile BOOL TGStackSamplingOn = NO;
 
+#if defined(__arm__)
 static BOOL TGPeek(const void *address, void *into, size_t length) {
 	vm_size_t got = 0;
 	if (vm_read_overwrite(mach_task_self(), (vm_address_t)address, length,
@@ -145,6 +146,7 @@ static BOOL TGPeek(const void *address, void *into, size_t length) {
 		return NO;
 	return got == length;
 }
+#endif
 
 static int TGCaptureMainStack(void **frames, int maximum) {
 	if (TGMainThreadPort == MACH_PORT_NULL)
@@ -236,8 +238,8 @@ void TGRegionReport(NSString *tag) {
 	for (NSInteger i = 0; i < 256; i++) {
 		if (byTag[i] < 1048576)
 			continue;
-		NSLog(@"PERF region %@ tag=%u resident=%.2f MB dirty=%.2f MB",
-			tag, i, byTag[i] / 1048576.0, dirtyByTag[i] / 1048576.0);
+		NSLog(@"PERF region %@ tag=%ld resident=%.2f MB dirty=%.2f MB",
+			tag, (long)i, byTag[i] / 1048576.0, dirtyByTag[i] / 1048576.0);
 	}
 }
 

@@ -9,7 +9,7 @@ SRC = os.path.join(ROOT, "src")
 if not os.path.isdir(SRC):
     raise SystemExit(f"source root not found: {SRC}")
 
-SKIP_DIRS = ("libvpx", "libtgvoip", "opus", "opusenc", "opusfile", "ogg", "quirc", "Resources")
+SKIP_DIRS = ("Resources",)
 
 SINKS = (
     r"\.(?:text|title|placeholder|prompt)\s*=\s*",

@@ -461,7 +461,7 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 		[line addAttribute:NSForegroundColorAttributeName value:ink
 					 range:NSMakeRange(0, whole.length)];
 	self.dateLabel.attributedText = line;
-	_dateWidth = (int)ceilf([line size].width);
+	_dateWidth = (int)ceil([line size].width);
 }
 
 - (void)setDateText:(NSString *)text suffix:(NSString *)suffix bold:(BOOL)bold {
@@ -500,7 +500,7 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 	if (self.draftLabel.hidden)
 		return 0;
 	CGFloat draftWidth = (int)[self.draftLabel.text sizeWithFont:self.draftLabel.font].width;
-	CGRect draftFrame = CGRectMake(left, top, draftWidth, MAX(18.0f, ceilf(self.draftLabel.font.lineHeight)));
+	CGRect draftFrame = CGRectMake(left, top, draftWidth, MAX(18.0f, ceil(self.draftLabel.font.lineHeight)));
 	self.draftLabel.frame = TGLocalizedMirroredRect(draftFrame, w);
 	return draftWidth + 4;
 }
@@ -540,24 +540,24 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 	titleWidth -= premiumWidth;
 	CGFloat credibilityWidth = self.credibilityLabel.hidden
 		? 0
-		: ceilf([self.credibilityLabel.text sizeWithFont:self.credibilityLabel.font].width) + 4;
+		: ceil([self.credibilityLabel.text sizeWithFont:self.credibilityLabel.font].width) + 4;
 	titleWidth -= credibilityWidth;
 	CGFloat tagWidth = 0;
 	if (!self.folderTag.hidden) {
-		CGFloat tagTextWidth = ceilf([self.folderTag.text sizeWithFont:self.folderTag.font].width);
+		CGFloat tagTextWidth = ceil([self.folderTag.text sizeWithFont:self.folderTag.font].width);
 		tagWidth = MIN(64, tagTextWidth + 10);
 		titleWidth -= tagWidth + 6;
 	}
 	titleWidth = MIN(titleWidth, TGEmojiTextSize(self.titleLabel.text, self.titleLabel.font, CGSizeMake(10000, 40), NSLineBreakByWordWrapping, 1).width);
 	if (titleWidth < 0)
 		titleWidth = 0;
-	CGFloat titleHeight = MAX(20.0f, ceilf(self.titleLabel.font.lineHeight));
+	CGFloat titleHeight = MAX(20.0f, ceil(self.titleLabel.font.lineHeight));
 	self.titleLabel.frame = TGLocalizedMirroredRect(
 		CGRectMake(titleX, 6, titleWidth, titleHeight), w);
 
 	CGFloat afterTitleX = titleX + titleWidth;
 	if (!self.credibilityLabel.hidden) {
-		CGFloat markHeight = ceilf(self.credibilityLabel.font.lineHeight);
+		CGFloat markHeight = ceil(self.credibilityLabel.font.lineHeight);
 		CGRect markFrame = CGRectMake(afterTitleX + 4, 6 + (titleHeight - markHeight) / 2,
 			credibilityWidth - 4, markHeight);
 		self.credibilityLabel.frame = TGLocalizedMirroredRect(markFrame, w);
@@ -585,7 +585,7 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 	CGRect previewFrame = CGRectMake(previewLeft, previewTop,
 		w - previewLeft - 10 - rightPadding, 40);
 	if (!self.authorLabel.hidden) {
-		CGFloat authorHeight = MAX(20.0f, ceilf(self.authorLabel.font.lineHeight));
+		CGFloat authorHeight = MAX(20.0f, ceil(self.authorLabel.font.lineHeight));
 		CGRect authorFrame = CGRectMake(left, previewTop, w - left - 10 - rightPadding, authorHeight);
 		self.authorLabel.frame = TGLocalizedMirroredRect(authorFrame, w);
 		previewFrame.origin.y += authorHeight - 2;
@@ -595,7 +595,7 @@ static const CGFloat kErrorBadgeHeight = 20.0f;
 		previewFrame.size, NSLineBreakByTruncatingTail, 2);
 	if (previewFits.height > 0)
 		previewFrame.size.height = MIN(previewFrame.size.height,
-			ceilf(previewFits.height));
+			ceil(previewFits.height));
 	CGFloat previewBottom = kRowHeight - 9;
 	if (CGRectGetMaxY(previewFrame) > previewBottom)
 		previewFrame.size.height = previewBottom - previewFrame.origin.y;

@@ -34,10 +34,10 @@
 		return [known floatValue];
 
 	CGFloat countWidth = [countText sizeWithFont:[UIFont boldSystemFontOfSize:kChipCountFontSize]].width;
-	CGFloat width = ceilf(kChipPadding * 2 + kChipGlyphSlot + kChipCountGap + countWidth);
+	CGFloat width = ceil(kChipPadding * 2 + kChipGlyphSlot + kChipCountGap + countWidth);
 	if (label.length) {
 		CGFloat labelWidth = [label sizeWithFont:[UIFont systemFontOfSize:kChipCountFontSize]].width;
-		width += ceilf(kChipCountGap + labelWidth);
+		width += ceil(kChipCountGap + labelWidth);
 	}
 	[widths setObject:[NSNumber numberWithFloat:width] forKey:cacheKey];
 	return width;
@@ -78,7 +78,7 @@
 		return CGSizeZero;
 	widest = MAX(widest, x - kChipGap);
 
-	return CGSizeMake(ceilf(MIN(widest, width)),
+	return CGSizeMake(ceil(MIN(widest, width)),
 		rows * kChipHeight + (rows - 1) * kChipRowGap);
 }
 

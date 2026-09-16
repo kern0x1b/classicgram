@@ -14,8 +14,8 @@ UIImage *TGBoxBlurredImage(UIImage *image) {
 	CGSize size = image.size;
 	if (size.width < 8 || size.height < 8)
 		return image;
-	CGSize small = CGSizeMake(floorf(size.width / 12.0f),
-		floorf(size.height / 12.0f));
+	CGSize small = CGSizeMake(floor(size.width / 12.0f),
+		floor(size.height / 12.0f));
 	if (small.width < 1 || small.height < 1)
 		return image;
 
@@ -170,7 +170,7 @@ static NSString *const kDefaultBackgroundIdKey = @"themeDefaultBackgroundId";
 	CGFloat current = self.messageFontSize;
 	NSInteger closest = 0;
 	for (NSInteger index = 0; index < sizes.count; index++)
-		if (fabsf([sizes[index] floatValue] - current) < fabsf([sizes[closest] floatValue] - current))
+		if (fabs([sizes[index] floatValue] - current) < fabs([sizes[closest] floatValue] - current))
 			closest = index;
 	return closest;
 }

@@ -17,8 +17,8 @@
 
 #include "libtgvoip/video/VideoSource.h"
 #include "libtgvoip/video/VideoRenderer.h"
-#include "libtgvoip/os/darwin/TGCallVideoSource.h"
-#include "libtgvoip/os/darwin/TGCallVideoRenderer.h"
+#include "TGCallVideoSource.h"
+#include "TGCallVideoRenderer.h"
 #include "libtgvoip/PrivateDefines.h"
 #import "TGVideoCapture.h"
 #import "TGVideoFrameView.h"

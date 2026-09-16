@@ -245,9 +245,10 @@ usually the SDK, the hardware, or a deliberate decision, never "not yet gotten t
 
 ## Building
 
-Toolchain: a Mac with a current Xcode, plus a legacy `iPhoneOS` SDK snapshot for the armv7 slice,
-fetched by a helper script below (current Xcode no longer ships an armv7 `libSystem` stub). The
-build is a [Theos](https://theos.dev) application project driven through `make`; no Xcode project exists.
+Toolchain: a Mac with the Xcode Command Line Tools, Conan 2, and
+[Charon](https://github.com/kern0x1b/ios6-toolchain), the build driver whose `apple-ios` platform
+supplies everything else as packages: the iOS SDK, the armv7 linker, `ldid` and the C++ runtime. No
+Xcode, no Xcode project and no Theos are involved.
 
 ```bash
 brew install cmake gperf ccache conan
@@ -265,40 +266,33 @@ cp src/Resources/Config/tg_config.h.example src/Resources/Config/tg_config.h
 and fill in `TG_API_ID` / `TG_API_HASH` in that file. It is git-ignored — keep your own credentials
 out of commits, they identify your application to Telegram.
 
-TDLib and OpenSSL are built through Conan (`packaging/tdlib`, `packaging/openssl`), fetched vanilla
-from upstream rather than vendored, and resolved by the Makefile itself the first time it needs
-them — no separate build step to run by hand. TDLib is loaded by the app at runtime with `dlopen`
-rather than linked statically — a statically linked copy pushes the combined `__TEXT` segment past
-the armv7 Thumb branch's 16 MB reach, which current Xcode's linker cannot route around. The armv7
-slice also needs an older SDK snapshot, because current Xcode's `iPhoneOS.sdk` no longer ships an
-armv7 `libSystem` stub at all:
+Every dependency is fetched from its own upstream by a Conan recipe under `recipes/` and built
+into the Conan cache; `recipes/README.md` says what each is pinned to and what little is carried on
+top of it. TDLib is loaded by the app at runtime with `dlopen` rather than linked statically - a
+statically linked copy pushes the combined `__TEXT` segment past the armv7 Thumb branch's 16 MB
+reach.
 
 ```bash
-scripts/fetch-ios-sdk.sh          # once — an armv7-capable SDK snapshot into build/sdks
-export THEOS=~/theos             # wherever Theos lives
-make FINALPACKAGE=1 stage         # builds TDLib/OpenSSL via Conan on first run, then the app bundle
-make package FINALPACKAGE=1       # the same, wrapped as a .deb under packages/
+charon setup                      # once per checkout: registers recipes/ as the itglegacy index
+charon build                      # armv7 and arm64 slices, merged and signed: build/universal/Telegram.app
+charon build --variant harness    # armv7 only, with the telegramdev:// debug harness compiled in
 ```
 
-`make` on its own builds the debug variant, which is larger and unstripped but otherwise identical.
-`make stage` assembles the bundle under `.theos/_/Applications/Telegram.app` without packaging it,
-and that is the path to copy onto a device. `make clean` removes `.theos/` and `packages/`.
+The default build is a fat binary for armv7 (iOS 6.0) and arm64 (iOS 7.0); armv7 is the slice the
+project is written for and the only one exercised on hardware. The `harness` variant additionally
+compiles in a `telegramdev://` URL-scheme debug harness (screenshot capture, memory/stack probes,
+synthetic taps and scrolls - see `src/App/AppDelegate+DebugHarness.m`); the default build never
+compiles that file, so production has zero trace of it.
 
-The build produces a fat binary for both armv7 and arm64 (`ARCHS = armv7 arm64` in the makefile);
-armv7 is the slice the project is written for and the only one exercised on hardware. `machofix`
-repairs the armv7 slice inside the fat binary after the link.
+The build checks the binaries it produces and refuses what the device could not run: an object or
+archive member recording a minimum other than the target's, a rebased code pointer whose Thumb bit
+disagrees with the function it names, a wrong `__PAGEZERO`, a bundled library still loading the
+runtime it carries from the system, or a signature missing a declared entitlement. The C++ runtime
+the app and TDLib are built against ships inside the bundle, under `Frameworks/`, because iOS 6's
+own libc++ predates the headers they compile with.
 
-`DEBUG_HARNESS=1 make` additionally compiles in a `telegramdev://` URL-scheme debug harness
-(screenshot capture, memory/stack probes, synthetic taps and scrolls — see
-`src/App/AppDelegate+DebugHarness.m`). A plain `make` never builds that file at all, so production
-has zero trace of it.
-
-Several more build-time traps are load-bearing here: the linker drops the Thumb bit on function
-pointers it writes into data sections, which `scripts/fix-armv7-macho.c` puts back on every build;
-symbols weak-imported from a later iOS resolve to `NULL` rather than failing to link; and the SDK
-snapshot above exists because current Xcode ships no armv7 `libSystem` stub. Each is explained in
-the commit that introduced its fix — this repository forbids comments in source, so `git log` and
-`git blame` are where the reasoning lives.
+`tweaks/system-call` and `daemon/relaunch` are modules of their own, built and packaged with
+`charon build --root <folder>` and `charon package --root <folder>`.
 
 No test framework is vendored; `scripts/run-host-tests.sh` compiles a small table of pure-function
 tests straight against the Mac's own Foundation, no iOS SDK involved, and prints pass/fail counts.
@@ -309,16 +303,16 @@ tests straight against the Mac's own Foundation, no iOS SDK involved, and prints
 
 A jailbreak is required — there is no signed distribution of this app anywhere, by design:
 
-1. `make FINALPACKAGE=1 stage` to produce `.theos/_/Applications/Telegram.app`, or
-   `make package FINALPACKAGE=1` for a `.deb` you can install with `dpkg -i` on the device.
+1. `charon build` to produce `build/universal/Telegram.app`, signed with
+   `src/Resources/entitlements.plist`.
 2. Copy the `.app` bundle onto the device (`scp`, over SSH, to a jailbroken device with OpenSSH
    installed — e.g. from Cydia).
-3. Ad-hoc sign the binary with [`ldid`](https://github.com/ProcursusTeam/ldid), which is available
-   on-device through Cydia/Sileo:
+3. The build signs it already. If the device's installed copy uses a different bundle identifier,
+   re-sign the executable with [`ldid`](https://github.com/ProcursusTeam/ldid) and an entitlements
+   file whose `application-identifier` and `keychain-access-groups` name that identifier:
    ```
    ldid -S/path/to/entitlements.plist /path/to/Telegram.app/Telegram
    ```
-   using `src/Resources/entitlements.plist` from this repository.
 4. Register the bundle with SpringBoard (`uicache`, or reinstalling through a package manager) so
    the icon appears.
 
@@ -338,7 +332,7 @@ Four further pieces are optional, not part of the app binary itself, each instal
   [kern0x1b/ios6-emoji](https://github.com/kern0x1b/ios6-emoji).
 - `daemon/relaunch` — a LaunchDaemon (`telegramd`) that relaunches the app if it's force-quit from
   the app switcher or killed by jetsam, so backgrounded notifications keep arriving; see
-  `daemon/relaunch/README.md` and `daemon/relaunch/install.sh`.
+  `daemon/relaunch/README.md`. Built and shipped as its own `.deb`.
 
 ## Repository layout
 
@@ -364,9 +358,9 @@ telegram-classic/
 │   └── Resources/          # Info.plist, entitlements, images/, Localization/, Config/
 ├── daemon/relaunch/        # optional jailbreak LaunchDaemon: relaunches the app after a force-quit/jetsam kill
 ├── tweaks/                 # the SpringBoard call-UI tweak: a dylib injected into another process, shipped as .deb
-├── packaging/              # Conan recipes — every dependency is fetched from its own upstream at
+├── recipes/                # Conan recipes — every dependency is fetched from its own upstream at
 │                           #   build time and built into the Conan cache; no third-party source
-│                           #   is stored in this repository. See packaging/DEPENDENCIES.md
+│                           #   is stored in this repository. See recipes/README.md
 ├── scripts/                # build, device-deployment and lint automation, flat and verb-first
 │   └── ui-automation/      # a SpringBoard driver injected for testing: unlock, tap, screenshot
 │                           #   plus baselines/ — the layer-lint baseline files the hook checks against
@@ -408,12 +402,13 @@ project, originally GPL-2.0-or-later and relicensed here under GPLv3 as that lic
   (Copyright Peter Iakovlev, 2013). Full file-by-file attribution is in [`NOTICE`](NOTICE).
 - **[TDLib](https://github.com/tdlib/td)**: Telegram's own open-source client library, which this
   app talks to via a dynamically loaded `libtdjson.dylib` — it is the entire networking and protocol
-  layer, built vanilla from upstream through the Conan recipe under `packaging/tdlib`.
+  layer, built from upstream through the Conan recipe under `recipes/tdlib`.
 - **Third-party components**, each under its own upstream licence and each fetched from its own
-  upstream by a Conan recipe under `packaging/`, never stored here: **libtgvoip** for voice/video
-  call transport; **libvpx** (VP8); **Opus**, **libogg** and **opusfile** plus **opus-tools**'
-  header serialiser for audio; **libwebp** for image decode; **quirc** for QR code decoding;
-  **OpenSSL** for TLS. `packaging/DEPENDENCIES.md` records what each one is pinned to and why.
+  upstream by a Conan recipe under `recipes/`, never stored here: **libtgvoip** for voice/video
+  call transport; **libvpx** (VP8); **Opus**, **libogg**, **opusfile** and **libopusenc** for audio;
+  **libwebp** for image decode; **quirc** for QR code decoding and **Project Nayuki's QR Code
+  generator** for encoding; **OpenSSL** for TLS; **LLVM's libc++** as the bundled C++ runtime.
+  `recipes/README.md` records what each one is pinned to and why.
 - **This project**: maintained by kern0x1b and contributors.
 
 Classicgram is an independent, unofficial project and is not affiliated with, endorsed by, or sponsored by

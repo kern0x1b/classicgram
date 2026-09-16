@@ -64,8 +64,8 @@
 	if (budget < kMosaicMinTileSide)
 		budget = kMosaicMinTileSide;
 	CGFloat scale = MIN(1.0f, budget / MAX(1.0f, maxDimensions.width));
-	return CGSizeMake(floorf(maxDimensions.width * scale),
-		floorf(maxDimensions.height * scale));
+	return CGSizeMake(floor(maxDimensions.width * scale),
+		floor(maxDimensions.height * scale));
 }
 
 - (NSDictionary *)mosaicForRow:(NSInteger)row {

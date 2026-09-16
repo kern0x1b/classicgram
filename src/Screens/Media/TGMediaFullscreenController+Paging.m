@@ -348,7 +348,7 @@
 		CGFloat panelWidth = _bottomBar.frame.size.width;
 		CGFloat labelWidth = _progressLabel.frame.size.width;
 		CGFloat labelHeight = _progressLabel.frame.size.height;
-		CGFloat labelLeft = (CGFloat)floorf((panelWidth - labelWidth) / 2.0f) + (failed ? 0.0f : 10.0f);
+		CGFloat labelLeft = (CGFloat)floor((panelWidth - labelWidth) / 2.0f) + (failed ? 0.0f : 10.0f);
 		CGFloat labelTop = _authorLabel.text.length > 0 ? 23.0f : 14.0f;
 		CGFloat retinaPixel = ([UIScreen mainScreen].scale > 1.0f) ? 0.5f : 0.0f;
 

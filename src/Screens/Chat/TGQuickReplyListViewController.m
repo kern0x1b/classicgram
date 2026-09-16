@@ -142,8 +142,8 @@ static const NSInteger kAddMessageAlertTag = 5;
 	CGSize size = [_statusLabel.text sizeWithFont:_statusLabel.font
 								constrainedToSize:CGSizeMake(self.view.bounds.size.width - 48, 1000)
 									lineBreakMode:NSLineBreakByWordWrapping];
-	_statusLabel.frame = CGRectMake(24, floorf((self.view.bounds.size.height - size.height) / 2),
-		self.view.bounds.size.width - 48, ceilf(size.height));
+	_statusLabel.frame = CGRectMake(24, floor((self.view.bounds.size.height - size.height) / 2),
+		self.view.bounds.size.width - 48, ceil(size.height));
 }
 
 - (void)messagesUpdated:(NSNotification *)note {
@@ -556,8 +556,8 @@ static const NSInteger kAddMessageAlertTag = 5;
 									   constrainedToSize:CGSizeMake(self.view.bounds.size.width - 48, 1000)
 										   lineBreakMode:NSLineBreakByWordWrapping];
 		self.emptyLabel.frame = CGRectMake(24,
-			floorf((self.view.bounds.size.height - size.height) / 2),
-			self.view.bounds.size.width - 48, ceilf(size.height));
+			floor((self.view.bounds.size.height - size.height) / 2),
+			self.view.bounds.size.width - 48, ceil(size.height));
 	}
 }
 

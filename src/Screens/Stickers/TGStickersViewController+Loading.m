@@ -555,7 +555,7 @@
 	if (width <= 0 || height <= 0)
 		return nil;
 	CGFloat factor = MIN(side / width, side / height);
-	CGSize target = CGSizeMake(floorf(width * factor), floorf(height * factor));
+	CGSize target = CGSizeMake(floor(width * factor), floor(height * factor));
 	if (target.width < 1 || target.height < 1)
 		return nil;
 
@@ -620,7 +620,7 @@
 		return nil;
 
 	CGFloat factor = MIN(side / width, side / height);
-	CGSize target = CGSizeMake(floorf(width * factor), floorf(height * factor));
+	CGSize target = CGSizeMake(floor(width * factor), floor(height * factor));
 	if (target.width < 1 || target.height < 1)
 		return nil;
 
@@ -731,7 +731,7 @@
 	CGFloat width = self.table.bounds.size.width;
 	if (width <= 0)
 		width = self.view.bounds.size.width;
-	NSInteger columns = (NSInteger)floorf((width - kTileInset * 2 + kTileGap) /
+	NSInteger columns = (NSInteger)floor((width - kTileInset * 2 + kTileGap) /
 		(kTileSide + kTileGap));
 	if (columns < 3)
 		columns = 3;

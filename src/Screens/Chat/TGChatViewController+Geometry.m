@@ -274,12 +274,12 @@ TGStampPlate TGStampPlateLayout(NSString *countText,
 	plate.trailPad = trailPad;
 	plate.showsViews = countText.length > 0;
 	plate.showsTicks = tickWidth > 0;
-	plate.timeWidth = ceilf([timeText sizeWithFont:font].width) + 1;
+	plate.timeWidth = ceil([timeText sizeWithFont:font].width) + 1;
 
 	if (plate.showsViews) {
 		plate.eyeWidth = kViewsEyeWidth;
 		plate.eyeGap = kViewsEyeGap;
-		plate.countWidth = ceilf([countText sizeWithFont:font].width) + 1;
+		plate.countWidth = ceil([countText sizeWithFont:font].width) + 1;
 		plate.countGap = kViewsTimeGap;
 	}
 	if (plate.showsTicks) {
@@ -354,7 +354,7 @@ TGStampPlate TGStampPlateLayout(NSString *countText,
 	if (width <= kBubbleReferenceWidth)
 		return kBubbleMaxW;
 
-	return floorf(width * (kBubbleBudgetAtReference / kBubbleReferenceWidth)) - kBubbleTailOverhang;
+	return floor(width * (kBubbleBudgetAtReference / kBubbleReferenceWidth)) - kBubbleTailOverhang;
 }
 
 - (BOOL)forwardOriginIsReachable:(NSDictionary *)m {
@@ -587,7 +587,7 @@ static CGFloat TGLargeEmojiFontSize(NSInteger count) {
 	CGFloat multiplier = (count >= 1 && count <= known)
 		? multipliers[count - 1]
 		: 0.21f;
-	return floorf(94.0f * multiplier);
+	return floor(94.0f * multiplier);
 }
 
 - (UIFont *)bodyFontFor:(NSDictionary *)m {
@@ -831,7 +831,7 @@ static const CGFloat kCaptionMinWrapWidth = 120.0f;
 	if (!text.length)
 		return nil;
 
-	CGFloat maxW = floorf([self maxBubbleWidthFor:m] - 2 * kPadH);
+	CGFloat maxW = floor([self maxBubbleWidthFor:m] - 2 * kPadH);
 	CGFloat cap = [self captionWidthCapFor:m];
 	if (cap > 0)
 		maxW = MIN(maxW, cap);
@@ -888,7 +888,7 @@ static const CGFloat kCaptionMinWrapWidth = 120.0f;
 	CGFloat budget = [self bubbleWidthBudget];
 	if (budget <= kBubbleMaxW)
 		return kImageMax;
-	return floorf(kImageMax * budget / kBubbleMaxW);
+	return floor(kImageMax * budget / kBubbleMaxW);
 }
 
 - (CGSize)drawnSizeForImageSize:(CGSize)source {
@@ -897,7 +897,7 @@ static const CGFloat kCaptionMinWrapWidth = 120.0f;
 	CGFloat side = [self mediaMaxSide];
 	CGFloat scale = MIN(side / source.width, side / source.height);
 	scale = MIN(scale, 1.0f);
-	return CGSizeMake(floorf(source.width * scale), floorf(source.height * scale));
+	return CGSizeMake(floor(source.width * scale), floor(source.height * scale));
 }
 
 - (CGSize)drawnPointSizeFor:(NSDictionary *)m {
@@ -930,7 +930,7 @@ static const CGFloat kCaptionMinWrapWidth = 120.0f;
 		CGFloat cover = MIN(1.0f, MAX(needW / source.width, needH / source.height));
 		side = MAX(source.width, source.height) * cover;
 	}
-	return MIN([self pictureDecodeLimit], ceilf(side));
+	return MIN([self pictureDecodeLimit], ceil(side));
 }
 
 - (NSNumber *)pictureFileIdFor:(NSDictionary *)m {
@@ -1059,8 +1059,8 @@ static CGSize TGStickerFittedSize(CGSize source, BOOL animated) {
 	if (source.width < 1 || source.height < 1)
 		return CGSizeMake(side, side);
 	CGFloat scale = MIN(side / source.width, side / source.height);
-	return CGSizeMake(floorf(source.width * scale),
-		floorf(source.height * scale));
+	return CGSizeMake(floor(source.width * scale),
+		floor(source.height * scale));
 }
 
 - (CGSize)reservedPictureSizeFor:(NSDictionary *)m {
@@ -1214,15 +1214,15 @@ static CGSize TGStickerFittedSize(CGSize source, BOOL animated) {
 		points.height * screen / sourceH);
 	if (cover >= 1.0f)
 		return image;
-	CGSize target = CGSizeMake(MAX(1.0f, floorf(sourceW * cover / screen)),
-		MAX(1.0f, floorf(sourceH * cover / screen)));
+	CGSize target = CGSizeMake(MAX(1.0f, floor(sourceW * cover / screen)),
+		MAX(1.0f, floor(sourceH * cover / screen)));
 
 	NSNumber *fileId = [self pictureFileIdFor:m];
 	if (!fileId)
 		return TGImageDrawnAtPointSize(image, target);
 
 	NSString *key = [NSString stringWithFormat:@"%@@%dx%d", fileId,
-		(int)roundf(points.width), (int)roundf(points.height)];
+		(int)round(points.width), (int)round(points.height)];
 	UIImage *cached = self.tileBitmaps[key];
 	if (cached)
 		return cached;
@@ -1367,7 +1367,7 @@ static CGSize TGStickerFittedSize(CGSize source, BOOL animated) {
 		return nil;
 
 	CGFloat factor = MIN(fitSize.width / width, fitSize.height / height);
-	CGSize target = CGSizeMake(floorf(width * factor), floorf(height * factor));
+	CGSize target = CGSizeMake(floor(width * factor), floor(height * factor));
 	if (target.width < 1 || target.height < 1)
 		return nil;
 

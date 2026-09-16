@@ -112,7 +112,7 @@ TGMessageLayoutComputed TGMessageLayoutBuildPhoto(TGMessageItem *item,
 	}
 
 	if (item.mediaBadgeText.length) {
-		CGFloat badgeW = ceilf([item.mediaBadgeText
+		CGFloat badgeW = ceil([item.mediaBadgeText
 							 sizeWithFont:[UIFont boldSystemFontOfSize:11]]
 								 .width) +
 			12;

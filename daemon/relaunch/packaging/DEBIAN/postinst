@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+JOB="/Library/LaunchDaemons/com.kern0x1b.telegramd.plist"
+
+case "$1" in
+configure)
+    launchctl unload "$JOB" 2>/dev/null || true
+    launchctl load "$JOB"
+    ;;
+esac
+
+exit 0

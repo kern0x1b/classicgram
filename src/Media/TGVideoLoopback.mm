@@ -4,8 +4,8 @@
 
 extern "C" unsigned long long TGResidentBytes(void);
 
-#include "libtgvoip/video/TGVP8Codec.h"
-#include "libtgvoip/os/darwin/TGCallVideoRenderer.h"
+#include "TGVP8Codec.h"
+#include "TGCallVideoRenderer.h"
 #include "libtgvoip/PrivateDefines.h"
 #include <chrono>
 #include <vector>

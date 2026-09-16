@@ -102,8 +102,8 @@
 
 	CGSize contentSize = self.contentSize;
 	self.contentOffset = CGPointMake(
-		MAX(0.0f, floorf((contentSize.width - bounds.width) / 2.0f)),
-		MAX(0.0f, floorf((contentSize.height - bounds.height) / 2.0f)));
+		MAX(0.0f, floor((contentSize.width - bounds.width) / 2.0f)),
+		MAX(0.0f, floor((contentSize.height - bounds.height) / 2.0f)));
 }
 
 - (void)centerContents {
@@ -111,10 +111,10 @@
 	CGRect frame = _imageView.frame;
 
 	frame.origin.x = bounds.width > frame.size.width
-		? floorf((bounds.width - frame.size.width) / 2.0f)
+		? floor((bounds.width - frame.size.width) / 2.0f)
 		: 0.0f;
 	frame.origin.y = bounds.height > frame.size.height
-		? floorf((bounds.height - frame.size.height) / 2.0f)
+		? floor((bounds.height - frame.size.height) / 2.0f)
 		: 0.0f;
 
 	_imageView.frame = frame;
@@ -139,7 +139,7 @@
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView
 					   withView:(UIView *)view
-						atScale:(float)scale {
+						atScale:(CGFloat)scale {
 	[self centerContents];
 	self.scrollEnabled = [self isZoomed];
 }

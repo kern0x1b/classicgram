@@ -238,7 +238,7 @@ static NSArray *TGPhoneCountries(void) {
 					   forState:UIControlStateNormal];
 
 	CGSize titleSize = [[button titleForState:UIControlStateNormal] sizeWithFont:button.titleLabel.font];
-	CGFloat width = MAX(59.0f, ceilf(titleSize.width) + 14.0f);
+	CGFloat width = MAX(59.0f, ceil(titleSize.width) + 14.0f);
 	button.frame = CGRectMake(0, 0, width, plate.size.height);
 
 	[button addTarget:self action:@selector(cancelButtonPressed) forControlEvents:UIControlEventTouchUpInside];

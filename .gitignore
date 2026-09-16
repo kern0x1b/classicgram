@@ -1,7 +1,5 @@
 # Build directory and auxiliary build files
 build/
-.theos/
-packages/
 build-aux/
 aclocal.m4
 configure
@@ -35,12 +33,6 @@ Makefile.in
 
 .DS_Store
 /.zsign_cache
-
-daemon/relaunch/out/
-
-tweaks/system-call/out/
-tweaks/system-call/work/
-tools/pushdaemon/out/
 
 # local-only reference material, never committed
 design-reference/

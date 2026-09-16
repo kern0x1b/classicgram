@@ -28,40 +28,57 @@ cleanup() {
 }
 trap cleanup EXIT
 
-PRINT_MK="$WORK_DIR/print.mk"
-cat > "$PRINT_MK" <<EOF
-THEOS_PROJECT_DIR := $ROOT_DIR
-include $ROOT_DIR/Makefile
-print-%:
-	@echo '\$(\$*)'
-EOF
-
-CLANG="$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-if [ ! -x "$CLANG" ]; then
-	CLANG="$(xcrun -f clang 2>/dev/null || true)"
-fi
-if [ ! -x "$CLANG" ]; then
-	CLANG="$(command -v clang || true)"
-fi
-SYSROOT=$(THEOS=${THEOS:-$HOME/theos} make -f "$PRINT_MK" print-SYSROOT 2>/dev/null | tail -1)
-INCLUDES=$(THEOS=${THEOS:-$HOME/theos} make -f "$PRINT_MK" print-SRC_INCLUDES 2>/dev/null | tail -1)
-
-if [ -z "$SYSROOT" ] || [ ! -d "$SYSROOT" ]; then
-	SYSROOT="$ROOT_DIR/build/sdks/iPhoneOS12.4.sdk"
-fi
-if [ ! -d "$SYSROOT" ]; then
-	SYSROOT="$ROOT_DIR/build/sdks/iPhoneOS9.3.sdk"
-fi
-OBJCFLAGS="-arch armv7 -mthumb -O0 -fsyntax-only -isysroot $SYSROOT -miphoneos-version-min=6.0 $INCLUDES -fobjc-arc -Wno-deprecated-declarations -Wno-macro-redefined"
-
-if [ ! -x "$CLANG" ]; then
-	echo "lint-header-standalone: no clang at $CLANG" >&2
+PROJECT="$ROOT_DIR/build/armv7/application"
+if [ ! -f "$PROJECT/build.ninja" ]; then
+	echo "lint-header-standalone: no application build tree at build/armv7/application - run 'charon build --variant armv7' first" >&2
 	exit 1
 fi
-if [ ! -d "$SYSROOT" ]; then
-	echo "lint-header-standalone: no iPhoneOS SDK under build/sdks" >&2
+
+ninja -C "$PROJECT" -t commands > "$WORK_DIR/commands.txt" 2>/dev/null || {
+	echo "lint-header-standalone: ninja could not list the application's compile commands" >&2
 	exit 1
-fi
+}
+
+python3 - "$WORK_DIR/commands.txt" "$WORK_DIR" <<'PY' || exit 1
+import shlex, sys
+commands, out = sys.argv[1], sys.argv[2]
+wanted = {".m": "objc", ".mm": "objcxx"}
+found = {}
+for line in open(commands, encoding="utf-8"):
+    words = shlex.split(line)
+    if not words or "-c" not in words:
+        continue
+    source = words[words.index("-c") + 1]
+    language = next((name for suffix, name in wanted.items() if source.endswith(suffix)), None)
+    if not language or language in found:
+        continue
+    flags, skip = [], False
+    for word in words[1:]:
+        if skip:
+            skip = False
+            continue
+        if word in ("-o", "-c", "-MF", "-MT", "-MQ"):
+            skip = True
+            continue
+        if word in ("-MD", "-MMD") or word == source:
+            continue
+        flags.append(word)
+    found[language] = (words[0], flags)
+    if len(found) == len(wanted):
+        break
+missing = [name for name in wanted.values() if name not in found]
+if missing:
+    sys.exit("lint-header-standalone: the build tree compiles no " + " or ".join(missing) + " source")
+for language, (compiler, flags) in found.items():
+    with open(f"{out}/{language}.flags", "w") as handle:
+        handle.write(shlex.join(flags))
+    with open(f"{out}/compiler", "w") as handle:
+        handle.write(compiler)
+PY
+
+CLANG=$(cat "$WORK_DIR/compiler")
+OBJC_FLAGS=$(cat "$WORK_DIR/objc.flags")
+OBJCXX_FLAGS=$(cat "$WORK_DIR/objcxx.flags")
 
 if [ "$MODE" = "changed" ]; then
 	HEADERS=()
@@ -104,7 +121,15 @@ cat > "$CHECK_HEADER" <<'EOF'
 #!/bin/bash
 h="$1"
 slot="$2"
-if ! out=$("$CLANG" -x objective-c-header -fsyntax-only $OBJCFLAGS "$h" 2>&1); then
+base="${h%.h}"
+if [ -f "$base.mm" ] && [ ! -f "$base.m" ]; then
+	language=objective-c++-header
+	eval "flags=($OBJCXX_FLAGS)"
+else
+	language=objective-c-header
+	eval "flags=($OBJC_FLAGS)"
+fi
+if ! out=$("$CLANG" -x "$language" -fsyntax-only "${flags[@]}" "$h" 2>&1); then
 	{
 		printf 'FAIL\t%s\n' "$h"
 		printf '%s\n' "$out"
@@ -116,7 +141,7 @@ chmod +x "$CHECK_HEADER"
 NPROC=$(sysctl -n hw.ncpu 2>/dev/null)
 [ -n "$NPROC" ] || NPROC=4
 
-export CLANG OBJCFLAGS FAIL_DIR
+export CLANG OBJC_FLAGS OBJCXX_FLAGS FAIL_DIR
 
 START_TS=$(date +%s)
 SLOT=0
@@ -132,7 +157,7 @@ ELAPSED=$((END_TS - START_TS))
 
 FAILED_HEADERS=$(find "$FAIL_DIR" -name '*.txt' | wc -l | tr -d ' ')
 
-echo "lint-header-standalone: checked ${#HEADERS[@]} header(s) in ${ELAPSED}s (mode: $MODE, $NPROC parallel jobs)"
+echo "lint-header-standalone: checked ${#HEADERS[@]} header(s) in ${ELAPSED}s (mode: $MODE, $NPROC parallel jobs, flags of build/armv7/application)"
 
 if [ "$FAILED_HEADERS" -gt 0 ]; then
 	echo ""

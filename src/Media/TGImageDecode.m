@@ -75,8 +75,8 @@ UIImage *TGImageWithinPixelLimit(UIImage *image, CGFloat maxPixelSize) {
 	if (shrink >= 1.0f)
 		return image;
 
-	CGSize points = CGSizeMake(MAX(1.0f, floorf(w * shrink)),
-		MAX(1.0f, floorf(h * shrink)));
+	CGSize points = CGSizeMake(MAX(1.0f, floor(w * shrink)),
+		MAX(1.0f, floor(h * shrink)));
 	UIGraphicsBeginImageContextWithOptions(points, NO, 1.0f);
 	[image drawInRect:CGRectMake(0, 0, points.width, points.height)];
 	UIImage *smaller = UIGraphicsGetImageFromCurrentImageContext();

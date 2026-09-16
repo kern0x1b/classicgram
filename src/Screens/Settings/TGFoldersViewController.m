@@ -226,7 +226,7 @@
 		return;
 	CGRect bounds = self.tableView.bounds;
 	self.statusLabel.frame = CGRectMake(kCaptionInset,
-		floorf((bounds.size.height - 60) / 2), bounds.size.width - kCaptionInset * 2, 60);
+		floor((bounds.size.height - 60) / 2), bounds.size.width - kCaptionInset * 2, 60);
 	[self.tableView bringSubviewToFront:self.statusLabel];
 }
 

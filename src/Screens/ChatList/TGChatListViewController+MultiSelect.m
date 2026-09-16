@@ -107,8 +107,8 @@
 	CGFloat slice = b.size.width / titles.count;
 	for (NSInteger i = 0; i < titles.count; i++) {
 		UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-		button.frame = CGRectMake(floorf(slice * i), 0,
-			floorf(slice * (i + 1)) - floorf(slice * i), height);
+		button.frame = CGRectMake(floor(slice * i), 0,
+			floor(slice * (i + 1)) - floor(slice * i), height);
 		button.titleLabel.font = [UIFont boldSystemFontOfSize:14];
 		button.tag = (NSInteger)i;
 		[button setTitle:titles[i] forState:UIControlStateNormal];
@@ -126,7 +126,7 @@
 		if (i > 0) {
 			CGFloat retinaPixel = ([UIScreen mainScreen].scale > 1.5f) ? 0.5f : 1.0f;
 			UIView *rule = [[UIView alloc] initWithFrame:
-					CGRectMake(floorf(slice * i), 7, retinaPixel, height - 14)];
+					CGRectMake(floor(slice * i), 7, retinaPixel, height - 14)];
 			rule.backgroundColor = [[TGTheme shared] separatorColour];
 			[panel addSubview:rule];
 		}

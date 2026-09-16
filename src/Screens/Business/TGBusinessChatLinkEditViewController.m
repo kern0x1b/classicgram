@@ -78,7 +78,7 @@ static const CGFloat kNameRowHeight = 44;
 	CGSize hintSize = [hintText sizeWithFont:[UIFont systemFontOfSize:13]
 							constrainedToSize:CGSizeMake(width - 24, 200)
 								lineBreakMode:NSLineBreakByWordWrapping];
-	self.hint = [[UILabel alloc] initWithFrame:CGRectMake(12, hintTop, width - 24, ceilf(hintSize.height))];
+	self.hint = [[UILabel alloc] initWithFrame:CGRectMake(12, hintTop, width - 24, ceil(hintSize.height))];
 	self.hint.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	self.hint.backgroundColor = [UIColor clearColor];
 	self.hint.font = [UIFont systemFontOfSize:13];

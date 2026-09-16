@@ -124,8 +124,8 @@ static UIImage *TGStickerThumbnailDecodeWebP(NSData *data, CGFloat pixelSide, CG
 	CGFloat fit = MIN(pixelSide / width, pixelSide / height);
 	if (fit > 1.0f)
 		fit = 1.0f;
-	int targetWidth = (int)floorf(width * fit);
-	int targetHeight = (int)floorf(height * fit);
+	int targetWidth = (int)floor(width * fit);
+	int targetHeight = (int)floor(height * fit);
 	if (targetWidth < 1 || targetHeight < 1)
 		return nil;
 

@@ -16,7 +16,7 @@ Two layers do that:
 
 | layer | where | what it buys |
 | --- | --- | --- |
-| iOS 6 `voip` socket + keep-alive | inside the app (`src/Storage/TGBackgroundSession.m`, TDLib hook added by `packaging/tdlib/conanfile.py`) | app stays alive and connected while backgrounded, screen locked, indefinitely; the system relaunches it after a reboot |
+| iOS 6 `voip` socket + keep-alive | inside the app (`src/Storage/TGBackgroundSession.m`, TDLib hook carried as `recipes/tdlib/all/patches/voip-primary-socket-callback.patch`) | app stays alive and connected while backgrounded, screen locked, indefinitely; the system relaunches it after a reboot |
 | `telegramd` watchdog | this directory, a LaunchDaemon | closes the hole the first layer cannot: force-quit from the app switcher, and a jetsam kill |
 
 ---
@@ -46,7 +46,7 @@ open them, and never read or write through them. The streams exist purely to
 register the fd with CFNetwork as a VoIP stream; TDLib keeps doing its own
 `read()`/`write()` on the same fd.
 
-Getting the fd needs a hook in TDLib, so `packaging/tdlib/conanfile.py` adds one when it fetches
+Getting the fd needs a hook in TDLib, so the tdlib recipe applies `patches/voip-primary-socket-callback.patch` when it fetches
 TDLib's source:
 
 - `td/telegram/net/Session.cpp` exports
@@ -168,13 +168,15 @@ and writes `/var/log/telegramd.log` (rotated at 256 KB to `.log.1`), plus
 
 ### Build
 
+This folder is its own Charon module, declared in `charon.toml`:
+
 ```
-cd daemon/relaunch
-./build.sh
+charon build --root daemon/relaunch     # telegramd staged into /usr/libexec with its plist and config
+charon package --root daemon/relaunch   # com.kern0x1b.telegramd_<version>_iphoneos-arm.deb
 ```
 
-armv7, `-miphoneos-version-min=6.0`, against `build/sdks/iPhoneOS12.4.sdk`,
-signed with `ldid -S entitlements.plist`. Output lands in `out/`.
+armv7 at iOS 6.0, linked with the platform's ld64 and signed with
+`entitlements.plist`, which the build reads back from the signed binary.
 
 The entitlements (`platform-application`,
 `com.apple.springboard.launchapplications`) are not enforced on iOS 6 and are
@@ -183,28 +185,28 @@ there so the same binary keeps working if it is ever moved to a newer jailbreak.
 ### Install
 
 ```
-./install.sh [ssh-host]        # defaults to the `itgphone` alias
+scp com.kern0x1b.telegramd_*_iphoneos-arm.deb root@<ip>:/tmp/
+ssh root@<ip> 'dpkg -i /tmp/com.kern0x1b.telegramd_*.deb'
 ```
 
-It copies the three files, fixes ownership and modes, then
-`launchctl unload` + `launchctl load`. Watch it work:
+`postinst` runs `launchctl unload` + `launchctl load` on the job. Watch it work:
 
 ```
-ssh itgphone tail -f /var/log/telegramd.log
+ssh root@<ip> tail -f /var/log/telegramd.log
 ```
 
 ### Remove
 
 ```
-./uninstall.sh [ssh-host]
+ssh root@<ip> 'dpkg --purge com.kern0x1b.telegramd'
 ```
 
-`launchctl unload`, then delete the binary, the config, the plist and the four
-log files. Nothing else on the device was ever modified, so that is a complete
-removal. To disable it without removing it:
+`prerm` unloads the job, dpkg deletes the binary, the config and the plist, and
+`postrm` on purge deletes the four log files. Nothing else on the device was ever
+modified, so that is a complete removal. To disable it without removing it:
 
 ```
-ssh itgphone touch /var/mobile/Library/Preferences/com.kern0x1b.telegram.nolaunch
+ssh root@<ip> touch /var/mobile/Library/Preferences/com.kern0x1b.telegram.nolaunch
 ```
 
 ### Configuration

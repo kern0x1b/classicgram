@@ -382,7 +382,7 @@ static NSString *TGServiceGiftLine(TGFlattenContext *context, NSDictionary *cont
 										@"%@ sent you a gift for %@"),
 				  actor, stars];
 	}
-	if ([ctype isEqualToString:@"messageGiftedTon"]) {
+	if ([ctype isEqualToString:@"messageGiftedGrams"]) {
 		long long grams = [content[@"gram_amount"] longLongValue];
 		NSString *amount = [NSString stringWithFormat:@"%.2f TON", grams / 1000000000.0];
 		return mine

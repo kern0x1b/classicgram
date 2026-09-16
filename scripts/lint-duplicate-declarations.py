@@ -8,7 +8,7 @@ SRC = os.path.join(ROOT, "src")
 if not os.path.isdir(SRC):
     raise SystemExit(f"source root not found: {SRC}")
 
-SKIP_DIRS = ("libvpx", "libtgvoip", "opus", "opusenc", "opusfile", "ogg", "quirc")
+SKIP_DIRS = ()
 
 INTERFACE_RE = re.compile(r'^@(interface|protocol)\b')
 END_RE = re.compile(r'^@end\b')

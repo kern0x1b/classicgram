@@ -93,8 +93,8 @@ static const NSInteger kOwnedSetsPageSize = 100;
 
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
-	self.spinner.center = CGPointMake(floorf(self.view.bounds.size.width / 2),
-		floorf(self.view.bounds.size.height / 2));
+	self.spinner.center = CGPointMake(floor(self.view.bounds.size.width / 2),
+		floor(self.view.bounds.size.height / 2));
 }
 
 - (void)viewWillAppear:(BOOL)animated {

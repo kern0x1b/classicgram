@@ -286,7 +286,7 @@ static TGSnackbar *sOpenBar = nil;
 		[self finishCommitting:YES animated:YES];
 		return;
 	}
-	NSInteger whole = (NSInteger)ceilf(_left);
+	NSInteger whole = (NSInteger)ceil(_left);
 	if (whole != _shown) {
 		_shown = whole;
 		_count.text = [NSString stringWithFormat:@"%ld", (long)_shown];

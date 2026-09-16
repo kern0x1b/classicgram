@@ -11,7 +11,7 @@ static CGFloat TGMosaicFloorToScreenPixels(CGFloat value) {
 	CGFloat scale = [UIScreen mainScreen].scale;
 	if (scale < 1.0f)
 		scale = 1.0f;
-	return floorf(value * scale) / scale;
+	return floor(value * scale) / scale;
 }
 
 static void TGMosaicSet(TGMosaicTile *tiles, NSUInteger index,
@@ -43,7 +43,7 @@ static CGFloat TGMosaicAttemptDiff(const CGFloat *cropped,
 	for (NSInteger i = 0; i < rowCount; i++) {
 		CGFloat rowHeight = TGMosaicMultiHeight(cropped + index, counts[i],
 			maxWidth, spacing);
-		CGFloat flooredRowHeight = floorf(rowHeight);
+		CGFloat flooredRowHeight = floor(rowHeight);
 		totalHeight += flooredRowHeight;
 		if (flooredRowHeight < minLineHeight)
 			minLineHeight = flooredRowHeight;
@@ -76,7 +76,7 @@ static NSUInteger TGMosaicSolve(const CGFloat *ratios,
 		cropped[i] = MAX(0.66667f, MIN(1.7f, ratio));
 	}
 
-	CGFloat maxHeight = floorf(maxSize.width / 3.0f * 4.0f);
+	CGFloat maxHeight = floor(maxSize.width / 3.0f * 4.0f);
 	NSInteger secondRowCap = (averageAspectRatio < 0.85f) ? 4 : 3;
 
 	NSUInteger bestCounts[4] = {0, 0, 0, 0};
@@ -139,7 +139,7 @@ static NSUInteger TGMosaicSolve(const CGFloat *ratios,
 	if (bestRows == 0) {
 		CGFloat y = 0;
 		for (NSInteger i = 0; i < count; i++) {
-			CGFloat height = ceilf(maxSize.width / MAX(0.66667f, cropped[i]));
+			CGFloat height = ceil(maxSize.width / MAX(0.66667f, cropped[i]));
 			NSUInteger position = TGMosaicPositionLeft | TGMosaicPositionRight |
 				(i == 0 ? TGMosaicPositionTop : 0) |
 				(i + 1 == count ? TGMosaicPositionBottom : 0);
@@ -154,7 +154,7 @@ static NSUInteger TGMosaicSolve(const CGFloat *ratios,
 	for (NSInteger row = 0; row < bestRows; row++) {
 		CGFloat rowHeight = TGMosaicMultiHeight(cropped + index, bestCounts[row],
 			maxSize.width, spacing);
-		CGFloat lineHeight = ceilf(rowHeight);
+		CGFloat lineHeight = ceil(rowHeight);
 		CGFloat x = 0;
 		NSUInteger rowFlags = (row == 0 ? TGMosaicPositionTop : 0) |
 			(row + 1 == bestRows ? TGMosaicPositionBottom : 0);
@@ -166,7 +166,7 @@ static NSUInteger TGMosaicSolve(const CGFloat *ratios,
 			if (rowFlags == 0)
 				flags = TGMosaicPositionInside;
 
-			CGFloat width = ceilf(cropped[index] * lineHeight);
+			CGFloat width = ceil(cropped[index] * lineHeight);
 			TGMosaicSet(tiles, index, x, y, width, lineHeight, flags);
 			x += width + spacing;
 			index++;
@@ -241,7 +241,7 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 		if (strcmp(proportions, "ww") == 0 &&
 			averageAspectRatio > 1.4f * maxAspectRatio && (A1 - A0) < 0.2f) {
 			CGFloat width = maxSize.width;
-			CGFloat height = floorf(MIN(MIN(width / A0, width / A1),
+			CGFloat height = floor(MIN(MIN(width / A0, width / A1),
 				(maxSize.height - s) / 2.0f));
 			TGMosaicSet(outTiles, 0, 0, 0, width, height,
 				TGMosaicPositionTop | TGMosaicPositionLeft | TGMosaicPositionRight);
@@ -250,17 +250,17 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 		} else if (strcmp(proportions, "ww") == 0 ||
 			strcmp(proportions, "qq") == 0) {
 			CGFloat width = (maxSize.width - s) / 2.0f;
-			CGFloat height = floorf(MIN(MIN(width / A0, width / A1), maxSize.height));
+			CGFloat height = floor(MIN(MIN(width / A0, width / A1), maxSize.height));
 			TGMosaicSet(outTiles, 0, 0, 0, width, height,
 				TGMosaicPositionTop | TGMosaicPositionLeft | TGMosaicPositionBottom);
 			TGMosaicSet(outTiles, 1, width + s, 0, width, height,
 				TGMosaicPositionTop | TGMosaicPositionRight | TGMosaicPositionBottom);
 		} else {
-			CGFloat secondWidth = floorf(MIN(0.5f * (maxSize.width - s),
-				roundf((maxSize.width - s) / A0 / (1.0f / A0 + 1.0f / A1))));
+			CGFloat secondWidth = floor(MIN(0.5f * (maxSize.width - s),
+				round((maxSize.width - s) / A0 / (1.0f / A0 + 1.0f / A1))));
 			CGFloat firstWidth = maxSize.width - secondWidth - s;
-			CGFloat height = floorf(MIN(maxSize.height,
-				roundf(MIN(firstWidth / A0, secondWidth / A1))));
+			CGFloat height = floor(MIN(maxSize.height,
+				round(MIN(firstWidth / A0, secondWidth / A1))));
 			TGMosaicSet(outTiles, 0, 0, 0, firstWidth, height,
 				TGMosaicPositionTop | TGMosaicPositionLeft | TGMosaicPositionBottom);
 			TGMosaicSet(outTiles, 1, firstWidth + s, 0, secondWidth, height,
@@ -271,14 +271,14 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 		if (proportions[0] == 'n') {
 			CGFloat firstHeight = maxSize.height;
 			CGFloat thirdHeight = MIN((maxSize.height - s) * 0.5f,
-				roundf(A1 * (maxSize.width - s) / (A2 + A1)));
+				round(A1 * (maxSize.width - s) / (A2 + A1)));
 			CGFloat secondHeight = maxSize.height - thirdHeight - s;
 			CGFloat rightWidth = MAX(kMosaicMinWidth,
 				MIN((maxSize.width - s) * 0.5f,
-					roundf(MIN(thirdHeight * A2, secondHeight * A1))));
+					round(MIN(thirdHeight * A2, secondHeight * A1))));
 			if (fillWidth)
 				rightWidth = TGMosaicFloorToScreenPixels(maxSize.width / 2.0f);
-			CGFloat leftWidth = roundf(MIN(firstHeight * A0,
+			CGFloat leftWidth = round(MIN(firstHeight * A0,
 				maxSize.width - s - rightWidth));
 			if (fillWidth)
 				leftWidth = maxSize.width - s - rightWidth;
@@ -292,14 +292,14 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 				TGMosaicPositionRight | TGMosaicPositionBottom);
 		} else {
 			CGFloat width = maxSize.width;
-			CGFloat firstHeight = floorf(MIN(width / A0,
+			CGFloat firstHeight = floor(MIN(width / A0,
 				(maxSize.height - s) * 0.66f));
 			TGMosaicSet(outTiles, 0, 0, 0, width, firstHeight,
 				TGMosaicPositionTop | TGMosaicPositionLeft | TGMosaicPositionRight);
 
 			width = (maxSize.width - s) / 2.0f;
 			CGFloat secondHeight = MIN(maxSize.height - firstHeight - s,
-				roundf(MIN(width / A1, width / A2)));
+				round(MIN(width / A1, width / A2)));
 			TGMosaicSet(outTiles, 1, 0, firstHeight + s, width, secondHeight,
 				TGMosaicPositionLeft | TGMosaicPositionBottom);
 			TGMosaicSet(outTiles, 2, width + s, firstHeight + s, width, secondHeight,
@@ -309,11 +309,11 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 		CGFloat A0 = ratios[0], A1 = ratios[1], A2 = ratios[2], A3 = ratios[3];
 		if (strcmp(proportions, "wwww") == 0 || proportions[0] == 'w') {
 			CGFloat w = maxSize.width;
-			CGFloat h0 = roundf(MIN(w / A0, (maxSize.height - s) * 0.66f));
+			CGFloat h0 = round(MIN(w / A0, (maxSize.height - s) * 0.66f));
 			TGMosaicSet(outTiles, 0, 0, 0, w, h0,
 				TGMosaicPositionTop | TGMosaicPositionLeft | TGMosaicPositionRight);
 
-			CGFloat h = roundf((maxSize.width - 2 * s) / (A1 + A2 + A3));
+			CGFloat h = round((maxSize.width - 2 * s) / (A1 + A2 + A3));
 			CGFloat w0 = MAX(kMosaicMinWidth,
 				MIN((maxSize.width - 2 * s) * 0.4f, h * A1));
 			CGFloat w2 = MAX(MAX(kMosaicMinWidth, (maxSize.width - 2 * s) * 0.33f),
@@ -329,14 +329,14 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 				TGMosaicPositionRight | TGMosaicPositionBottom);
 		} else {
 			CGFloat h = maxSize.height;
-			CGFloat w0 = roundf(MIN(h * A0, (maxSize.width - s) * 0.6f));
+			CGFloat w0 = round(MIN(h * A0, (maxSize.width - s) * 0.6f));
 			TGMosaicSet(outTiles, 0, 0, 0, w0, h,
 				TGMosaicPositionTop | TGMosaicPositionLeft | TGMosaicPositionBottom);
 
-			CGFloat w = roundf((maxSize.height - 2 * s) /
+			CGFloat w = round((maxSize.height - 2 * s) /
 				(1.0f / A1 + 1.0f / A2 + 1.0f / A3));
-			CGFloat h0 = floorf(w / A1);
-			CGFloat h1 = floorf(w / A2);
+			CGFloat h0 = floor(w / A1);
+			CGFloat h1 = floor(w / A2);
 			CGFloat h2 = h - h0 - h1 - 2 * s;
 			w = MAX(kMosaicMinWidth, MIN(maxSize.width - w0 - s, w));
 
@@ -357,8 +357,8 @@ NSUInteger TGMosaicLayoutTiles(const CGSize *sizes,
 			outTiles[i].frame.size.width = 1;
 		if (outTiles[i].frame.size.height < 1)
 			outTiles[i].frame.size.height = 1;
-		width = MAX(width, roundf(CGRectGetMaxX(outTiles[i].frame)));
-		height = MAX(height, roundf(CGRectGetMaxY(outTiles[i].frame)));
+		width = MAX(width, round(CGRectGetMaxX(outTiles[i].frame)));
+		height = MAX(height, round(CGRectGetMaxY(outTiles[i].frame)));
 	}
 	if (outTotal)
 		*outTotal = CGSizeMake(width, height);
