@@ -54,8 +54,9 @@ Each of these was checked against a flag or an upstream option first; none exist
   data centre.
 - **`tdlib`: emulated thread-local storage.** Clang refuses `__thread` below iOS 9.0 on both armv7
   and arm64, even with `-femulated-tls`. The recipe probes the compiler and, where it is refused,
-  compiles against iOS 9.0 with `-femulated-tls`, links compiler-rt's `__emutls_get_address` from
-  the newest LLVM release, and records the real minimum in the Mach-O.
+  compiles against iOS 9.0 with `-femulated-tls` and links at the real minimum, which the Mach-O
+  records. `__emutls_get_address` comes from the compiler's own runtime, `libclang_rt.ios.a`, which
+  the driver links anyway, so no compiler-rt source is fetched.
 
 ## Bumping one
 
