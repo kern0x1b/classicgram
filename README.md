@@ -246,7 +246,7 @@ usually the SDK, the hardware, or a deliberate decision, never "not yet gotten t
 ## Building
 
 Toolchain: a Mac with the Xcode Command Line Tools, Conan 2, and
-[Charon](https://github.com/kern0x1b/ios6-toolchain), the build driver whose `apple-ios` platform
+[Charon](https://github.com/kern0x1b/charon), the build driver whose `apple-ios` platform
 supplies everything else as packages: the iOS SDK, the armv7 linker, `ldid` and the C++ runtime. No
 Xcode, no Xcode project and no Theos are involved.
 
