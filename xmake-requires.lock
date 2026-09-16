@@ -1,0 +1,69 @@
+{
+    __meta__ = {
+        version = "1.0"
+    },
+    ["iphoneos|armv7"] = {
+        ["charon@iphoneos-sdk 16.4#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "2db9950c0594a270fd8291c2aedb811c6210e54e",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "16.4"
+        },
+        ["charon@ld64 956.6#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "2db9950c0594a270fd8291c2aedb811c6210e54e",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "956.6"
+        },
+        ["charon@ldid 2.1.5-procursus7+23.gaf86971#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "2db9950c0594a270fd8291c2aedb811c6210e54e",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "2.1.5-procursus7+23.gaf86971"
+        },
+        ["charon@libplist 2.7.0#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "2db9950c0594a270fd8291c2aedb811c6210e54e",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "2.7.0"
+        },
+        ["charon@openssl 4.0.2#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "2db9950c0594a270fd8291c2aedb811c6210e54e",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "4.0.2"
+        },
+        ["cmake#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "4.3.4"
+        },
+        ["ninja#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "v1.13.2"
+        },
+        ["qrcodegen 1.8.0+31.g3c6d0b3#f56260b5"] = {
+            version = "1.8.0+31.g3c6d0b3"
+        },
+        ["quirc 1.2+7.g927d680#f56260b5"] = {
+            version = "1.2+7.g927d680"
+        }
+    }
+}
