@@ -138,6 +138,10 @@ runtime-from = "libcxx"
 "libc++.1.0.dylib" = "libc++.1.dylib"
 "libc++abi.1.0.dylib" = "libc++abi.1.dylib"
 
+[package]
+control = "packaging/control"
+variant = "universal"
+
 [pipeline]
 armv7 = ["build:application"]
 arm64 = ["build:application"]

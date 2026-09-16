@@ -291,6 +291,8 @@ runtime it carries from the system, or a signature missing a declared entitlemen
 the app and TDLib are built against ships inside the bundle, under `Frameworks/`, because iOS 6's
 own libc++ predates the headers they compile with.
 
+`charon package --variant universal` writes the Cydia package, `com.kern0x1b.telegram_<version>_iphoneos-arm.deb`,
+installing the universal bundle at `/Applications/Telegram.app`, from `packaging/control`.
 `tweaks/system-call` and `daemon/relaunch` are modules of their own, built and packaged with
 `charon build --root <folder>` and `charon package --root <folder>`.
 
@@ -302,6 +304,9 @@ tests straight against the Mac's own Foundation, no iOS SDK involved, and prints
 ## Installing on a device
 
 A jailbreak is required — there is no signed distribution of this app anywhere, by design:
+
+The `.deb` from `charon package --variant universal` installs through any package manager. To copy
+the bundle by hand instead:
 
 1. `charon build` to produce `build/universal/Telegram.app`, signed with
    `src/Resources/entitlements.plist`.
@@ -338,7 +343,8 @@ Four further pieces are optional, not part of the app binary itself, each instal
 
 ```
 telegram-classic/
-├── Makefile              # the entire build — there is no Xcode project
+├── charon.toml           # the entire build, declared for Charon — there is no Xcode project
+├── packaging/            # the Cydia control file for the app's .deb
 ├── src/                  # everything that compiles into Classicgram.app
 │   ├── App/               # application lifecycle, root view controllers, TGCoordinator (navigation seam)
 │   ├── TDLibClient/        # the TDLib wrapper (TGClient and its per-feature categories) — the only package allowed to import TDLib's own headers

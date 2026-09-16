@@ -58,7 +58,7 @@ the `Bash` tool call that would do it ever runs.
 Each was written from an actual incident or an actual repo fact, checked against the current
 source rather than assumed — see `../iTgLegacy-notes/docs/claude-md-practice.md` for the research this
 was built from, including the practitioner sources and the survey of ready-made skills that didn't
-fit (none did; this project's combination of hand-written Makefile, dlopen'd TDLib, iOS 6 SDK
+fit (none did; this project's combination of an armv7 iOS 6 cross build, dlopen'd TDLib, iOS 6 SDK
 ceiling, and jailbroken-device SSH deploy has no existing off-the-shelf skill).
 
 ## Adding a skill
