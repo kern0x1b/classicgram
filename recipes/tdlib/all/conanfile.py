@@ -1,15 +1,13 @@
 import os
-import shutil
 
 from conan import ConanFile
 from conan.errors import ConanException
 from conan.tools.cmake import CMake, CMakeToolchain
 from conan.tools.env import Environment
-from conan.tools.files import apply_conandata_patches, copy, download
+from conan.tools.files import apply_conandata_patches, copy
 from conan.tools.scm import Git
 
 
-_EMUTLS_DIR = "compiler-rt-builtins"
 _EMULATED_TLS_VERSION = "9.0"
 
 
@@ -36,43 +34,29 @@ class TdlibConan(ConanFile):
         self.requires("libcxx/23.1.1@charon/stable")
         self.requires("apple-compat/1.0@charon/stable")
 
+    def build_requirements(self):
+        self.tool_requires("gperf/3.1")
+
     def source(self):
-        sources = self.conan_data["sources"][self.version]
-        tdlib = sources["tdlib"]
+        tdlib = self.conan_data["sources"][self.version]
         Git(self).fetch_commit(url=tdlib["url"], commit=tdlib["commit"])
         apply_conandata_patches(self)
-        runtime = sources["compiler-rt-builtins"]
-        for filename, checksum in runtime["files"].items():
-            download(self, runtime["url"] + "/" + filename,
-                     os.path.join(self.source_folder, _EMUTLS_DIR, filename),
-                     sha256=checksum)
 
     def layout(self):
         super().layout()
         self.folders.build = "cross-build"
 
     @property
-    def _cross_folder(self):
-        return self.build_folder
-
-    @property
     def _native_folder(self):
         return os.path.join(self.source_folder, "native-build")
 
-    def _target_c_command(self):
-        clang = shutil.which("clang") or "/usr/bin/clang"
-        flags = " ".join(self.conf.get("tools.build:cflags", default=[], check_type=list))
-        return (f'"{clang}" -arch {self.apple_architecture} -Os -isysroot "{self.sdk_path}" '
-                f'-miphoneos-version-min={self.settings.os.version} {flags}')
-
     def _has_real_thread_local(self):
-        clangxx = shutil.which("clang++") or "/usr/bin/clang++"
         probe = os.path.join(self.build_folder, "_tls_probe.cpp")
         os.makedirs(self.build_folder, exist_ok=True)
         with open(probe, "w") as handle:
             handle.write("static __thread int x;\nint main() { x = 1; return x; }\n")
         status = self.run(
-            f'"{clangxx}" -arch {self.apple_architecture} -isysroot "{self.sdk_path}" '
+            f'clang++ -arch {self.apple_architecture} -isysroot "{self.sdk_path}" '
             f'-miphoneos-version-min={self.settings.os.version} -fsyntax-only "{probe}"',
             ignore_errors=True, quiet=True)
         return status == 0
@@ -90,10 +74,8 @@ class TdlibConan(ConanFile):
 
         toolchain = CMakeToolchain(self)
         toolchain.blocks.remove("find_paths")
-        toolchain.extra_cflags = ["-Wno-error", f"-I{self.source_folder}",
-                                  *(flag for component in compat for flag in component.cflags)]
-        toolchain.extra_cxxflags = ["-Wno-error", f"-I{self.source_folder}",
-                                    *(flag for component in compat for flag in component.cxxflags), *headers.cxxflags,
+        toolchain.extra_cflags = [flag for component in compat for flag in component.cflags]
+        toolchain.extra_cxxflags = [*(flag for component in compat for flag in component.cxxflags), *headers.cxxflags,
                                     *(f"-isystem {folder}" for folder in headers.includedirs),
                                     *(f"-D{define}" for define in runtime.defines)]
         toolchain.extra_sharedlinkflags = ["-nostdlib++",
@@ -105,36 +87,24 @@ class TdlibConan(ConanFile):
         variables.update({
             "BUILD_SHARED_LIBS": True,
             "TD_ENABLE_LTO": False,
-            "ATOMICS_FOUND": True,
-            "ATOMICS_LIBRARIES": "",
             "OPENSSL_INCLUDE_DIR": openssl["crypto"].includedirs[0],
             "OPENSSL_CRYPTO_LIBRARY": os.path.join(openssl["crypto"].libdirs[0], "libcrypto.a"),
             "OPENSSL_SSL_LIBRARY": os.path.join(openssl["ssl"].libdirs[0], "libssl.a"),
-            "CMAKE_C_COMPILER_LAUNCHER": "ccache",
-            "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
         })
         if self._has_real_thread_local():
             self.output.info("the target compiler has real __thread, so TDLib builds at the deployment target")
         else:
             self.output.info(
                 f"no real __thread at iOS {self.settings.os.version}: compiling against iOS {_EMULATED_TLS_VERSION} "
-                f"with -femulated-tls, linking compiler-rt's __emutls_get_address and recording iOS "
+                f"with -femulated-tls, taking __emutls_get_address from the compiler's own runtime and recording iOS "
                 f"{self.settings.os.version} in the Mach-O")
             toolchain.extra_cflags.append("-femulated-tls")
             toolchain.extra_cxxflags.append("-femulated-tls")
-            toolchain.extra_sharedlinkflags += [os.path.join(self._cross_folder, "emutls.o"),
-                                                f"-miphoneos-version-min={self.settings.os.version}"]
+            toolchain.extra_sharedlinkflags.append(f"-miphoneos-version-min={self.settings.os.version}")
             variables["CMAKE_OSX_DEPLOYMENT_TARGET"] = _EMULATED_TLS_VERSION
         toolchain.generate()
 
-    def _require(self, tool):
-        if shutil.which(tool) is None:
-            raise ConanException(f"{tool} not found on PATH (brew install {tool})")
-
     def build(self):
-        for tool in ("cmake", "gperf", "ccache"):
-            self._require(tool)
-
         if not os.path.isdir(self._native_folder):
             self.output.info("pregenerating sources with a native build")
             os.makedirs(self._native_folder)
@@ -142,12 +112,6 @@ class TdlibConan(ConanFile):
             self.run(f'cmake -DTD_GENERATE_SOURCE_FILES=ON "{self.source_folder}"',
                      cwd=self._native_folder, env=host_tools)
             self.run("cmake --build . --target prepare_cross_compiling", cwd=self._native_folder, env=host_tools)
-
-        os.makedirs(self._cross_folder, exist_ok=True)
-        compile_c = self._target_c_command()
-        builtins = os.path.join(self.source_folder, _EMUTLS_DIR)
-        self.run(f'{compile_c} -I "{builtins}" -c "{os.path.join(builtins, "emutls.c")}" '
-                 f'-o "{os.path.join(self._cross_folder, "emutls.o")}"')
 
         cmake = CMake(self)
         cmake.configure(build_script_folder=self.source_folder, variables={

@@ -26,7 +26,7 @@ webp = "1.6.0+258.g6ff2f43@itglegacy/stable"
 libcxx = "23.1.1@charon/stable"
 
 [tools]
-ldid = "2.1.5@charon/stable"
+ldid = "2.1.5-procursus7+23.gaf86971@charon/stable"
 
 [variants.armv7]
 
@@ -145,5 +145,5 @@ variant = "universal"
 [pipeline]
 armv7 = ["build:application"]
 arm64 = ["build:application"]
-universal = ["merge:application", "sign:application"]
-harness = ["build:application", "sign:application"]
+universal = ["merge:application", "sign:application", "check:imports"]
+harness = ["build:application", "sign:application", "check:imports"]
