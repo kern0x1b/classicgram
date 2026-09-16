@@ -8,6 +8,6 @@
             commit = "db27a3adbcc2f501370e5fb9bc65af84c5bfa9bc",
             url = "https://github.com/kern0x1b/charon.git"
         },
-        version = "v0.2.1"
+        version = "v0.3.0"
     }
 }
