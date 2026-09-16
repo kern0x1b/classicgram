@@ -43,7 +43,6 @@ static inline int writeOggPage(ogg_page *page, NSFileHandle *fileHandle)
     int size_segments;
 
     opus_int64 nb_encoded;
-    opus_int64 bytes_written;
     opus_int64 pages_out;
     opus_int64 total_bytes;
     opus_int64 total_samples;
@@ -220,7 +219,6 @@ static inline int writeOggPage(ogg_page *page, NSFileHandle *fileHandle)
                 NSLog(@"Error: failed writing header to output stream");
                 return false;
             }
-            bytes_written += pageBytesWritten;
             pages_out++;
         }
 
@@ -246,7 +244,6 @@ static inline int writeOggPage(ogg_page *page, NSFileHandle *fileHandle)
             return false;
         }
 
-        bytes_written += writtenPageBytes;
         pages_out++;
     }
 
@@ -324,7 +321,6 @@ static inline int writeOggPage(ogg_page *page, NSFileHandle *fileHandle)
             NSLog(@"Error: failed writing data to output stream");
             return false;
         }
-        bytes_written += writtenPageBytes;
         pages_out++;
     }
 
@@ -352,21 +348,10 @@ static inline int writeOggPage(ogg_page *page, NSFileHandle *fileHandle)
             NSLog(@"Error: failed writing data to output stream");
             return false;
         }
-        bytes_written += writtenPageBytes;
         pages_out++;
     }
 
     return true;
-}
-
-- (NSUInteger)encodedBytes
-{
-    return (NSUInteger)bytes_written;
-}
-
-- (NSTimeInterval)encodedDuration
-{
-    return total_samples / (NSTimeInterval)coding_rate;
 }
 
 @end

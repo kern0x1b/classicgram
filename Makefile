@@ -28,15 +28,16 @@ IOS6_DEPS_CONANFILES := $(ROOT)/packaging/deps/conanfile.py $(ROOT)/packaging/td
 	$(ROOT)/packaging/openssl/conanfile.py $(ROOT)/packaging/ogg/conanfile.py \
 	$(ROOT)/packaging/quirc/conanfile.py $(ROOT)/packaging/opusenc/conanfile.py \
 	$(ROOT)/packaging/opusfile/conanfile.py $(ROOT)/packaging/opus/conanfile.py \
-	$(ROOT)/packaging/libvpx/conanfile.py $(ROOT)/packaging/libtgvoip/conanfile.py
+	$(ROOT)/packaging/libvpx/conanfile.py $(ROOT)/packaging/libtgvoip/conanfile.py \
+	$(ROOT)/packaging/webp/conanfile.py
 
 $(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env: $(IOS6_DEPS_CONANFILES)
-	ITGLEGACY_ROOT=$(ROOT) conan install $(ROOT)/packaging/deps -pr:h ios6-armv7 -pr:b default --build=missing
+	conan install $(ROOT)/packaging/deps -pr:h ios6-armv7 -pr:h $(ROOT)/packaging/profiles/cxx-stdlib -pr:b default --build=missing
 
 $(ROOT)/packaging/deps/build/conan/armv8/ios6-deps.env: $(IOS6_DEPS_CONANFILES)
-	ITGLEGACY_ROOT=$(ROOT) conan install $(ROOT)/packaging/deps -pr:h $(ROOT)/packaging/profiles/arm64 -pr:b default --build=missing
+	conan install $(ROOT)/packaging/deps -pr:h $(ROOT)/packaging/profiles/arm64 -pr:h $(ROOT)/packaging/profiles/cxx-stdlib -pr:b default --build=missing
 
-IOS6_DEPS := TDLIB OPENSSL OGG QUIRC OPUSENC OPUSFILE OPUS LIBVPX LIBTGVOIP
+IOS6_DEPS := TDLIB OPENSSL OGG QUIRC OPUSENC OPUSFILE OPUS LIBVPX LIBTGVOIP WEBP
 
 include $(ROOT)/packaging/deps/build/conan/armv7/ios6-deps.env
 $(foreach d,$(IOS6_DEPS),$(eval IOS6_HOST_$(d)_armv7 := $(IOS6_HOST_$(d))))
@@ -64,8 +65,7 @@ SRC_INCLUDES = $(addprefix -I$(ROOT)/,\
 	src/Screens/Business src/Screens/Login src/Screens/Search src/Screens/Search/Items \
 	src/Screens/Media src/Screens/Media/Cells src/Screens/Media/Items \
 	src/Screens/Storage src/Screens/Storage/Cells src/Screens/Storage/Items \
-	src/Screens/Payments src/Screens/Misc \
-	third_party/webp/prebuilt) \
+	src/Screens/Payments src/Screens/Misc) \
 	-I$(IOS6_HOST_OPENSSL)/include \
 	-I$(IOS6_HOST_OGG)/include \
 	-I$(IOS6_HOST_QUIRC)/include \
@@ -73,7 +73,8 @@ SRC_INCLUDES = $(addprefix -I$(ROOT)/,\
 	-I$(IOS6_HOST_OPUSFILE)/include \
 	-I$(IOS6_HOST_OPUS)/include -I$(IOS6_HOST_OPUS)/include/opus \
 	-I$(IOS6_HOST_LIBVPX)/include \
-	-I$(IOS6_HOST_LIBTGVOIP)/include
+	-I$(IOS6_HOST_LIBTGVOIP)/include \
+	-I$(IOS6_HOST_WEBP)/include
 
 CXX_STDLIB_SDK := $(firstword $(wildcard $(ROOT)/build/sdks/iPhoneOS16.5.sdk/usr/include/c++/v1) \
 	$(wildcard $(ROOT)/build/sdks/iPhoneOS15.6.sdk/usr/include/c++/v1) \
@@ -109,9 +110,9 @@ Telegram_LDFLAGS = -Wl,-dead_strip -ObjC -Wl,-pagezero_size,0x1000 \
 	-L$(IOS6_HOST_OPENSSL)/lib \
 	-L$(IOS6_HOST_OGG)/lib -L$(IOS6_HOST_QUIRC)/lib -L$(IOS6_HOST_OPUSENC)/lib \
 	-L$(IOS6_HOST_OPUSFILE)/lib -L$(IOS6_HOST_OPUS)/lib -L$(IOS6_HOST_LIBVPX)/lib \
-	-L$(IOS6_HOST_LIBTGVOIP)/lib \
-	-F$(ROOT)/third_party/webp/prebuilt -framework WebP \
-	-ltgvoip -lopusfile -lopusenc -lquirc -lopus -lvpx -logg -lstdc++ -lz -lcrypto -lpthread
+	-L$(IOS6_HOST_LIBTGVOIP)/lib -L$(IOS6_HOST_WEBP)/lib \
+	-ltgvoip -lopusfile -lopusenc -lquirc -lopus -lvpx -logg -lwebp -lsharpyuv \
+	-lstdc++ -lz -lcrypto -lpthread
 
 Telegram_INSTALL_PATH = /Applications
 Telegram_CODESIGN_FLAGS = -S$(ROOT)/src/Resources/entitlements.plist

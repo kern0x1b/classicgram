@@ -1,0 +1,10 @@
+sources:
+  libtgvoip:
+    url: "https://github.com/grishka/libtgvoip.git"
+    branch: "public"
+    commit: "6c82c9de85cca69ea099a738fcbd2ab2de4f839d"
+patches:
+  "2.4.4-itglegacy":
+    - patch_file: "patches/ios6.patch"
+      patch_type: "portability"
+      patch_description: "iOS 6 / armv7 port: custom crypto hooks, echo canceller and input/output volume effects, callback audio I/O, and the VideoToolbox paths this port drives"

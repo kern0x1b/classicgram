@@ -10,9 +10,12 @@ class OpenSSLConan(ConanFile):
     name = "openssl"
     user = "itglegacy"
     channel = "stable"
-    version = "3.0.15"
+    version = "3.0.22"
     package_type = "static-library"
-    description = "OpenSSL 3.0.15 for the iOS 6 / armv7 and armv8 profiles this port targets"
+    description = ("OpenSSL 3.0.22, the latest patch release of the 3.0 LTS branch (supported through "
+                   "2026) - 3.5/3.6 moved OPENSSL_armcap_P from an assembly .comm to a C global, which "
+                   "breaks the PC-relative addressing several armv4 .S files use to reach it without a "
+                   "GOT, for the iOS 6 / armv7 and armv8 profiles this port targets")
     license = "Apache-2.0"
     homepage = "https://www.openssl.org"
 

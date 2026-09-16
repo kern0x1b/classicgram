@@ -11,9 +11,9 @@ class OpusConan(ConanFile):
     name = "opus"
     user = "itglegacy"
     channel = "stable"
-    version = "1.3.1"
+    version = "1.6.1"
     package_type = "static-library"
-    description = "libopus 1.3.1, the version string embedded in the prebuilt archive this replaces"
+    description = "libopus 1.6.1, fetched vanilla from upstream"
     license = "BSD-3-Clause"
     homepage = "https://opus-codec.org"
 
@@ -21,7 +21,7 @@ class OpusConan(ConanFile):
     python_requires_extend = "ios6-base.Ios6Port"
 
     def source(self):
-        Git(self).fetch_commit(url="https://github.com/xiph/opus.git", commit="v1.3.1")
+        Git(self).fetch_commit(url="https://github.com/xiph/opus.git", commit="v1.6.1")
 
     def _apple_arch(self):
         return to_apple_arch(self)
@@ -54,8 +54,6 @@ class OpusConan(ConanFile):
             f'-DOPUS_BUILD_TESTING=OFF '
             f'-DOPUS_INSTALL_PKG_CONFIG_MODULE=OFF '
             f'-DOPUS_INSTALL_CMAKE_CONFIG_MODULE=OFF '
-            f'-DOPUS_MAY_HAVE_NEON=ON '
-            f'-DOPUS_PRESUME_NEON=ON '
             f'-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
             cwd=build_dir,
         )

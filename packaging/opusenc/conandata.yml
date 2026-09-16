@@ -1,0 +1,5 @@
+sources:
+  opus-tools:
+    url: "https://github.com/xiph/opus-tools.git"
+    tag: "v0.1.10"
+    commit: "20b1e667bc4343249cc0cfabb49272d58a69825e"

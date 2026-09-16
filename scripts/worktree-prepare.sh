@@ -17,15 +17,6 @@ if [ -d "$main/build/sdks" ] && [ ! -e "$worktree/build/sdks" ]; then
 	echo "worktree-prepare: linked build/sdks"
 fi
 
-if [ -f "$main/build/armv7/libvpx-obj/libvpx.a" ] && [ ! -f "$worktree/build/armv7/libvpx-obj/libvpx.a" ]; then
-	cp -R "$main/build/armv7/libvpx-obj" "$worktree/build/armv7/libvpx-obj"
-	config="$worktree/build/armv7/libvpx-obj/libs-armv7-darwin-gcc.mk"
-	if [ -f "$config" ]; then
-		sed -i '' "s|SRC_PATH_BARE=.*|SRC_PATH_BARE=$worktree/third_party/libvpx|" "$config"
-	fi
-	echo "worktree-prepare: copied the prebuilt libvpx"
-fi
-
 config_dir="$worktree/src/Resources/Config"
 if [ -f "$main/src/Resources/Config/tg_config.h" ] && [ ! -f "$config_dir/tg_config.h" ]; then
 	cp "$main/src/Resources/Config/tg_config.h" "$config_dir/tg_config.h"

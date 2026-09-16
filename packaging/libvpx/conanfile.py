@@ -11,9 +11,9 @@ class LibvpxConan(ConanFile):
     name = "libvpx"
     user = "itglegacy"
     channel = "stable"
-    version = "1.13.1"
+    version = "1.16.0"
     package_type = "static-library"
-    description = "libvpx 1.13.1 'Ugly Duckling', VP8-only realtime build, matching scripts/build-libvpx.sh"
+    description = "libvpx 1.16.0, VP8-only realtime build for the iOS 6 armv7 and armv8 profiles"
     license = "BSD-3-Clause"
     homepage = "https://chromium.googlesource.com/webm/libvpx"
 
@@ -21,7 +21,7 @@ class LibvpxConan(ConanFile):
     python_requires_extend = "ios6-base.Ios6Port"
 
     def source(self):
-        Git(self).fetch_commit(url="https://github.com/webmproject/libvpx.git", commit="v1.13.1")
+        Git(self).fetch_commit(url="https://github.com/webmproject/libvpx.git", commit="v1.16.0")
 
     def _real_sdk_path(self):
         sdk = self.conf.get("tools.apple:sdk_path")
@@ -44,13 +44,9 @@ class LibvpxConan(ConanFile):
         flags = f"-arch {to_apple_arch(self)} -miphoneos-version-min={min_version} -isysroot {sdk}"
 
         cxx_stdlib_inc = ""
-        root = os.environ.get("ITGLEGACY_ROOT")
-        if root:
-            for sdk_name in ("iPhoneOS16.5.sdk", "iPhoneOS15.6.sdk"):
-                candidate = os.path.join(root, "build", "sdks", sdk_name, "usr", "include", "c++", "v1")
-                if os.path.isdir(candidate):
-                    cxx_stdlib_inc = f"-isystem {candidate}"
-                    break
+        cxx_stdlib_dir = self.conf.get("user.itglegacy:cxx_stdlib_include")
+        if cxx_stdlib_dir:
+            cxx_stdlib_inc = f"-isystem {cxx_stdlib_dir}"
 
         env = {
             "CC": "clang",

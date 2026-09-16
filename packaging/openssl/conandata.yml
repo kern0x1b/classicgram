@@ -1,4 +1,4 @@
 sources:
-  "3.0.15":
+  "3.0.22":
     url: "https://github.com/openssl/openssl.git"
-    commit: "c523121f902fde2929909dc7f76b13ceb4961efe"
+    commit: "openssl-3.0.22"
