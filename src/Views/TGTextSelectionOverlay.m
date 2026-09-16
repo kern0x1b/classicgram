@@ -26,7 +26,7 @@
 	CGContextSetFillColorWithColor(context, tint.CGColor);
 
 	CGFloat stemHeight = MAX(0.0f, rect.size.height - 13.0f);
-	CGRect stem = CGRectMake(floorf(rect.size.width / 2) - 1, 0, 2, stemHeight);
+	CGRect stem = CGRectMake(floor(rect.size.width / 2) - 1, 0, 2, stemHeight);
 	CGContextFillRect(context, stem);
 
 	CGRect knob = CGRectMake(rect.size.width / 2 - 6.5f, stemHeight, 13, 13);

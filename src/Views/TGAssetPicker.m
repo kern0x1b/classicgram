@@ -467,13 +467,13 @@ static NSString *TGAssetPickerStage(ALAsset *asset, double stamp, NSInteger seri
 	if (width < 1.0f)
 		return;
 
-	NSInteger columns = (NSInteger)floorf((width - kTileSpacing) / (kTileSide + kTileSpacing));
+	NSInteger columns = (NSInteger)floor((width - kTileSpacing) / (kTileSide + kTileSpacing));
 	if (columns < 1)
 		columns = 1;
 	CGFloat used = columns * kTileSide + (columns - 1) * kTileSpacing;
 	CGFloat sideInset = (CGFloat)(int)((width - used) / 2.0f);
 
-	BOOL changed = (columns != _columns) || (fabsf(width - _laidOutWidth) > 0.5f);
+	BOOL changed = (columns != _columns) || (fabs(width - _laidOutWidth) > 0.5f);
 	_columns = columns;
 	_sideInset = sideInset;
 	_laidOutWidth = width;
@@ -595,10 +595,10 @@ static NSString *TGAssetPickerStage(ALAsset *asset, double stamp, NSInteger seri
 
 	CGFloat top = _grid.contentOffset.y - kTileSide;
 	CGFloat bottom = _grid.contentOffset.y + _grid.bounds.size.height + kTileSide;
-	NSInteger firstRow = (NSInteger)floorf((top - kTileSpacing) / (kTileSide + kTileSpacing));
+	NSInteger firstRow = (NSInteger)floor((top - kTileSpacing) / (kTileSide + kTileSpacing));
 	if (firstRow < 0)
 		firstRow = 0;
-	NSInteger lastRow = (NSInteger)ceilf((bottom - kTileSpacing) / (kTileSide + kTileSpacing));
+	NSInteger lastRow = (NSInteger)ceil((bottom - kTileSpacing) / (kTileSide + kTileSpacing));
 
 	NSInteger first = firstRow * _columns;
 	NSInteger last = MIN(count - 1, (lastRow + 1) * _columns - 1);

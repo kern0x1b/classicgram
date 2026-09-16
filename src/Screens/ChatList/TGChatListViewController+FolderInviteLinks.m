@@ -144,7 +144,7 @@
 			[self unreadSuffixForList:(TGChatListId)(listId ?: TGChatListMain)]];
 	BOOL selected = (listId == self.folderId);
 
-	CGFloat textWidth = ceilf([caption sizeWithFont:font].width);
+	CGFloat textWidth = ceil([caption sizeWithFont:font].width);
 	CGFloat buttonWidth = textWidth + kFolderChipPadding * 2;
 	UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
 	button.exclusiveTouch = YES;

@@ -43,7 +43,7 @@ UIImage *TGReactionScaledIcon(UIImage *image, CGFloat side) {
 		return nil;
 
 	CGFloat factor = MIN(side / source.width, side / source.height);
-	CGSize target = CGSizeMake(floorf(source.width * factor), floorf(source.height * factor));
+	CGSize target = CGSizeMake(floor(source.width * factor), floor(source.height * factor));
 	if (target.width < 1.0f || target.height < 1.0f)
 		return nil;
 

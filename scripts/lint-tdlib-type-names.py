@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-import glob
 import os
+import subprocess
 import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCHEME_UNDER_ROOT = os.path.join("third_party", "tdlib", "td", "td", "generate", "scheme",
-                                 "td_api.tl")
 POSITIONS = (
     re.compile(r'@"@type"\s*:\s*@"([A-Za-z]\w*)"'),
     re.compile(r'\[@"@type"\]\s*=\s*@"([A-Za-z]\w*)"'),
@@ -34,31 +32,21 @@ def main_checkout():
 
 def packaged_scheme():
     for root in (ROOT, main_checkout()):
-        if not root:
+        if not root or not os.path.isfile(os.path.join(root, "charon.toml")):
             continue
-        for env in glob.glob(os.path.join(root, "packaging", "deps", "build", "conan", "*",
-                                          "ios6-deps.env")):
-            for line in open(env, encoding="utf-8"):
-                if line.startswith("IOS6_HOST_TDLIB="):
-                    candidate = os.path.join(line.split("=", 1)[1].strip(), "res", "td_api.tl")
-                    if os.path.isfile(candidate):
-                        return candidate
+        try:
+            answer = subprocess.run(["charon", "--root", root, "where", "pkg:tdlib", "--variant", "armv7"],
+                                    capture_output=True, text=True, check=False)
+        except FileNotFoundError:
+            return None
+        lines = answer.stdout.strip().splitlines()
+        if answer.returncode == 0 and lines:
+            candidate = os.path.join(lines[-1].strip(), "res", "td_api.tl")
+            if os.path.isfile(candidate):
+                return candidate
     return None
 
 
-def scheme_path():
-    here = os.path.join(ROOT, SCHEME_UNDER_ROOT)
-    if os.path.isfile(here):
-        return here
-    packaged = packaged_scheme()
-    if packaged:
-        return packaged
-    checkout = main_checkout()
-    if checkout:
-        shared = os.path.join(checkout, SCHEME_UNDER_ROOT)
-        if os.path.isfile(shared):
-            return shared
-    return here
 
 
 def declared_types(text):
@@ -105,9 +93,10 @@ def self_test():
 def main():
     if "--self-test" in sys.argv:
         return self_test()
-    scheme = scheme_path()
-    if not os.path.isfile(scheme):
-        print("lint-tdlib-type-names: skipped, no td_api.tl at %s" % scheme)
+    scheme = packaged_scheme()
+    if not scheme:
+        print("lint-tdlib-type-names: skipped, charon where pkg:tdlib names no packaged td_api.tl "
+              "(charon is not on PATH, or tdlib is not built yet)")
         return 0
     types = declared_types(open(scheme, encoding="utf-8", errors="replace").read())
     root = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "src")

@@ -553,7 +553,7 @@ NSDictionary *TGStarsBadgeRow(NSString *title,
 	label.textAlignment = NSTextAlignmentRight;
 	label.textColor = isNegative ? TGColourFromHex(0xee4928) : TGColourFromHex(0x41a903);
 	CGSize size = [text sizeWithFont:label.font];
-	label.frame = CGRectMake(0, 0, ceilf(size.width) + 2, 20);
+	label.frame = CGRectMake(0, 0, ceil(size.width) + 2, 20);
 	return label;
 }
 
@@ -565,7 +565,7 @@ NSDictionary *TGStarsBadgeRow(NSString *title,
 	label.textAlignment = NSTextAlignmentRight;
 	label.textColor = [[TGTheme shared] emptyStateColour];
 	CGSize size = [text sizeWithFont:label.font];
-	label.frame = CGRectMake(0, 0, ceilf(size.width) + 2, 20);
+	label.frame = CGRectMake(0, 0, ceil(size.width) + 2, 20);
 	return label;
 }
 
@@ -699,7 +699,7 @@ NSDictionary *TGStarsBadgeRow(NSString *title,
 		label.textAlignment = NSTextAlignmentRight;
 		label.textColor = [[TGTheme shared] secondaryTextColour];
 		CGSize size = [label.text sizeWithFont:label.font];
-		label.frame = CGRectMake(0, 0, ceilf(size.width) + 2, 20);
+		label.frame = CGRectMake(0, 0, ceil(size.width) + 2, 20);
 		cell.accessoryView = label;
 	}
 	return cell;

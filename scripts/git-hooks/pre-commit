@@ -2,7 +2,7 @@
 
 staged_all=$(git diff --cached --name-only --diff-filter=ACM)
 
-staged=$(printf '%s\n' "$staged_all" | grep -E '\.(m|h|c|mm)$' | grep -vE '^(src|third_party)/(libvpx|libtgvoip|opus|opusenc|opusfile|ogg|quirc)/')
+staged=$(printf '%s\n' "$staged_all" | grep -E '\.(m|h|c|mm)$')
 if [ -n "$staged" ]; then
 	LINTER=scripts/lint-source-comments.py
 	[ -f "$LINTER" ] || LINTER=scripts/strip-comments.py
@@ -220,14 +220,10 @@ fi
 
 staged_unset_keys_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm|h)$')
 if [ -n "$staged_unset_keys_relevant" ] && [ -f scripts/lint-unset-dictionary-keys.py ]; then
-	schema=""
-	for env in packaging/deps/build/conan/*/ios6-deps.env; do
-		[ -f "$env" ] || continue
-		candidate="$(sed -n 's/^IOS6_HOST_TDLIB=//p' "$env")/res/td_api.tl"
-		if [ -f "$candidate" ]; then schema="$candidate"; break; fi
-	done
-	if [ -z "$schema" ]; then
-		echo "commit refused: no td_api.tl to check against - run 'conan install packaging/deps' so the TDLib package is resolved"
+	tdlib="$(charon where pkg:tdlib --variant armv7 2>/dev/null | tail -1)"
+	schema="$tdlib/res/td_api.tl"
+	if [ -z "$tdlib" ] || [ ! -f "$schema" ]; then
+		echo "commit refused: no td_api.tl to check against - put charon on the path and run 'charon build' so the TDLib package is in the cache"
 		exit 1
 	fi
 	python3 scripts/lint-unset-dictionary-keys.py src "$schema" scripts/baselines/unset-dictionary-keys.txt || {

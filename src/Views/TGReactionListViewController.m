@@ -194,7 +194,7 @@
 	_groupSeparators = [[NSMutableArray alloc] init];
 
 	CGFloat width = self.view.bounds.size.width - kListGroupInset * 2;
-	CGFloat originY = floorf((kListBarHeight - kListGroupHeight) / 2);
+	CGFloat originY = floor((kListBarHeight - kListGroupHeight) / 2);
 
 	UIView *group = [[UIView alloc] initWithFrame:
 			CGRectMake(kListGroupInset, originY, width, kListGroupHeight)];
@@ -202,7 +202,7 @@
 
 	NSInteger count = (NSInteger)_filters.count;
 	CGFloat usable = width - kListSeparatorWidth * (count - 1);
-	CGFloat buttonWidth = floorf(usable / MAX(1, count));
+	CGFloat buttonWidth = floor(usable / MAX(1, count));
 
 	UIColor *shadowColour = [UIColor colorWithRed:0x0e / 255.0f green:0x28 / 255.0f
 											 blue:0x4d / 255.0f

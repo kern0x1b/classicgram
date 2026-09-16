@@ -149,7 +149,7 @@
 	if (!text.length)
 		return nil;
 	NSArray *entities = [self entitiesOf:m] ?: @[];
-	CGFloat maxW = floorf([self maxBubbleWidthFor:m] - 2 * kPadH);
+	CGFloat maxW = floor([self maxBubbleWidthFor:m] - 2 * kPadH);
 	NSNumber *messageId = [m[@"id"] isKindOfClass:NSNumber.class] ? m[@"id"] : nil;
 	BOOL revealed = messageId && [self.revealedSpoilers containsObject:messageId];
 	NSSet *expanded = messageId ? self.expandedQuotes[messageId] : nil;

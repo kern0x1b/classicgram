@@ -22,12 +22,12 @@ TGMessageLayoutComputed TGMessageLayoutBuildRichMessage(TGMessageItem *item,
 
 	CGSize contentSize = TGMessageLayoutLinkPreviewSize(item, context);
 	CGFloat contentWidth = width - 2 * kMessageLayoutPadH;
-	CGFloat afterRow = top + ceilf(contentSize.height);
+	CGFloat afterRow = top + ceil(contentSize.height);
 
 	TGMessageLayoutReactionGeometry reactions = TGMessageLayoutReactionBlock(
 		item, afterRow, width, kMessageLayoutPadH, NO, NO);
 	CGFloat bottomPad = TGMessageLayoutBubbleBottomPad(item, NO, kMessageLayoutPadV);
-	CGFloat bubbleH = kMessageLayoutPadV + bottomPad + senderH + fwd + ceilf(contentSize.height) +
+	CGFloat bubbleH = kMessageLayoutPadV + bottomPad + senderH + fwd + ceil(contentSize.height) +
 		reactions.height;
 
 	computed.messageHeight = bubbleH + 3;
@@ -35,7 +35,7 @@ TGMessageLayoutComputed TGMessageLayoutBuildRichMessage(TGMessageItem *item,
 	computed.parts = TGMessageLayoutPartBubble | TGMessageLayoutPartPreview;
 	computed.sitsOnWallpaper = NO;
 	computed.bubble.preview = CGRectMake(kMessageLayoutPadH, top, contentWidth,
-		ceilf(contentSize.height));
+		ceil(contentSize.height));
 	if (reactions.present) {
 		computed.bubble.reactions = reactions.frame;
 		computed.parts |= TGMessageLayoutPartReactions;

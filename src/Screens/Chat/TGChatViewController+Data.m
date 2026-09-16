@@ -48,8 +48,8 @@
 				return;
 			CGRect history = strongSelf.table.frame;
 			strongSelf.historySpinner.center = CGPointMake(
-				floorf(CGRectGetMidX(history)),
-				floorf(CGRectGetMidY(history) + strongSelf.pinnedBannerInset / 2));
+				floor(CGRectGetMidX(history)),
+				floor(CGRectGetMidY(history) + strongSelf.pinnedBannerInset / 2));
 			[strongSelf.historySpinner startAnimating];
 		});
 }
@@ -80,7 +80,7 @@ static void TGRememberChatPosition(int64_t chatId, int64_t threadId, int64_t mes
 		if (!entry)
 			return;
 	} else if ([entry[@"m"] longLongValue] == messageId &&
-		fabsf([entry[@"d"] floatValue] - (float)delta) < 1.0f) {
+		fabs([entry[@"d"] floatValue] - (float)delta) < 1.0f) {
 		return;
 	}
 
@@ -1167,7 +1167,7 @@ static UIImage *TGMapCardWithPin(UIImage *tile, CGSize points) {
 
 	NSNumber *messageId = [m[@"id"] isKindOfClass:NSNumber.class] ? m[@"id"] : nil;
 	NSArray *cached = messageId ? self.chipsRowSizes[messageId] : nil;
-	if (cached.count == 2 && fabsf([cached[0] floatValue] - maxW) < 0.5f)
+	if (cached.count == 2 && fabs([cached[0] floatValue] - maxW) < 0.5f)
 		return [cached[1] CGSizeValue];
 
 	CGSize size = [TGReactionChipsView sizeForChips:chips width:maxW];
@@ -1222,7 +1222,7 @@ static UIImage *TGMapCardWithPin(UIImage *tile, CGSize points) {
 	CGFloat pad = rows ? room - self.table.contentSize.height : 0;
 	if (pad < 0)
 		pad = 0;
-	if (fabsf(pad - self.shortContentInset) < 0.5f)
+	if (fabs(pad - self.shortContentInset) < 0.5f)
 		return;
 	insets.top = fixed + pad;
 	self.shortContentInset = pad;
@@ -1251,9 +1251,9 @@ static const CGFloat kEmptyPlateHeight = 116.0f;
 	if (history.size.height < 1)
 		return;
 	self.emptyPlate.frame = CGRectMake(
-		floorf((history.size.width - kEmptyPlateWidth) / 2),
+		floor((history.size.width - kEmptyPlateWidth) / 2),
 		CGRectGetMinY(history) + self.pinnedBannerInset +
-			floorf((history.size.height - self.pinnedBannerInset -
+			floor((history.size.height - self.pinnedBannerInset -
 					   kEmptyPlateHeight) /
 				2),
 		kEmptyPlateWidth, kEmptyPlateHeight);
@@ -1283,7 +1283,7 @@ static const CGFloat kEmptyPlateHeight = 116.0f;
 			glyph = [self plainConversationGlyph];
 		self.emptyGlyph = [[UIImageView alloc] initWithImage:glyph];
 		self.emptyGlyph.frame = CGRectMake(
-			floorf((kEmptyPlateWidth - glyph.size.width) / 2), 23,
+			floor((kEmptyPlateWidth - glyph.size.width) / 2), 23,
 			glyph.size.width, glyph.size.height);
 		[self.emptyPlate addSubview:self.emptyGlyph];
 
@@ -1302,7 +1302,7 @@ static const CGFloat kEmptyPlateHeight = 116.0f;
 		? TGL(@"Conversation.SearchNoResults", @"No results")
 		: TGL(@"Conversation.EmptyPlaceholder", @"No messages here yet");
 	CGSize fits = [self.emptyLabel sizeThatFits:CGSizeMake(110, 1000)];
-	self.emptyLabel.frame = CGRectMake(floorf((kEmptyPlateWidth - fits.width) / 2),
+	self.emptyLabel.frame = CGRectMake(floor((kEmptyPlateWidth - fits.width) / 2),
 		kEmptyPlateHeight - fits.height - 8,
 		fits.width, fits.height);
 	[self centreEmptyPlate];
@@ -1472,7 +1472,7 @@ static const CGFloat kEmptyPlateHeight = 116.0f;
 
 	self.scrollDownBadge.text = unread > 99 ? @"99+"
 											: [NSString stringWithFormat:@"%ld", (long)unread];
-	CGFloat width = MAX(18.0f, ceilf([self.scrollDownBadge.text sizeWithFont:self.scrollDownBadge.font].width) + 10.0f);
+	CGFloat width = MAX(18.0f, ceil([self.scrollDownBadge.text sizeWithFont:self.scrollDownBadge.font].width) + 10.0f);
 	self.scrollDownBadge.frame = CGRectMake(
 		(kFloatingButtonSide - width) / 2, -6, width, 18);
 	self.scrollDownBadge.hidden = NO;

@@ -74,13 +74,13 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 	CGFloat width = self.view.bounds.size.width;
 	CGFloat height = 148.0f;
 	CGFloat plateHeight = 124.0f;
-	CGFloat plateWidth = floorf(plateHeight * 9.0f / 16.0f);
+	CGFloat plateWidth = floor(plateHeight * 9.0f / 16.0f);
 
 	UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
 	header.backgroundColor = [UIColor clearColor];
 
 	UIImageView *thumb = [[UIImageView alloc] initWithFrame:
-			CGRectMake(floorf((width - plateWidth) / 2.0f), 12.0f, plateWidth, plateHeight)];
+			CGRectMake(floor((width - plateWidth) / 2.0f), 12.0f, plateWidth, plateHeight)];
 	thumb.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin |
 		UIViewAutoresizingFlexibleRightMargin;
 	thumb.backgroundColor = [UIColor blackColor];
@@ -128,8 +128,8 @@ static NSString *TGStoryPrivacyTitle(NSString *privacy) {
 	_overlay.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
 
 	CGFloat plateWidth = MIN(240.0f, self.view.bounds.size.width - 60.0f);
-	CGRect plateFrame = CGRectMake(floorf((self.view.bounds.size.width - plateWidth) / 2.0f),
-		floorf((self.view.bounds.size.height - 96.0f) / 2.0f),
+	CGRect plateFrame = CGRectMake(floor((self.view.bounds.size.width - plateWidth) / 2.0f),
+		floor((self.view.bounds.size.height - 96.0f) / 2.0f),
 		plateWidth, 96.0f);
 	UIView *plate = [[UIView alloc] initWithFrame:plateFrame];
 	plate.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin |

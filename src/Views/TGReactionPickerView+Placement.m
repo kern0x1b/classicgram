@@ -15,7 +15,7 @@
 	CGRect frame = _card.frame;
 	CGRect rect = _anchorRect;
 
-	frame.origin.x = floorf(rect.origin.x + rect.size.width / 2 - frame.size.width / 2);
+	frame.origin.x = floor(rect.origin.x + rect.size.width / 2 - frame.size.width / 2);
 	if (frame.origin.x < 4)
 		frame.origin.x = 4;
 	if (frame.origin.x + frame.size.width > self.bounds.size.width - 4)
@@ -27,14 +27,14 @@
 	if (frame.origin.y < 2) {
 		frame.origin.y = rect.origin.y + rect.size.height + 17;
 		if (frame.origin.y + frame.size.height > self.bounds.size.height - 14) {
-			frame.origin.y = floorf((self.bounds.size.height - frame.size.height) / 2);
+			frame.origin.y = floor((self.bounds.size.height - frame.size.height) / 2);
 			_arrowOnTop = NO;
 		} else
 			_arrowOnTop = YES;
 	} else
 		_arrowOnTop = NO;
 
-	_arrowLocation = floorf(rect.origin.x + rect.size.width / 2) - frame.origin.x;
+	_arrowLocation = floor(rect.origin.x + rect.size.width / 2) - frame.origin.x;
 
 	_card.layer.anchorPoint = CGPointMake(MAX(0.0f, MIN(1.0f, _arrowLocation / MAX(1.0f, frame.size.width))),
 		_arrowOnTop ? -0.2f : 1.2f);
@@ -48,7 +48,7 @@
 	CGFloat bottomHeight = _bottomLineView.image.size.height;
 
 	CGFloat arrowWidth = _arrowTopView.image.size.width;
-	CGFloat arrowX = floorf(_arrowLocation - arrowWidth / 2);
+	CGFloat arrowX = floor(_arrowLocation - arrowWidth / 2);
 	arrowX = MIN(MAX(10.0f, arrowX), MAX(10.0f, width - arrowWidth - 10.0f));
 
 	_arrowTopView.frame = CGRectMake(arrowX, -9, arrowWidth, _arrowTopView.image.size.height);

@@ -638,10 +638,10 @@ static UIImage *TGPlayerRowTile(UIImage *cover, BOOL current, BOOL playing) {
 }
 
 - (void)applyPlaceholderForSide:(CGFloat)side {
-	if (side <= 0 || fabsf(side - _placeholderSide) < 0.5f)
+	if (side <= 0 || fabs(side - _placeholderSide) < 0.5f)
 		return;
 	_placeholderSide = side;
-	_placeholder.image = [TGIcons musicNoteOfSide:floorf(side * 0.42f)
+	_placeholder.image = [TGIcons musicNoteOfSide:floor(side * 0.42f)
 										   colour:[[TGTheme shared] separatorColour]];
 }
 

@@ -134,9 +134,9 @@
 		NSString *title = [button titleForState:UIControlStateNormal];
 		if (title.length > 0) {
 			CGSize size = [title sizeWithFont:button.titleLabel.font];
-			width = MAX(kStickerPanelKeyMinWidth, floorf(size.width) + 18.0f);
+			width = MAX(kStickerPanelKeyMinWidth, floor(size.width) + 18.0f);
 		}
-		button.frame = CGRectMake(floorf(x), 0, width, kStickerPanelKeyHeight);
+		button.frame = CGRectMake(floor(x), 0, width, kStickerPanelKeyHeight);
 		x += width;
 	}
 	self.tabStrip.contentSize = CGSizeMake(x, kStickerPanelKeyHeight);

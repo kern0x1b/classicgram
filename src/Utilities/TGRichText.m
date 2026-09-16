@@ -478,7 +478,7 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 		descent = -base.descender;
 	if (ascentOut)
 		*ascentOut = ascent;
-	CGFloat advance = ceilf(ascent + descent);
+	CGFloat advance = ceil(ascent + descent);
 	return MAX(advance, base.lineHeight);
 }
 
@@ -732,7 +732,7 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 					 globalBase:trimmed.location];
 			for (NSInteger i = before; i < _lines.count; i++) {
 				TGRichLineBox *box = [_lines objectAtIndex:i];
-				rightMost = MAX(rightMost, box.left + ceilf(box.width));
+				rightMost = MAX(rightMost, box.left + ceil(box.width));
 			}
 			index = NSMaxRange(run);
 			continue;
@@ -750,7 +750,7 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 
 		if (spec.code && spec.language.length) {
 			CTFontRef titleFont = TGRichCreateFont(
-				[UIFont boldSystemFontOfSize:floorf(base.pointSize * 0.8f)], 0);
+				[UIFont boldSystemFontOfSize:floor(base.pointSize * 0.8f)], 0);
 			NSMutableDictionary *titleAttributes = [NSMutableDictionary dictionary];
 			if (titleFont) {
 				[titleAttributes setObject:CFBridgingRelease(titleFont)
@@ -782,7 +782,7 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 		CGFloat blockRight = kBlockLeftInset + 24;
 		for (NSInteger i = before; i < _lines.count; i++) {
 			TGRichLineBox *box = [_lines objectAtIndex:i];
-			blockRight = MAX(blockRight, box.left + ceilf(box.width));
+			blockRight = MAX(blockRight, box.left + ceil(box.width));
 		}
 		blockRight = MIN(blockRight + kBlockRightInset, width);
 		for (NSInteger i = before; i < _lines.count; i++)
@@ -803,11 +803,11 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 
 	if (_blocks.count && _lines.count) {
 		TGRichBlockBox *last = [_blocks lastObject];
-		if (fabsf(CGRectGetMaxY(last.frame) + kBlockGap - cursor) < 0.01f)
+		if (fabs(CGRectGetMaxY(last.frame) + kBlockGap - cursor) < 0.01f)
 			cursor -= kBlockGap;
 	}
 
-	_size = CGSizeMake(ceilf(MIN(rightMost, width)), ceilf(cursor));
+	_size = CGSizeMake(ceil(MIN(rightMost, width)), ceil(cursor));
 
 	for (TGRichLineBox *box in _lines)
 		if (box.rightLimit < 0.5f)
@@ -852,7 +852,7 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 }
 
 - (CGFloat)verticalSlackIn:(CGRect)rect {
-	return floorf(MAX(0.0f, rect.size.height - _size.height) / 2);
+	return floor(MAX(0.0f, rect.size.height - _size.height) / 2);
 }
 
 - (CGFloat)xOfLine:(TGRichLineBox *)box shift:(CGFloat)shift {
@@ -1056,7 +1056,7 @@ static CGFloat TGRichLineAdvance(CTLineRef line, UIFont *base, CGFloat *ascentOu
 	for (TGRichLineBox *box in _lines) {
 		[self enumerateRunsOf:box attribute:TGRichStrikeAttribute shift:shift
 						block:^(CGRect runRect, NSRange range) {
-							CGFloat y = floorf(runRect.origin.y + box.ascent * 0.68f) + 0.5f;
+							CGFloat y = floor(runRect.origin.y + box.ascent * 0.68f) + 0.5f;
 							CGContextSetStrokeColorWithColor(context,
 								[self inkOf:box at:range.location].CGColor);
 							CGContextSetLineWidth(context, 1.0f);

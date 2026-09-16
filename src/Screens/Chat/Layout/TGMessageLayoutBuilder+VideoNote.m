@@ -82,13 +82,13 @@ TGMessageLayoutComputed TGMessageLayoutBuildVideoNote(TGMessageItem *item,
 		senderH + headerH + kRoundNoteRimInset, inner, inner);
 	computed.parts |= TGMessageLayoutPartPicture;
 
-	CGFloat pillAnchorX = floorf(circleX + side / 2 - kRoundNoteBadgeSide / 2);
+	CGFloat pillAnchorX = floor(circleX + side / 2 - kRoundNoteBadgeSide / 2);
 
-	CGFloat pillW = ceilf([item.roundNoteDurationText
+	CGFloat pillW = ceil([item.roundNoteDurationText
 						sizeWithFont:[UIFont systemFontOfSize:11]]
 							.width) +
 		11;
-	computed.bubble.roundBadge = CGRectMake(floorf(pillAnchorX - 6 - pillW),
+	computed.bubble.roundBadge = CGRectMake(floor(pillAnchorX - 6 - pillW),
 		senderH + headerH + side - 16,
 		pillW, 18);
 	computed.parts |= TGMessageLayoutPartRoundBadge;

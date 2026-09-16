@@ -678,7 +678,7 @@
 	self.badgeView.hidden = YES;
 	CGSize measured = [mark sizeWithFont:self.badgeLabel.font];
 	CGRect frame = self.badgeLabel.frame;
-	frame.size.width = MAX(20.0f, ceilf(measured.width) + 4.0f);
+	frame.size.width = MAX(20.0f, ceil(measured.width) + 4.0f);
 	self.badgeLabel.frame = frame;
 	[self layoutNameBadge];
 }
@@ -1340,7 +1340,7 @@
 	CGFloat width = scrollView.bounds.size.width;
 	if (width < 1)
 		return;
-	NSInteger page = (NSInteger)floorf((scrollView.contentOffset.x + width / 2) / width);
+	NSInteger page = (NSInteger)floor((scrollView.contentOffset.x + width / 2) / width);
 	if (page < 0)
 		page = 0;
 	if (page >= self.photoPager.numberOfPages)

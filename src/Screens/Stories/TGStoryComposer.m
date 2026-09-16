@@ -350,9 +350,9 @@ static NSMutableArray *TGStoryComposersInFlight(void) {
 		CGFloat scale = portrait
 			? MAX(canvas.width / source.width, canvas.height / source.height)
 			: MIN(canvas.width / source.width, canvas.height / source.height);
-		CGSize drawn = CGSizeMake(floorf(source.width * scale), floorf(source.height * scale));
-		CGRect target = CGRectMake(floorf((canvas.width - drawn.width) / 2.0f),
-			floorf((canvas.height - drawn.height) / 2.0f),
+		CGSize drawn = CGSizeMake(floor(source.width * scale), floor(source.height * scale));
+		CGRect target = CGRectMake(floor((canvas.width - drawn.width) / 2.0f),
+			floor((canvas.height - drawn.height) / 2.0f),
 			drawn.width, drawn.height);
 
 		UIGraphicsBeginImageContextWithOptions(canvas, YES, 1.0f);

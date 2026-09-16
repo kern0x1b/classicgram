@@ -108,23 +108,21 @@ alert on the lock screen.
 * The filter plist restricts loading to `com.apple.springboard`, and the
   constructor bails immediately if the `SpringBoard` class is absent.
 * `/var/lib/telegramsystemcall/disabled` switches it off without uninstalling.
-* The dylib links Foundation and libobjc only - no UIKit, no substrate. `make
-  check` enforces that.
+* The dylib links Foundation and libobjc only - no UIKit, no substrate. The
+  `links-neither-uikit-nor-substrate` task in the build pipeline enforces that.
 
 ## Building
 
+This folder is its own Charon module, declared in `charon.toml`:
+
 ```
-cd tweaks/system-call
-make            # out/TelegramSystemCall.dylib, armv7, min iOS 6.0
-make check      # armv7 slice, no UIKit, no substrate
-make deb        # out/com.kern0x1b.telegramsystemcall_<version>_iphoneos-arm.deb
+charon build --root tweaks/system-call     # staged, signed TelegramSystemCall.dylib and its filter plist
+charon package --root tweaks/system-call   # com.kern0x1b.telegramsystemcall_<version>_iphoneos-arm.deb
 ```
 
-`SDK=` overrides the SDK; it needs an armv7 slice in `libSystem.tbd`
-(`build/sdks/iPhoneOS12.4.sdk` works, the 9.3 one in this repo is missing
-`liblaunch.dylib` for armv7).
+The SDK, the armv7 linker and `ldid` come from the `apple-ios` platform's packages.
 
-The app half is already in the normal build - `make FINALPACKAGE=1` at the repo root.
+The app half is already in the normal build - `charon build` at the repo root.
 **Both halves are needed.** An app without the tweak posts notifications nobody
 listens to and behaves exactly as before; a tweak without the app half never
 hears an incoming call.
@@ -132,12 +130,13 @@ hears an incoming call.
 ## Installing
 
 ```
-scp out/com.kern0x1b.telegramsystemcall_*_iphoneos-arm.deb root@<ip>:/tmp/
+scp com.kern0x1b.telegramsystemcall_*_iphoneos-arm.deb root@<ip>:/tmp/
 ssh root@<ip> 'dpkg -i /tmp/com.kern0x1b.telegramsystemcall_*.deb'
 ```
 
-`postinst` resprings after 4 s. Set `TELEGRAMSYSTEMCALL_NO_RESPRING=1` to
-respring by hand instead.
+Installed through Cydia, `postinst` asks Cydia for its Restart SpringBoard
+button. Installed with `dpkg`, it only says that SpringBoard has to be restarted
+by hand for the tweak to load.
 
 ## Removing it from SSH
 
@@ -178,8 +177,7 @@ written. Do these in order; each one is a separate failure the design has a
 distinct answer for.
 
 Two shells help: `ssh root@<ip>` for the device log, and the app's own log at
-`/var/mobile/Applications/<uuid>/Library/Caches/log.txt`
-(`scripts/deploy-and-watch.sh` already pulls it).
+`/var/mobile/Applications/<uuid>/Library/Caches/log.txt`.
 
 **0. It loaded, and it loaded nowhere else.**
 ```

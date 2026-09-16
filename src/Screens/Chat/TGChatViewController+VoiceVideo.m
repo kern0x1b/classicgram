@@ -531,7 +531,7 @@ UIImage *TGRoundNoteMuteBadge(void) {
 
 	self.videoNoteMute = [[UIImageView alloc] initWithImage:TGRoundNoteMuteBadge()];
 	self.videoNoteMute.frame = CGRectMake(
-		floorf(CGRectGetMidX(circle.bounds) - kRoundNoteBadgeSide / 2),
+		floor(CGRectGetMidX(circle.bounds) - kRoundNoteBadgeSide / 2),
 		CGRectGetMaxY(circle.bounds) - kRoundNoteBadgeSide - 8,
 		kRoundNoteBadgeSide, kRoundNoteBadgeSide);
 	self.videoNoteMute.hidden = !self.videoNoteMuted;

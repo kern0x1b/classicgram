@@ -29,7 +29,7 @@ static const CGFloat kEventsRightInset = 10.0f;
 										  constrainedToSize:CGSizeMake(textWidth, 1000)
 											  lineBreakMode:NSLineBreakByWordWrapping];
 	CGFloat height = 28 + size.height + 8;
-	return height < kEventsMinRowHeight ? kEventsMinRowHeight : floorf(height);
+	return height < kEventsMinRowHeight ? kEventsMinRowHeight : floor(height);
 }
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -75,7 +75,7 @@ static const CGFloat kEventsRightInset = 10.0f;
 
 	CGSize dateSize = [self.dateLabel.text.length ? self.dateLabel.text : @" "
 		sizeWithFont:self.dateLabel.font];
-	CGFloat dateWidth = floorf(dateSize.width) + 2;
+	CGFloat dateWidth = floor(dateSize.width) + 2;
 	self.dateLabel.frame = CGRectMake(width - dateWidth - 9, 7 + TGEventsRetinaPixel(),
 		dateWidth, 15);
 
@@ -92,7 +92,7 @@ static const CGFloat kEventsRightInset = 10.0f;
 		constrainedToSize:CGSizeMake(textWidth, 1000)
 			lineBreakMode:NSLineBreakByWordWrapping];
 	self.bodyLabel.frame = CGRectMake(kEventsTextOrigin, 26 + TGEventsRetinaPixel(),
-		textWidth, floorf(bodySize.height));
+		textWidth, floor(bodySize.height));
 
 	CGFloat thickness = 1.0f / [UIScreen mainScreen].scale;
 	self.hairline.frame = CGRectMake(kEventsTextOrigin, bounds.size.height - thickness,

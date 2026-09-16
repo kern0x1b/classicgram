@@ -1,0 +1,15 @@
+Package: com.kern0x1b.telegramd
+Name: Telegram relaunch daemon
+Architecture: iphoneos-arm
+Maintainer: kern0x1b <kern0x1b@users.noreply.github.com>
+Author: kern0x1b <kern0x1b@users.noreply.github.com>
+Section: System
+Priority: optional
+Depends: firmware (>= 6.0), firmware (<< 7.0)
+Description: keeps Telegram running in the background after a force-quit or a jetsam kill
+ A small root LaunchDaemon that checks every 30 seconds whether the Telegram
+ process exists and, when it does not, asks SpringBoard to launch it suspended
+ into the background. Nothing is hooked or injected, and all Telegram work
+ stays inside the app. Creating
+ /var/mobile/Library/Preferences/com.kern0x1b.telegram.nolaunch stops the
+ relaunching without uninstalling.

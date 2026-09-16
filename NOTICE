@@ -22,7 +22,7 @@ as that licence permits.
 Material taken from Twelve:
 
   src/TGBackgroundSession.m
-  packaging/tdlib/conanfile.py, applied to TDLib's td/telegram/net/Session.cpp
+  recipes/tdlib/all/patches/voip-primary-socket-callback.patch, applied to TDLib's td/telegram/net/Session.cpp
       The selective VoIP socket policy, from
       submodules/MTProtoKit/MTProtoKit/MTTcpConnection.m
       (-socket:didConnectToHost:port:). Only the long-lived primary data

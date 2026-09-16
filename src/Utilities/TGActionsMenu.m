@@ -325,7 +325,7 @@ static TGActionsMenuView *sOpenMenu = nil;
 		CGFloat width = [title sizeWithFont:titleFont].width + kMenuTitlePadding;
 		if (i == 0 || i == _items.count - 1)
 			width += 1;
-		width = floorf(width);
+		width = floor(width);
 		naturalWidth += width;
 		[widths addObject:[NSNumber numberWithFloat:width]];
 	}
@@ -334,11 +334,11 @@ static TGActionsMenuView *sOpenMenu = nil;
 		CGFloat scale = maximumWidth / naturalWidth;
 		CGFloat used = 0;
 		for (NSInteger i = 0; i < widths.count; i++) {
-			CGFloat width = floorf([[widths objectAtIndex:i] floatValue] * scale);
+			CGFloat width = floor([[widths objectAtIndex:i] floatValue] * scale);
 			if (width < 24.0f)
 				width = 24.0f;
 			if (i == widths.count - 1 && used + width < maximumWidth)
-				width = floorf(maximumWidth - used);
+				width = floor(maximumWidth - used);
 			used += width;
 			[widths replaceObjectAtIndex:i withObject:[NSNumber numberWithFloat:width]];
 		}
@@ -454,7 +454,7 @@ static TGActionsMenuView *sOpenMenu = nil;
 	CGRect frame = _card.frame;
 	CGRect rect = _anchorRect;
 
-	frame.origin.x = floorf(rect.origin.x + rect.size.width / 2 - frame.size.width / 2);
+	frame.origin.x = floor(rect.origin.x + rect.size.width / 2 - frame.size.width / 2);
 	if (frame.origin.x < kMenuEdgeMargin)
 		frame.origin.x = kMenuEdgeMargin;
 	if (frame.origin.x + frame.size.width > self.bounds.size.width - kMenuEdgeMargin)
@@ -464,14 +464,14 @@ static TGActionsMenuView *sOpenMenu = nil;
 	if (frame.origin.y < 2.0f) {
 		frame.origin.y = rect.origin.y + rect.size.height + kMenuGapBelow;
 		if (frame.origin.y + frame.size.height > self.bounds.size.height - kMenuGapAbove) {
-			frame.origin.y = floorf((self.bounds.size.height - frame.size.height) / 2);
+			frame.origin.y = floor((self.bounds.size.height - frame.size.height) / 2);
 			_arrowOnTop = NO;
 		} else
 			_arrowOnTop = YES;
 	} else
 		_arrowOnTop = NO;
 
-	_arrowLocation = floorf(rect.origin.x + rect.size.width / 2) - frame.origin.x;
+	_arrowLocation = floor(rect.origin.x + rect.size.width / 2) - frame.origin.x;
 
 	_card.layer.anchorPoint = CGPointMake(MAX(0.0f, MIN(1.0f, _arrowLocation / MAX(1.0f, frame.size.width))),
 		_arrowOnTop ? -0.2f : 1.2f);
@@ -531,7 +531,7 @@ static TGActionsMenuView *sOpenMenu = nil;
 			CGFloat minArrowX = button.frame.origin.x + (index == 0 ? kMenuLineInset : 0.0f);
 			CGFloat maxArrowX = button.frame.origin.x + button.frame.size.width - arrowWidth +
 				(index == count - 1 ? -kMenuLineInset : 0.0f);
-			CGFloat arrowX = floorf(_arrowLocation - arrowWidth / 2.0f);
+			CGFloat arrowX = floor(_arrowLocation - arrowWidth / 2.0f);
 			arrowX = MIN(MAX(minArrowX, arrowX), maxArrowX);
 
 			_arrowTopView.frame = CGRectMake(arrowX, -9,

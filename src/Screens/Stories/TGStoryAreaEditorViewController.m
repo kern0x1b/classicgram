@@ -196,10 +196,10 @@ static const NSInteger kTGStoryAreaMaxReactionsFallback = 1;
 	if (area.size.width < 1.0f || area.size.height < 1.0f)
 		return CGRectZero;
 	CGFloat scale = MIN(area.size.width / size.width, area.size.height / size.height);
-	CGFloat drawWidth = floorf(size.width * scale);
-	CGFloat drawHeight = floorf(size.height * scale);
-	return CGRectMake(floorf((area.size.width - drawWidth) / 2.0f),
-		floorf((area.size.height - drawHeight) / 2.0f),
+	CGFloat drawWidth = floor(size.width * scale);
+	CGFloat drawHeight = floor(size.height * scale);
+	return CGRectMake(floor((area.size.width - drawWidth) / 2.0f),
+		floor((area.size.height - drawHeight) / 2.0f),
 		drawWidth, drawHeight);
 }
 
@@ -415,7 +415,7 @@ static const NSInteger kTGStoryAreaMaxReactionsFallback = 1;
 	}
 
 	UIView *host = self.view;
-	CGRect anchor = CGRectMake(floorf(host.bounds.size.width / 2.0f) - 1.0f, 70.0f, 2.0f, 2.0f);
+	CGRect anchor = CGRectMake(floor(host.bounds.size.width / 2.0f) - 1.0f, 70.0f, 2.0f, 2.0f);
 	__weak typeof(self) weakSelf = self;
 	[[TGClient shared] storyReactionsWithLimit:12 completion:^(NSArray *emoji) {
 		typeof(self) strongSelf = weakSelf;

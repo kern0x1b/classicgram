@@ -45,7 +45,7 @@
 	CGFloat contentWidth = self.contentView.bounds.size.width;
 	CGFloat height = kButtonsRowHeight;
 	if (!_leftButton.hidden && !_rightButton.hidden) {
-		CGFloat buttonWidth = floorf((contentWidth - kButtonGutter) / 2);
+		CGFloat buttonWidth = floor((contentWidth - kButtonGutter) / 2);
 		_leftButton.frame = CGRectMake(0, 0, buttonWidth, height);
 		_rightButton.frame = CGRectMake(contentWidth - buttonWidth, 0,
 			buttonWidth, height);

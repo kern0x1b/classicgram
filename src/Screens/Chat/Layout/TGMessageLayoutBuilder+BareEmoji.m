@@ -21,7 +21,7 @@ TGMessageLayoutComputed TGMessageLayoutBuildBareEmoji(TGMessageItem *item,
 	CGSize measured = TGEmojiTextSize(text, glyphFont,
 		CGSizeMake(kBareEmojiMeasureWidth, kBareEmojiFontSize * 1.4f),
 		NSLineBreakByClipping, 1);
-	CGSize glyph = CGSizeMake(ceilf(measured.width), ceilf(measured.height));
+	CGSize glyph = CGSizeMake(ceil(measured.width), ceil(measured.height));
 	if (glyph.width < 1 || glyph.height < 1)
 		glyph = CGSizeMake(kBareEmojiFontSize, kBareEmojiFontSize);
 

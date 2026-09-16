@@ -35,7 +35,6 @@ src/Media/TGVideoRecorder.m
 src/Media/TGVoiceDecoder.m
 src/Media/TGVoiceRecorder.m
 src/Media/UIImage+WebP.m
-src/Media/opusenc.m
 src/Model/TGChatComposerState.m
 src/Screens/Business/TGBusinessBotSearchViewController.m
 src/Screens/Business/TGBusinessChatLinkEditViewController.m
@@ -697,7 +696,6 @@ src/Utilities/TGPluralRules.m
 src/Utilities/TGPopupMenu.m
 src/Utilities/TGPreferenceFlags.m
 src/Utilities/TGPrivacySettingTitle.m
-src/Utilities/TGQRCode.c
 src/Utilities/TGQuickReplyTrigger.m
 src/Utilities/TGResendCountdown.m
 src/Utilities/TGRichText.m

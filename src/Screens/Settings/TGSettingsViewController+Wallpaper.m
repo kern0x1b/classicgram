@@ -681,7 +681,7 @@
 	if (scale >= 1.0f)
 		return image;
 
-	CGSize target = CGSizeMake(floorf(size.width * scale), floorf(size.height * scale));
+	CGSize target = CGSizeMake(floor(size.width * scale), floor(size.height * scale));
 	UIGraphicsBeginImageContextWithOptions(target, YES, 1.0f);
 	[image drawInRect:CGRectMake(0, 0, target.width, target.height)];
 	UIImage *scaled = UIGraphicsGetImageFromCurrentImageContext();

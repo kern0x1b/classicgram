@@ -6,7 +6,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
-SKIP_DIRS = ("libvpx", "libtgvoip", "opus", "opusenc", "opusfile", "ogg", "quirc", "Resources")
+SKIP_DIRS = ("Resources",)
 PROPERTY_RE = re.compile(r"@property\s*\(([^)]*)\)\s*[\w\s\*<>,]+?\**(\w+)\s*;")
 METHOD_RE = re.compile(r"^[-+]\s*\([\w\s\*<>]+\)\s*(\w+)\s*;$")
 SIGNATURE_RE = re.compile(r"^[-+]\s*\([\w\s\*<>]+\)\s*(\w+)\s*[;{]?\s*$")

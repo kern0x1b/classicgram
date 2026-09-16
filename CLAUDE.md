@@ -1,7 +1,7 @@
 # Telegram Classic — house rules
 
 A Telegram client for hardware Telegram itself dropped: 32-bit armv7 iPhones and iPads on iOS 6.
-Objective-C against the iOS 6 SDK, a Theos build, TDLib
+Objective-C against the iOS 6 SDK, built by Charon from `charon.toml`, TDLib
 reached at runtime through a `dlopen`ed `tdjson`.
 
 These rules bind anyone working in this repository, human or agent. They describe the project, not
@@ -64,8 +64,8 @@ not a preference.
 
 ## Working rules
 
-- Build before claiming a change works: `make FINALPACKAGE=1` has to reach the `machofix` lines, and the
-  checks under `scripts/` have to stay green. Compiling is not verifying.
+- Build before claiming a change works: `charon build` has to finish with every one of its binary checks
+  passing, and the checks under `scripts/` have to stay green. Compiling is not verifying.
 - A screenshot that renders is not a screenshot that is correct. Compare the region you changed
   against the same region before the change, zoomed with nearest-neighbour — a smoothed zoom hides
   exactly the single-pixel differences that matter here.

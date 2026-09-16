@@ -180,14 +180,14 @@ static UIImage *TGPasscodeKeyArt(CGSize size, NSString *digit, NSString *letters
 
 	UIColor *ink = highlighted ? [UIColor colorWithWhite:0.09f alpha:1.0f]
 							   : [UIColor whiteColor];
-	UIFont *digitFont = TGPasscodeDigitFont(floorf(size.height * 0.46f));
+	UIFont *digitFont = TGPasscodeDigitFont(floor(size.height * 0.46f));
 	UIFont *lettersFont = [UIFont boldSystemFontOfSize:
-			MAX(8.0f, floorf(size.height * 0.115f))];
+			MAX(8.0f, floor(size.height * 0.115f))];
 
 	CGFloat digitHeight = digitFont.lineHeight;
 	CGFloat lettersHeight = letters.length ? lettersFont.lineHeight : 0.0f;
 	CGFloat block = digitHeight + lettersHeight;
-	CGFloat top = floorf((size.height - block) / 2.0f) - (letters.length ? 1.0f : 0.0f);
+	CGFloat top = floor((size.height - block) / 2.0f) - (letters.length ? 1.0f : 0.0f);
 
 	if (!highlighted) {
 		CGContextSaveGState(context);
@@ -411,21 +411,21 @@ static UIImage *TGPasscodeDotArt(CGFloat side, BOOL filled) {
 	if (self.field) {
 		CGFloat width = MIN(bounds.size.width - 40.0f, 360.0f);
 		self.titleLabel.frame = CGRectMake(0, top, bounds.size.width, 22.0f);
-		self.field.frame = CGRectMake(floorf((bounds.size.width - width) / 2.0f),
+		self.field.frame = CGRectMake(floor((bounds.size.width - width) / 2.0f),
 			top + 40.0f, width, 31.0f);
 		return;
 	}
 
 	CGFloat column = MIN(bounds.size.width, 420.0f);
-	CGFloat side = floorf(MIN(84.0f, (column - 48.0f) / 3.0f - 14.0f));
-	CGFloat gapX = floorf((column - side * 3.0f) / 4.0f);
-	CGFloat gapY = floorf(MIN(gapX, 14.0f));
+	CGFloat side = floor(MIN(84.0f, (column - 48.0f) / 3.0f - 14.0f));
+	CGFloat gapX = floor((column - side * 3.0f) / 4.0f);
+	CGFloat gapY = floor(MIN(gapX, 14.0f));
 	CGFloat gridWidth = side * 3.0f + gapX * 2.0f;
 	CGFloat gridHeight = side * 4.0f + gapY * 3.0f;
-	CGFloat left = floorf((bounds.size.width - gridWidth) / 2.0f);
+	CGFloat left = floor((bounds.size.width - gridWidth) / 2.0f);
 
 	CGFloat headHeight = 22.0f + 18.0f + 14.0f;
-	CGFloat gridTop = floorf((bounds.size.height - gridHeight + headHeight) / 2.0f);
+	CGFloat gridTop = floor((bounds.size.height - gridHeight + headHeight) / 2.0f);
 	gridTop = MAX(gridTop, top + headHeight + 8.0f);
 	if (gridTop + gridHeight > bounds.size.height - 10.0f)
 		gridTop = bounds.size.height - 10.0f - gridHeight;
@@ -436,7 +436,7 @@ static UIImage *TGPasscodeDotArt(CGFloat side, BOOL filled) {
 	CGFloat dotSide = 14.0f;
 	CGFloat dotGap = 22.0f;
 	CGFloat dotsWidth = dotSide * kPasscodeSimpleLength + dotGap * (kPasscodeSimpleLength - 1);
-	self.dotsView.frame = CGRectMake(floorf((bounds.size.width - dotsWidth) / 2.0f),
+	self.dotsView.frame = CGRectMake(floor((bounds.size.width - dotsWidth) / 2.0f),
 		headTop + 32.0f, dotsWidth, dotSide);
 	for (NSInteger i = 0; i < self.dots.count; i++)
 		[self.dots[i] setFrame:CGRectMake(i * (dotSide + dotGap), 0, dotSide, dotSide)];

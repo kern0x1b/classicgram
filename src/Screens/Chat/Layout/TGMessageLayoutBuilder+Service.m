@@ -23,8 +23,8 @@ TGMessageLayoutComputed TGMessageLayoutBuildService(TGMessageItem *item,
 	CGFloat oneLine = font.lineHeight;
 	CGFloat grown = 0;
 	if (oneLine >= 1 && text.height > 0) {
-		NSInteger lines = (NSInteger)floorf(text.height / oneLine + 0.5f);
-		grown = lines > 1 ? ceilf((lines - 1) * oneLine) : 0;
+		NSInteger lines = (NSInteger)floor(text.height / oneLine + 0.5f);
+		grown = lines > 1 ? ceil((lines - 1) * oneLine) : 0;
 	}
 
 	CGFloat plateW = MIN(text.width, full - 60) + 20;
@@ -34,13 +34,13 @@ TGMessageLayoutComputed TGMessageLayoutBuildService(TGMessageItem *item,
 	computed.messageHeight = kMessageLayoutDayRowHeight + grown +
 		(side > 0 ? side + kServicePhotoGap : 0);
 
-	computed.row.bubble = CGRectMake(floorf((full - plateW) / 2),
-		floorf((kMessageLayoutDayRowHeight - kSystemPlateHeight) / 2), plateW, plateH);
+	computed.row.bubble = CGRectMake(floor((full - plateW) / 2),
+		floor((kMessageLayoutDayRowHeight - kSystemPlateHeight) / 2), plateW, plateH);
 
 	computed.bubble.body = CGRectMake(0, 1, plateW, plateH - 2);
 	computed.parts = TGMessageLayoutPartBubble | TGMessageLayoutPartBody;
 	if (side > 0) {
-		computed.bubble.picture = CGRectMake(floorf((plateW - side) / 2),
+		computed.bubble.picture = CGRectMake(floor((plateW - side) / 2),
 			plateH + kServicePhotoGap, side, side);
 		computed.parts |= TGMessageLayoutPartPicture;
 	}

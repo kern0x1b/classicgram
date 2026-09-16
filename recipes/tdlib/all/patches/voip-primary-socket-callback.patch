@@ -1,0 +1,49 @@
+diff -ruN a/td/telegram/net/Session.cpp b/td/telegram/net/Session.cpp
+--- a/td/telegram/net/Session.cpp
++++ b/td/telegram/net/Session.cpp
+@@ -49,6 +49,22 @@
+ #include <tuple>
+ #include <utility>
+ 
++#include "td/utils/port/config.h"
++
++#if TD_DARWIN_IOS
++extern "C" {
++
++typedef void (*td_ios_primary_socket_callback)(int fd);
++
++static td_ios_primary_socket_callback td_ios_primary_socket_cb = nullptr;
++
++__attribute__((visibility("default"))) void td_ios_set_primary_socket_callback(
++    td_ios_primary_socket_callback callback) {
++  td_ios_primary_socket_cb = callback;
++}
++}
++#endif
++
+ namespace td {
+ 
+ namespace detail {
+@@ -1289,6 +1305,14 @@
+   }
+   info->connection_->set_online(connection_online_flag_, is_primary_);
+   info->connection_->set_name(name);
++#if TD_DARWIN_IOS
++  if (is_main_ && is_primary_ && info->connection_id_ == 0 && td_ios_primary_socket_cb != nullptr) {
++    const auto &primary_native_fd = info->connection_->get_poll_info().native_fd();
++    if (primary_native_fd) {
++      td_ios_primary_socket_cb(primary_native_fd.socket());
++    }
++  }
++#endif
+   Scheduler::subscribe(info->connection_->get_poll_info().extract_pollable_fd(this));
+   info->mode_ = mode_;
+   info->state_ = ConnectionInfo::State::Ready;
+diff -ruN a/tdclientjson_export_list b/tdclientjson_export_list
+--- a/tdclientjson_export_list
++++ b/tdclientjson_export_list
+@@ -12,3 +12,4 @@
+ _td_receive
+ _td_execute
+ _td_set_log_message_callback
++_td_ios_set_primary_socket_callback

@@ -83,7 +83,7 @@ void TGHostSetNamedImageSize(NSString *name, CGSize size) {
 }
 
 - (CGFloat)lineHeight {
-	return ceilf(self.pointSize * 1.2f);
+	return ceil(self.pointSize * 1.2f);
 }
 
 @end
@@ -636,7 +636,7 @@ void UIGraphicsPopContext(void) {
 	CGFloat width = self.length * point * TGHostTextWidthPerPoint();
 	if (font.isBold)
 		width *= 1.05f;
-	return CGSizeMake(ceilf(width), font ? font.lineHeight : ceilf(point * 1.2f));
+	return CGSizeMake(ceil(width), font ? font.lineHeight : ceil(point * 1.2f));
 }
 
 - (CGSize)sizeWithFont:(UIFont *)font
@@ -646,7 +646,7 @@ void UIGraphicsPopContext(void) {
 	if (limit.width <= 0 || single.width <= limit.width)
 		return single;
 
-	CGFloat lines = ceilf(single.width / limit.width);
+	CGFloat lines = ceil(single.width / limit.width);
 	CGFloat height = lines * single.height;
 	if (height > limit.height)
 		height = limit.height;

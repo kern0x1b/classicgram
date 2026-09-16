@@ -12,7 +12,7 @@ if not os.path.isdir(SRC):
 if not os.path.isfile(STRINGS):
     raise SystemExit(f"string table not found: {STRINGS}")
 
-SKIP_DIRS = ("libvpx", "libtgvoip", "opus", "opusenc", "opusfile", "ogg", "quirc", "Resources")
+SKIP_DIRS = ("Resources",)
 
 PLURAL_CALL_RE = re.compile(r'TGLPlural\(\s*@"([^"]+)"')
 PLAIN_CALL_RE = re.compile(r'TGL\(\s*@"([^"]+(?:_1|_any))"')

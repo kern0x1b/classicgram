@@ -578,7 +578,7 @@ static void TGAlertPanelAddRoundedRect(CGContextRef context, CGRect rect, CGFloa
 		CGSize size = [self.title sizeWithFont:TGAlertPanelTitleFont()
 							 constrainedToSize:CGSizeMake(contentWidth, CGFLOAT_MAX)
 								 lineBreakMode:NSLineBreakByWordWrapping];
-		titleHeight = ceilf(size.height);
+		titleHeight = ceil(size.height);
 	}
 
 	CGFloat messageHeight = 0.0f;
@@ -586,7 +586,7 @@ static void TGAlertPanelAddRoundedRect(CGContextRef context, CGRect rect, CGFloa
 		CGSize size = [self.message sizeWithFont:TGAlertPanelMessageFont()
 							   constrainedToSize:CGSizeMake(contentWidth, CGFLOAT_MAX)
 								   lineBreakMode:NSLineBreakByWordWrapping];
-		messageHeight = ceilf(size.height);
+		messageHeight = ceil(size.height);
 	}
 
 	BOOL stacked = [self panelStacksButtonsForWidth:contentWidth] || _panelButtons.count == 1;
@@ -662,13 +662,13 @@ static void TGAlertPanelAddRoundedRect(CGContextRef context, CGRect rect, CGFloa
 	}
 
 	CGFloat panelHeight = top + bottomInset;
-	CGFloat originY = floorf((hostHeight - _panelKeyboardHeight - panelHeight) / 2.0f);
+	CGFloat originY = floor((hostHeight - _panelKeyboardHeight - panelHeight) / 2.0f);
 	if (originY < kAlertPanelScreenMargin / 2.0f)
 		originY = kAlertPanelScreenMargin / 2.0f;
 
 	CGAffineTransform transform = _panel.transform;
 	_panel.transform = CGAffineTransformIdentity;
-	_panel.frame = CGRectMake(floorf((hostWidth - panelWidth) / 2.0f), originY, panelWidth, panelHeight);
+	_panel.frame = CGRectMake(floor((hostWidth - panelWidth) / 2.0f), originY, panelWidth, panelHeight);
 	_panel.transform = transform;
 	[_panel setNeedsDisplay];
 }

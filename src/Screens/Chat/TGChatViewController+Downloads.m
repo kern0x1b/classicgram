@@ -58,8 +58,8 @@ static NSDictionary *TGChatCurrentAutoDownloadSettings(void) {
 		[self.downloadHUD addSubview:self.downloadPercent];
 	}
 	self.downloadPercent.text = @"0%";
-	self.downloadHUD.center = CGPointMake(floorf(self.view.bounds.size.width / 2),
-		floorf(self.view.bounds.size.height / 2));
+	self.downloadHUD.center = CGPointMake(floor(self.view.bounds.size.width / 2),
+		floor(self.view.bounds.size.height / 2));
 	self.downloadHUD.alpha = 0.0f;
 	self.downloadHUD.hidden = NO;
 	[self.downloadSpinner startAnimating];

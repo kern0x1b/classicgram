@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+PKG="com.kern0x1b.telegramsystemcall"
+PKGDIR="/var/lib/telegramsystemcall"
+DYLIB="/Library/MobileSubstrate/DynamicLibraries/TelegramSystemCall.dylib"
+FILTER="/Library/MobileSubstrate/DynamicLibraries/TelegramSystemCall.plist"
+
+say() { echo "$PKG: $*"; }
+warn() { echo "$PKG: $*" >&2; }
+die() { echo "$PKG: $*" >&2; exit 1; }
+
+[ "$1" = "configure" ] || exit 0
+
+[ -f "$DYLIB" ] || die "$DYLIB is missing; the package did not unpack correctly."
+[ -f "$FILTER" ] || die "$FILTER is missing; the package did not unpack correctly."
+
+if [ ! -d /Library/MobileSubstrate/DynamicLibraries ]; then
+    warn "/Library/MobileSubstrate/DynamicLibraries does not exist."
+    warn "MobileSubstrate does not look installed, so nothing will load this tweak."
+fi
+
+if [ -f "$PKGDIR/disabled" ]; then
+    warn "$PKGDIR/disabled exists, so the tweak will load and then do nothing."
+    warn "Remove that file and restart SpringBoard to switch it back on."
+fi
+
+if [ -n "${CYDIA:-}" ]; then
+    eval "echo 'finish:respring' >&${CYDIA%% *}"
+else
+    say "restart SpringBoard to load the tweak"
+fi
+
+exit 0

@@ -1,41 +1,44 @@
 ---
 name: build-and-verify
-description: Use when building this project for armv7, setting up a new git worktree for it, reading a make failure, checking for duplicate method definitions after moving code between files, or running the layer/comment lint scripts. Covers the symlink discipline that keeps worktrees off the disk-fill path, and why a naive duplicate scan misses real duplicates.
+description: Use when building this project with charon, setting up a new git worktree for it, reading a build failure, checking for duplicate method definitions after moving code between files, or running the layer/comment lint scripts. Covers what the build's binary checks refuse, and why a naive duplicate scan misses real duplicates.
 ---
 
 # Build and verify
 
-## Building for armv7
+## Building
 
-The build is [Theos](https://theos.dev); `$THEOS` must point at the checkout.
+The build is Charon, reading `charon.toml`:
 
 ```
-make FINALPACKAGE=1 stage
+charon build                      # build/universal/Telegram.app: armv7 + arm64, merged and signed
+charon build --variant armv7      # build/armv7/Telegram.app alone
+charon build --variant harness    # armv7 with the telegramdev:// debug harness, for device testing
 ```
 
-assembles `.theos/_/Applications/Telegram.app/Telegram`, stripped and signed — `make package
-FINALPACKAGE=1` wraps the same bundle as a `.deb`, needed only for a real install-from-scratch.
-Plain `make` builds the debug variant. `machofix` (built from
-`scripts/fix-armv7-macho.c`) runs as part of the link step and restores Thumb bits the armv7 linker drops;
-without that fixup the app compiles but dies immediately at launch on the device. A successful
-build log contains a line like `machofix: Thumb bit restored`; its absence is a build that looks
-green but ships a binary that cannot run — treat a build without that line as suspect even if
-`make` exits 0.
+Every dependency comes from the Conan cache through `recipes/`; the SDK, the armv7 linker, `ldid`
+and the C++ runtime come from the `apple-ios` platform's packages, so nothing outside the checkout
+and `~/.conan2` is needed. `export LLVM_PREFIX="$(brew --prefix llvm)"` once per shell, before the
+first build on a machine: the ld64 package reads it when it has to be built from source.
 
-## Reading make output correctly
+A build that exits 0 is one whose binary checks passed. Charon refuses, naming the file:
 
-`make` does not reliably print a line starting with `error:` when a build fails early (a missing
-header, a bad `#import` path) — the failure can scroll by inside compiler output that doesn't
-match a simple `grep error:`. After every build:
+- an object or archive member recording a minimum iOS version other than the variant's;
+- a rebased code pointer whose Thumb bit disagrees with the function it names;
+- a `__PAGEZERO` wrong for the architecture;
+- a bundled binary that loads a library the bundle carries from anywhere else;
+- a signature that does not carry a declared entitlement.
 
-1. Confirm the binary exists: `ls -la .theos/_/Applications/Telegram.app/Telegram`.
-2. Confirm it is **newer than your last edit** — `ccache`/`make` can otherwise report success while
-   silently reusing a stale object file for an unrelated reason, leaving your change absent from
-   the binary you're about to test. If in doubt, `touch <file>.m` to force recompilation and
-   re-check the build log for that file's compile line.
-3. Grep broadly, not just for `error:` — `grep -iE "error:|fixup error|Undefined symbols"` across
-   the full build log catches linker failures too, which never contain the word "error" in some
-   toolchains' phrasing.
+There is no fixup step after the link any more; if one of these fails, the input is wrong.
+
+## Reading a build failure
+
+Charon prints the failing command's own output. After every build:
+
+1. Confirm the bundle is newer than your last edit: `ls -la build/universal/Telegram.app/Telegram`.
+   `ccache` can report success while reusing a stale object; if in doubt, `touch <file>.m` and look
+   for that file's compile line.
+2. Grep the whole log broadly - `grep -iE "error:|refus|Undefined symbols"` - since a check's
+   refusal and a linker failure do not always contain `error:`.
 
 ## Worktrees: where they live, and how they end
 
@@ -55,27 +58,11 @@ worktree loses nothing that was committed — the branch keeps the commits — b
 diff as a patch outside the repository first. Leaving finished work parked in a worktree means the
 next person opens the repository and sees the old tree.
 
-A `git worktree add` does not carry over untracked files. Several build inputs are large, untracked,
-and shared identically across every worktree — copy them once and 190 worktrees fill the disk and
-kill every shell, which has already happened on this project:
-
-| Path | What it is | Symlink target |
-|---|---|---|
-| `build/sdks` | Extracted iOS SDK headers (~1.2 GB) | `ln -s <main checkout>/build/sdks build/sdks` |
-| `build/armv7/libvpx-obj` | Built `libvpx.a` — its own `configure` mis-resolves the SDK sysroot in a fresh worktree and fails with `Toolchain is unable to link executables` | `ln -s <main checkout>/build/armv7/libvpx-obj build/armv7/libvpx-obj` |
-
-TDLib and OpenSSL need none of this: the Makefile resolves both through Conan
-(`packaging/tdlib`, `packaging/openssl`), and Conan's own cache (`~/.conan2`) is already shared
-across every worktree on the machine, so the first build in a new worktree just reuses whatever
-was already built there instead of rebuilding from source.
-
-Set the remaining two up right after `git worktree add`, before the first build in that worktree.
-A worktree that only edits source and never builds doesn't need either of them.
-
-`scripts/worktree-prepare.sh`, run from inside the new worktree, does this automatically: it
-symlinks `build/sdks`, copies `build/armv7/libvpx-obj` (copied rather than symlinked, so a
-worktree's own build never writes into the main checkout's object files), and copies
-`src/Resources/Config/tg_config.h`. It skips anything already present, so it's safe to re-run.
+A `git worktree add` does not carry over untracked files. The one a build needs is
+`src/Resources/Config/tg_config.h`; `scripts/worktree-prepare.sh`, run from inside the new
+worktree, copies it from the main checkout and skips it if it is already there. Everything else a
+build uses lives in Conan's cache (`~/.conan2`), which every worktree on the machine shares, so a
+first build in a new worktree reuses what was already built instead of rebuilding it.
 
 `src/Resources/Config/tg_config.h` is gitignored too and no worktree gets it from `git worktree
 add`; copy it in from the main checkout or the build stops at the first include of it.

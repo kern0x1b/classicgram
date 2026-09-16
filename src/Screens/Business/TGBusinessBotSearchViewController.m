@@ -64,7 +64,7 @@ typedef NS_ENUM(NSInteger, TGBBSState) {
 - (void)viewDidLayoutSubviews {
 	if ([[UIViewController class] instancesRespondToSelector:@selector(viewDidLayoutSubviews)])
 		[super viewDidLayoutSubviews];
-	self.spinner.center = CGPointMake(floorf(self.view.bounds.size.width / 2), 90);
+	self.spinner.center = CGPointMake(floor(self.view.bounds.size.width / 2), 90);
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

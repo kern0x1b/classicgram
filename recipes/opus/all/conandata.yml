@@ -1,0 +1,4 @@
+sources:
+  1.6.1+68.g503d81b:
+    commit: 503d81b138d76621aae4b12786e90de48aa8db3a
+    url: https://github.com/xiph/opus.git

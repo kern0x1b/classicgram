@@ -1,0 +1,145 @@
+[port]
+name = "itglegacy"
+version = "1.0.2"
+description = "A Telegram client for armv7 / iOS 6"
+index = "itglegacy"
+licenses = ["LICENSE", "NOTICE"]
+
+[platform]
+use = "apple-ios"
+arch = "armv7"
+os-version = "6.0"
+distribution = "jailbreak"
+
+[requires]
+tdlib = "1.8.67@itglegacy/stable"
+openssl = "4.0.2@itglegacy/stable"
+ogg = "1.3.6+7.g06a5e02@itglegacy/stable"
+quirc = "1.2+7.g927d680@itglegacy/stable"
+qrcodegen = "1.8.0+31.g3c6d0b3@itglegacy/stable"
+libopusenc = "0.3+14.g3c65f44@itglegacy/stable"
+opusfile = "0.12+59.g6dfd29e@itglegacy/stable"
+opus = "1.6.1+68.g503d81b@itglegacy/stable"
+libvpx = "1.17.0+60.gfcc9ba8@itglegacy/stable"
+libtgvoip = "2.4.4+124.g2d25928@itglegacy/stable"
+webp = "1.6.0+258.g6ff2f43@itglegacy/stable"
+libcxx = "23.1.1@charon/stable"
+
+[tools]
+ldid = "2.1.5@charon/stable"
+
+[variants.armv7]
+
+[variants.arm64.platform]
+arch = "armv8"
+os-version = "7.0"
+
+[variants.universal]
+merge = ["armv7", "arm64"]
+
+[variants.harness.targets.Telegram]
+exclude = ["src/Resources/**"]
+resources = [
+    { from = "src/Resources/images/", as = "." },
+    { from = "src/Resources/Localization/", as = "." },
+    { from = "src/Resources/AppIcon/", as = "." },
+    { from = "src/Resources/CustomKeys.txt", as = "CustomKeys.txt" },
+]
+
+[application]
+name = "Telegram"
+sources = ["src/**/*.m", "src/**/*.c", "src/**/*.mm"]
+exclude = [
+    "src/Resources/**",
+    "src/App/AppDelegate+DebugHarness.m",
+    "src/App/AppDelegate+I18nDump.m",
+]
+include = ["src/**/"]
+include-exclude = [
+    "src",
+    "src/Resources",
+    "src/Resources/images/**",
+    "src/Resources/AppIcon/**",
+    "src/Resources/Localization/**",
+]
+options = [
+    "-O2",
+    "-fPIC",
+    "-fno-modules",
+    "-Wall",
+    "-Wconditional-uninitialized",
+    "-Wunreachable-code",
+    "-Wobjc-missing-super-calls",
+    "-Wno-macro-redefined",
+    "-Wno-deprecated-declarations",
+    "-Wno-error",
+]
+packages = ["libcxx", "openssl", "ogg", "opus", "opusfile", "libopusenc", "quirc", "qrcodegen", "libvpx", "libtgvoip", "webp"]
+definitions = ["TGVOIP_NO_DSP", "WEBRTC_POSIX", "TGVOIP_USE_CUSTOM_CRYPTO"]
+link-options = ["-Wl,-dead_strip", "-nostdlib++", "-ObjC"]
+frameworks = [
+    "UIKit",
+    "Foundation",
+    "CoreGraphics",
+    "QuartzCore",
+    "AudioToolbox",
+    "AVFoundation",
+    "CoreMedia",
+    "CoreVideo",
+    "AddressBook",
+    "AddressBookUI",
+    "MobileCoreServices",
+    "CoreTelephony",
+    "ImageIO",
+    "CoreText",
+    "CFNetwork",
+    "SystemConfiguration",
+    "Security",
+    "MapKit",
+    "CoreLocation",
+]
+libraries = [
+    "libtgvoip::libtgvoip",
+    "OpusFile::opusfile",
+    "libopusenc::libopusenc",
+    "Opus::opus",
+    "Ogg::ogg",
+    "libvpx::libvpx",
+    "quirc::quirc",
+    "qrcodegen::qrcodegen",
+    "WebP::webp",
+    "OpenSSL::Crypto",
+    "libcxx::runtime",
+    "z",
+    "pthread",
+]
+resources = [
+    { from = "src/Resources/images/", as = "." },
+    { from = "src/Resources/Localization/", as = "." },
+    { from = "src/Resources/AppIcon/", as = "." },
+]
+plist-file = "src/Resources/Info.plist"
+entitlements = "src/Resources/entitlements.plist"
+strip = "-S -x"
+bundle = [{ from = "{pkg:tdlib}/lib/libtdjson.dylib", into = "Frameworks" }]
+
+[application.options-for]
+objc = ["-fobjc-arc"]
+objcxx = ["-fobjc-arc", "-nostdinc++", "-fno-cxx-modules", "-std=c++14"]
+
+[application.plist]
+CFBundleDisplayName = "Telegram"
+CFBundleName = "Telegram"
+
+[stage]
+runtime-from = "libcxx"
+
+[stage.runtime]
+"libc++.1.0.dylib" = "libc++.1.dylib"
+"libc++abi.1.0.dylib" = "libc++abi.1.dylib"
+
+[pipeline]
+armv7 = ["build:application"]
+arm64 = ["build:application"]
+universal = ["merge:application", "sign:application"]
+harness = ["build:application", "sign:application"]

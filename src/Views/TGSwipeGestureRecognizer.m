@@ -83,7 +83,7 @@
 		[self endGesture];
 		return;
 	} else if (!_matchedVelocity && self.velocityThreshold > FLT_EPSILON && translationSquared >= self.velocityFailDistance * self.velocityFailDistance) {
-		float velocity = (float)(sqrtf(translationSquared) / (touch.timestamp - _touchStartTime));
+		float velocity = (float)(sqrt(translationSquared) / (touch.timestamp - _touchStartTime));
 		if (velocity < self.velocityThreshold) {
 			[self failGesture];
 			return;

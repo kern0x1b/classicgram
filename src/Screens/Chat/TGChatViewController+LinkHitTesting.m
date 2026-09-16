@@ -73,7 +73,7 @@
 									  width:label.bounds.size.width];
 	if (!lines.count)
 		return -1;
-	NSInteger index = (NSInteger)floorf(MAX(0.0f, point.y) / lineHeight);
+	NSInteger index = (NSInteger)floor(MAX(0.0f, point.y) / lineHeight);
 	if (index < 0 || index >= (NSInteger)lines.count)
 		return -1;
 

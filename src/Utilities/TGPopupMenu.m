@@ -316,7 +316,7 @@ static NSTimeInterval sLastHideTime = 0;
 	NSMutableArray *widths = [[NSMutableArray alloc] init];
 	for (NSInteger i = 0; i < items.count; i++) {
 		NSString *title = [items[i] objectForKey:@"title"];
-		CGFloat width = floorf([title sizeWithFont:titleFont].width + kMenuTitlePadding);
+		CGFloat width = floor([title sizeWithFont:titleFont].width + kMenuTitlePadding);
 		if (width > maximumWidth - 2)
 			width = maximumWidth - 2;
 		[widths addObject:[NSNumber numberWithFloat:width]];
@@ -368,7 +368,7 @@ static NSTimeInterval sLastHideTime = 0;
 		if (!indexes.count || sum >= cardWidth)
 			continue;
 		CGFloat slack = cardWidth - sum;
-		CGFloat share = floorf(slack / indexes.count);
+		CGFloat share = floor(slack / indexes.count);
 		CGFloat used = 0;
 		for (NSInteger k = 0; k < indexes.count; k++) {
 			NSInteger i = [[indexes objectAtIndex:k] unsignedIntegerValue];
@@ -468,7 +468,7 @@ static NSTimeInterval sLastHideTime = 0;
 - (void)positionCardFromRect:(CGRect)rect {
 	CGRect frame = _card.frame;
 
-	frame.origin.x = floorf(rect.origin.x + rect.size.width / 2 - frame.size.width / 2);
+	frame.origin.x = floor(rect.origin.x + rect.size.width / 2 - frame.size.width / 2);
 	if (frame.origin.x < 4)
 		frame.origin.x = 4;
 	if (frame.origin.x + frame.size.width > self.bounds.size.width - 4)
@@ -478,14 +478,14 @@ static NSTimeInterval sLastHideTime = 0;
 	if (frame.origin.y < 2) {
 		frame.origin.y = rect.origin.y + rect.size.height + 17;
 		if (frame.origin.y + frame.size.height > self.bounds.size.height - 14) {
-			frame.origin.y = floorf((self.bounds.size.height - frame.size.height) / 2);
+			frame.origin.y = floor((self.bounds.size.height - frame.size.height) / 2);
 			_arrowOnTop = NO;
 		} else
 			_arrowOnTop = YES;
 	} else
 		_arrowOnTop = NO;
 
-	_arrowLocation = floorf(rect.origin.x + rect.size.width / 2) - frame.origin.x;
+	_arrowLocation = floor(rect.origin.x + rect.size.width / 2) - frame.origin.x;
 
 	_card.layer.anchorPoint = CGPointMake(MAX(0.0f, MIN(1.0f, _arrowLocation / frame.size.width)),
 		_arrowOnTop ? -0.2f : 1.2f);
@@ -561,7 +561,7 @@ static NSTimeInterval sLastHideTime = 0;
 			CGFloat minArrowX = button.frame.origin.x + (firstInRow ? kMenuLineInset : 0);
 			CGFloat maxArrowX = button.frame.origin.x + button.frame.size.width - arrowWidth +
 				(lastInRow ? (-kMenuLineInset) : 0);
-			CGFloat arrowX = floorf(_arrowLocation - arrowWidth / 2);
+			CGFloat arrowX = floor(_arrowLocation - arrowWidth / 2);
 			arrowX = MIN(MAX(minArrowX, arrowX), maxArrowX);
 
 			_arrowTopView.frame = CGRectMake(arrowX, -9, arrowWidth, _arrowTopView.image.size.height);

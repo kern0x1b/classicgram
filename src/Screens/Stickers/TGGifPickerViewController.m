@@ -246,7 +246,7 @@ static const CGFloat kGifWindowMargin = 220.0f;
 	self.spinner.center = CGPointMake(CGRectGetMidX(bounds),
 		top + (bounds.size.height - top) / 2.0f);
 	self.statusLabel.frame = CGRectMake(20, top + 40, bounds.size.width - 40, 40);
-	if (fabsf(self.laidOutWidth - bounds.size.width) > 0.5f) {
+	if (fabs(self.laidOutWidth - bounds.size.width) > 0.5f) {
 		self.laidOutWidth = bounds.size.width;
 		[self relayout];
 	}
@@ -419,10 +419,10 @@ static const CGFloat kGifWindowMargin = 220.0f;
 	if (width < 1.0f)
 		return;
 
-	NSInteger columns = (NSInteger)floorf(width / kGifColumnWidthTarget);
+	NSInteger columns = (NSInteger)floor(width / kGifColumnWidthTarget);
 	if (columns < 2)
 		columns = 2;
-	CGFloat columnWidth = floorf((width - kGifGridSpacing * (columns + 1)) / columns);
+	CGFloat columnWidth = floor((width - kGifGridSpacing * (columns + 1)) / columns);
 
 	CGFloat *columnY = (CGFloat *)malloc(sizeof(CGFloat) * (size_t)columns);
 	for (NSInteger i = 0; i < columns; i++)
@@ -437,7 +437,7 @@ static const CGFloat kGifWindowMargin = 220.0f;
 			ratio = 0.4f;
 		if (ratio > 1.6f)
 			ratio = 1.6f;
-		CGFloat tileHeight = floorf(columnWidth * ratio);
+		CGFloat tileHeight = floor(columnWidth * ratio);
 
 		NSInteger shortest = 0;
 		for (NSInteger i = 1; i < columns; i++)

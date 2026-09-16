@@ -1,5 +1,5 @@
 #import "TGVoiceDecoder.h"
-#include "opusfile/opusfile.h"
+#include <opusfile.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -122,7 +122,7 @@ static void TGVoiceDecoderFillHeader(unsigned char *header, int rate, int channe
 				break;
 			}
 			if (samples < 0) {
-				NSLog(@"TGVoiceDecoder: op_read failed (%d)", samples);
+				NSLog(@"TGVoiceDecoder: op_read failed (%ld)", (long)samples);
 				failed = YES;
 				break;
 			}

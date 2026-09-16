@@ -71,8 +71,8 @@
 
 	_emojiLabel.frame = CGRectMake(0, 0, size.width, glyphHeight);
 	CGFloat iconSide = MIN(kStripEmojiFontSize, glyphHeight - 14.0f);
-	_iconView.frame = CGRectMake(floorf((size.width - iconSide) / 2),
-		floorf((glyphHeight - iconSide) / 2), iconSide, iconSide);
+	_iconView.frame = CGRectMake(floor((size.width - iconSide) / 2),
+		floor((glyphHeight - iconSide) / 2), iconSide, iconSide);
 	_tagLabelView.frame = CGRectMake(1, size.height - tagLabelHeight, size.width - 2, tagLabelHeight);
 	[self bringSubviewToFront:_emojiLabel];
 	[self bringSubviewToFront:_iconView];

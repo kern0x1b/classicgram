@@ -228,7 +228,7 @@ static inline NSString *tgFormatNationalNumber(NSString *dialDigits, NSString *n
 					  minWidth:(CGFloat)minWidth {
 	NSString *title = [button titleForState:UIControlStateNormal];
 	CGSize textSize = title.length > 0 ? [title sizeWithFont:button.titleLabel.font] : CGSizeZero;
-	CGFloat width = paddingLeft + paddingRight + ceilf(textSize.width);
+	CGFloat width = paddingLeft + paddingRight + ceil(textSize.width);
 	if (width < minWidth)
 		width = minWidth;
 	button.frame = CGRectMake(button.frame.origin.x, button.frame.origin.y, width, 30);
@@ -268,8 +268,8 @@ static inline NSString *tgFormatNationalNumber(NSString *dialDigits, NSString *n
 	[self.nextButton addTarget:self action:@selector(actionButtonTapped) forControlEvents:UIControlEventTouchUpInside];
 
 	self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-	self.spinner.frame = CGRectMake(floorf((self.nextButton.frame.size.width - self.spinner.frame.size.width) / 2),
-		floorf((self.nextButton.frame.size.height - self.spinner.frame.size.height) / 2),
+	self.spinner.frame = CGRectMake(floor((self.nextButton.frame.size.width - self.spinner.frame.size.width) / 2),
+		floor((self.nextButton.frame.size.height - self.spinner.frame.size.height) / 2),
 		self.spinner.frame.size.width, self.spinner.frame.size.height);
 	self.spinner.hidesWhenStopped = YES;
 	[self.nextButton addSubview:self.spinner];

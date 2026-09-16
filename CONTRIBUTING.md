@@ -6,15 +6,15 @@ review.
 
 ## Before you write code
 
-- Build once and run the tests: `make FINALPACKAGE=1`, then `./scripts/run-host-tests.sh`. The build must
-  reach its `machofix: Thumb bit restored …` line; a build that stops earlier produces a binary the
-  device cannot launch.
-- Point `$THEOS` at a Theos checkout; the build is a Theos application target.
+- Build once and run the tests: `charon build`, then `./scripts/run-host-tests.sh`. The build refuses a
+  binary the device could not launch - a wrong minimum iOS version, a mismatched Thumb pointer, a
+  missing entitlement - so a build that finishes is one the checks passed.
+- Set up Charon once per machine, as its repository's README describes, then run `charon setup` here.
 - Install the hooks: `./scripts/install-git-hooks.sh`. The pre-commit hook runs the lint scripts
   under `scripts/`, and it refuses the same things a reviewer would.
 - Work on a branch in a worktree under `.claude/worktree/`, not in the main checkout. See
   [`.claude/skills/build-and-verify/SKILL.md`](.claude/skills/build-and-verify/SKILL.md) for the
-  symlinks a fresh worktree needs before its first build.
+  one file a fresh worktree needs before its first build.
 
 ## The rules a change is measured against
 

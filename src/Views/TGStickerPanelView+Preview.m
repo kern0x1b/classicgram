@@ -32,10 +32,10 @@
 		MIN(bounds.size.width - 24.0f, bounds.size.height - 96.0f));
 	if (side < 1.0f)
 		side = 1.0f;
-	CGFloat centreX = floorf(bounds.size.width / 2.0f);
-	CGFloat centreY = floorf(bounds.size.height / 2.0f);
-	self.previewImageView.frame = CGRectMake(floorf(centreX - side / 2.0f),
-		floorf(centreY - side / 2.0f), side, side);
+	CGFloat centreX = floor(bounds.size.width / 2.0f);
+	CGFloat centreY = floor(bounds.size.height / 2.0f);
+	self.previewImageView.frame = CGRectMake(floor(centreX - side / 2.0f),
+		floor(centreY - side / 2.0f), side, side);
 	self.previewPlate.frame = CGRectInset(self.previewImageView.frame, -14.0f, -14.0f);
 	self.previewEmojiLabel.frame = CGRectMake(0,
 		CGRectGetMinY(self.previewImageView.frame) - 48.0f, bounds.size.width, 38.0f);

@@ -733,7 +733,7 @@ static UIImage *TGStatsStretch(NSString *name, int leftCap) {
 	NSInteger largest = [self largestSenderCount];
 	CGFloat available = cell.contentView.bounds.size.width - 54 - 70;
 	CGFloat barWidth = (largest > 0 && messages > 0)
-		? floorf(available * messages / (CGFloat)largest)
+		? floor(available * messages / (CGFloat)largest)
 		: 0;
 	UIView *bar = [cell.contentView viewWithTag:23];
 	bar.frame = CGRectMake(54, 25, MAX(barWidth, messages > 0 ? 2 : 0), 4);

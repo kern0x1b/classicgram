@@ -114,7 +114,7 @@
 	CGFloat width = [self headerWidth];
 	if (width < 1)
 		return;
-	if (fabsf(width - self.headerLaidOutForWidth) < 0.5f)
+	if (fabs(width - self.headerLaidOutForWidth) < 0.5f)
 		return;
 	self.headerLaidOutForWidth = width;
 

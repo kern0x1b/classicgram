@@ -340,8 +340,8 @@
 	container.bodyLabel.text = TGSavedEmptyTextForScope(self.scope);
 
 	CGFloat height = [container layoutContentWidth:250];
-	container.frame = CGRectMake(floorf((background.bounds.size.width - 250) / 2.0f),
-		floorf((background.bounds.size.height - height) / 2.0f), 250, height);
+	container.frame = CGRectMake(floor((background.bounds.size.width - 250) / 2.0f),
+		floor((background.bounds.size.height - height) / 2.0f), 250, height);
 	container.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
 
 	self.emptyContainer = container;
@@ -387,7 +387,7 @@
 	CGFloat width = container.bounds.size.width;
 	CGRect frame = container.frame;
 	CGFloat height = [container layoutContentWidth:width];
-	frame.origin.y += floorf((frame.size.height - height) / 2.0f);
+	frame.origin.y += floor((frame.size.height - height) / 2.0f);
 	frame.size.height = height;
 	container.frame = frame;
 }

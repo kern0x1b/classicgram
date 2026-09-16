@@ -43,13 +43,13 @@
 	[super layoutSubviews];
 
 	CGSize size = self.contentView.bounds.size;
-	_avatarView.frame = CGRectMake(5, floorf((size.height - kListAvatarSide) / 2),
+	_avatarView.frame = CGRectMake(5, floor((size.height - kListAvatarSide) / 2),
 		kListAvatarSide, kListAvatarSide);
 	_emojiLabel.frame = CGRectMake(size.width - 40, 0, 30, size.height);
 
 	CGFloat nameWidth = MAX(10.0f, size.width - 54 - 46);
 	CGFloat nameHeight = _nameLabel.font.lineHeight;
-	_nameLabel.frame = CGRectMake(54, floorf((size.height - nameHeight) / 2) - 1, nameWidth, nameHeight);
+	_nameLabel.frame = CGRectMake(54, floor((size.height - nameHeight) / 2) - 1, nameWidth, nameHeight);
 }
 
 @end

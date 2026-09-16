@@ -9,7 +9,7 @@ SRC = os.path.join(ROOT, "src")
 if not os.path.isdir(SRC):
     raise SystemExit(f"source root not found: {SRC}")
 
-SKIP_DIRS = ("libvpx", "libtgvoip", "opus", "opusenc", "opusfile", "ogg", "quirc")
+SKIP_DIRS = ()
 
 GROUP_RE = re.compile(r'^([A-Za-z0-9_]+?)(?:\+[A-Za-z0-9_]+)?\.m$')
 METHOD_START_RE = re.compile(r'^\s*[-+]\s*\(')

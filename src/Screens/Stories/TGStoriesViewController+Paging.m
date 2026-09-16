@@ -179,7 +179,7 @@
 	if (count == 0)
 		return;
 
-	NSInteger start = (NSInteger)floorf(offset / width) - 1;
+	NSInteger start = (NSInteger)floor(offset / width) - 1;
 	NSInteger end = start + 2;
 	if (start < 0)
 		start = 0;

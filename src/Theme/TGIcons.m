@@ -253,7 +253,7 @@ static const NSInteger kTGBackButtonBadgeLabelTag = 894612003;
 	label.text = text;
 	container.hidden = false;
 
-	CGFloat textWidth = ceilf([text sizeWithFont:label.font
+	CGFloat textWidth = ceil([text sizeWithFont:label.font
 							   constrainedToSize:CGSizeMake(200, badgeHeight)
 								   lineBreakMode:NSLineBreakByTruncatingTail]
 			.width);

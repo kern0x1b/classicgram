@@ -5,7 +5,7 @@
 #import "TGSettingsService.h"
 #import "TGTheme.h"
 #import "TGWebViewController.h"
-#import "quirc/quirc.h"
+#include <quirc.h>
 #import <AVFoundation/AVFoundation.h>
 #import <QuartzCore/QuartzCore.h>
 #import <dlfcn.h>

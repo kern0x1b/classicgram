@@ -312,8 +312,8 @@ NSString *TGEventsText(NSDictionary *source, NSString *key) {
 
 - (void)layoutOverlays {
 	CGRect bounds = self.view.bounds;
-	self.spinner.center = CGPointMake(floorf(bounds.size.width / 2),
-		floorf(bounds.size.height / 2));
+	self.spinner.center = CGPointMake(floor(bounds.size.width / 2),
+		floor(bounds.size.height / 2));
 
 	CGFloat infoSide = CGRectGetWidth(self.infoButton.frame);
 	self.infoButton.frame = CGRectMake(bounds.size.width - infoSide - 14,
@@ -324,8 +324,8 @@ NSString *TGEventsText(NSDictionary *source, NSString *key) {
 
 	CGFloat width = 250;
 	CGFloat height = [self.messageView layoutContentWidth:width];
-	self.messageView.frame = CGRectMake(floorf((bounds.size.width - width) / 2),
-		floorf((bounds.size.height - height) / 2), width, height);
+	self.messageView.frame = CGRectMake(floor((bounds.size.width - width) / 2),
+		floor((bounds.size.height - height) / 2), width, height);
 }
 
 @end

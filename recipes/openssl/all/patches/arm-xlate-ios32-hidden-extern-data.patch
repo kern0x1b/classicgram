@@ -1,0 +1,25 @@
+--- a/crypto/perlasm/arm-xlate.pl
++++ b/crypto/perlasm/arm-xlate.pl
+@@ -45,8 +45,13 @@
+ 	last;
+     }
+ };
++my %externs;
+ my $hidden = sub {
+-    if ($flavour =~ /ios/)	{ ".private_extern\t".join(',',@_); }
++    if ($flavour =~ /ios32/ && $externs{$_[0]}) {
++	my $name = $externs{$_[0]};
++	".private_extern\t_$name\n.data\n.align\t2\n$name:\n.long\t_$name\n.text";
++    }
++    elsif ($flavour =~ /ios/)	{ ".private_extern\t".join(',',@_); }
+     elsif ($flavour =~ /win64/) { ""; }
+     else			{ ".hidden\t".join(',',@_); }
+ };
+@@ -85,6 +90,7 @@
+ };
+ my $global = $globl;
+ my $extern = sub {
++    $externs{"_$_[0]"} = $_[0] if ($flavour =~ /ios32/);
+     &$globl(@_);
+     return;	# return nothing
+ };

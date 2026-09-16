@@ -77,7 +77,7 @@ CGFloat TGMessageLayoutBubbleWidthBudget(TGChatLayoutContext *context) {
 	if (width <= kBubbleBudgetReferenceWidth)
 		return kMessageLayoutBubbleMaxW;
 
-	return floorf(width * (kBubbleBudgetAtReference / kBubbleBudgetReferenceWidth)) - kMessageLayoutBubbleTailOverhang;
+	return floor(width * (kBubbleBudgetAtReference / kBubbleBudgetReferenceWidth)) - kMessageLayoutBubbleTailOverhang;
 }
 
 TGMessageLayoutStampPlate TGMessageLayoutStampPlateMake(NSString *countText,
@@ -92,12 +92,12 @@ TGMessageLayoutStampPlate TGMessageLayoutStampPlateMake(NSString *countText,
 	plate.trailPad = trailPad;
 	plate.showsViews = countText.length > 0;
 	plate.showsTicks = tickWidth > 0;
-	plate.timeWidth = ceilf([timeText sizeWithFont:font].width) + 1;
+	plate.timeWidth = ceil([timeText sizeWithFont:font].width) + 1;
 
 	if (plate.showsViews) {
 		plate.eyeWidth = kViewsEyeWidth;
 		plate.eyeGap = 3.0f;
-		plate.countWidth = ceilf([countText sizeWithFont:font].width) + 1;
+		plate.countWidth = ceil([countText sizeWithFont:font].width) + 1;
 		plate.countGap = kViewsTimeGap;
 	}
 	if (plate.showsTicks) {
@@ -310,7 +310,7 @@ CGSize TGMessageLayoutLinkPreviewSize(TGMessageItem *item, TGChatLayoutContext *
 		height += 8 + kInstantHeight;
 
 	CGFloat width = (large || smallThumb) ? maxWidth : columnX + textW;
-	return CGSizeMake(width, ceilf(height));
+	return CGSizeMake(width, ceil(height));
 }
 
 CGFloat TGMessageLayoutFootDecorationHeight(TGMessageItem *item,
@@ -369,20 +369,20 @@ CGFloat TGMessageLayoutSignatureWidth(TGMessageItem *item) {
 	NSString *line = item.signatureText;
 	if (!line.length)
 		return 0;
-	return ceilf([line sizeWithFont:[UIFont systemFontOfSize:11]].width);
+	return ceil([line sizeWithFont:[UIFont systemFontOfSize:11]].width);
 }
 
 CGSize TGMessageLayoutTranscriptSize(TGMessageItem *item, TGChatLayoutContext *context) {
 	NSString *text = item.transcriptText;
 	if (!text.length)
 		return CGSizeZero;
-	CGFloat maxW = floorf(TGMessageLayoutMaxBubbleWidth(item, context) - 2 * kMessageLayoutPadH);
+	CGFloat maxW = floor(TGMessageLayoutMaxBubbleWidth(item, context) - 2 * kMessageLayoutPadH);
 	if (maxW < 40)
 		return CGSizeZero;
 	CGSize measured = [text sizeWithFont:[UIFont systemFontOfSize:14]
 					   constrainedToSize:CGSizeMake(maxW, 10000)
 						   lineBreakMode:NSLineBreakByWordWrapping];
-	return CGSizeMake(ceilf(measured.width), ceilf(measured.height) + 8);
+	return CGSizeMake(ceil(measured.width), ceil(measured.height) + 8);
 }
 
 CGFloat TGMessageLayoutForwardLineWidth(TGMessageItem *item) {
@@ -391,7 +391,7 @@ CGFloat TGMessageLayoutForwardLineWidth(TGMessageItem *item) {
 		return 0;
 	CGFloat prefix = [item.forwardLinePrefix sizeWithFont:[UIFont systemFontOfSize:13]].width;
 	CGFloat named = [name sizeWithFont:[UIFont boldSystemFontOfSize:13]].width;
-	return ceilf(prefix + named) + kMessageLayoutForwardLineSlack;
+	return ceil(prefix + named) + kMessageLayoutForwardLineSlack;
 }
 
 CGFloat TGMessageLayoutGenericBubbleWidth(TGMessageItem *item,
@@ -419,7 +419,7 @@ CGFloat TGMessageLayoutGenericBubbleWidth(TGMessageItem *item,
 	}
 
 	if (item.senderDisplayName.length) {
-		CGFloat nameW = ceilf([item.senderDisplayName
+		CGFloat nameW = ceil([item.senderDisplayName
 							sizeWithFont:[UIFont boldSystemFontOfSize:13]]
 								.width) +
 			4;
@@ -498,7 +498,7 @@ TGMessageLayoutStampGeometry TGMessageLayoutPlaceStampBesideBox(TGMessageItem *i
 	geo.showsViews = plate.showsViews;
 	if (plate.showsViews) {
 		geo.plateEye = CGRectMake(badge.origin.x + plate.eyeOffset,
-			dateY + floorf((kStampLineHeight - kViewsEyeHeight) / 2),
+			dateY + floor((kStampLineHeight - kViewsEyeHeight) / 2),
 			plate.eyeWidth, kViewsEyeHeight);
 		geo.plateViews = CGRectMake(badge.origin.x + plate.countOffset, dateY,
 			plate.countWidth, kStampLineHeight);

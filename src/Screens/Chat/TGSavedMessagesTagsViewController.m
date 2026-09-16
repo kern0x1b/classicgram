@@ -303,10 +303,10 @@ static UIImage *TGTagsBadgeImage(void) {
 	CGFloat badgeWidth = 0;
 	if (self.badgeLabel.text.length) {
 		CGSize size = [self.badgeLabel.text sizeWithFont:self.badgeLabel.font];
-		badgeWidth = floorf(size.width) + 10;
+		badgeWidth = floor(size.width) + 10;
 		if (badgeWidth < 27)
 			badgeWidth = 27;
-		CGFloat badgeY = floorf((bounds.size.height - kTagsBadgeHeight) / 2);
+		CGFloat badgeY = floor((bounds.size.height - kTagsBadgeHeight) / 2);
 		CGRect badgeFrame = CGRectMake(width - kTagsRightInset - badgeWidth, badgeY,
 			badgeWidth, kTagsBadgeHeight);
 		self.badgeView.frame = badgeFrame;
@@ -330,7 +330,7 @@ static UIImage *TGTagsBadgeImage(void) {
 			28 + TGTagsRetinaPixel(), textWidth, 18);
 	} else {
 		self.titleLabel.frame = CGRectMake(kTagsTextOrigin,
-			floorf((bounds.size.height - 24) / 2), textWidth, 24);
+			floor((bounds.size.height - 24) / 2), textWidth, 24);
 		self.subtitleLabel.frame = CGRectZero;
 	}
 
@@ -501,16 +501,16 @@ static UIImage *TGTagsBadgeImage(void) {
 
 - (void)layoutOverlays {
 	CGRect bounds = self.view.bounds;
-	self.spinner.center = CGPointMake(floorf(bounds.size.width / 2),
-		floorf(bounds.size.height / 2));
+	self.spinner.center = CGPointMake(floor(bounds.size.width / 2),
+		floor(bounds.size.height / 2));
 
 	if (self.messageView.hidden)
 		return;
 
 	CGFloat width = 250;
 	CGFloat height = [self.messageView layoutContentWidth:width];
-	self.messageView.frame = CGRectMake(floorf((bounds.size.width - width) / 2),
-		floorf((bounds.size.height - height) / 2), width, height);
+	self.messageView.frame = CGRectMake(floor((bounds.size.width - width) / 2),
+		floor((bounds.size.height - height) / 2), width, height);
 }
 
 #pragma mark - loading

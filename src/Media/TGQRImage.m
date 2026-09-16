@@ -1,6 +1,5 @@
 #import "TGQRImage.h"
-#import "TGQRCode.h"
-#import "quirc/quirc.h"
+#include <qrcodegen.h>
 #import <QuartzCore/QuartzCore.h>
 
 static const int kQRQuietModules = 4;
@@ -13,9 +12,12 @@ UIImage *TGQRCodeImage(NSString *text, CGFloat maximumSide) {
 	if (!utf8)
 		return nil;
 
-	TGQRMatrix matrix;
-	if (TGQRCodeEncodeString(utf8, QUIRC_ECC_LEVEL_M, &matrix) != 0)
+	uint8_t temporary[qrcodegen_BUFFER_LEN_MAX];
+	uint8_t code[qrcodegen_BUFFER_LEN_MAX];
+	if (!qrcodegen_encodeText(utf8, temporary, code, qrcodegen_Ecc_MEDIUM,
+			qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, false))
 		return nil;
+	int size = qrcodegen_getSize(code);
 
 	CGFloat screenScale = 1.0f;
 	if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)])
@@ -23,7 +25,7 @@ UIImage *TGQRCodeImage(NSString *text, CGFloat maximumSide) {
 	if (screenScale < 1.0f)
 		screenScale = 1.0f;
 
-	NSInteger across = matrix.size + kQRQuietModules * 2;
+	NSInteger across = size + kQRQuietModules * 2;
 	NSInteger module = (int)((maximumSide * screenScale) / across);
 	if (module < 1)
 		module = 1;
@@ -33,10 +35,8 @@ UIImage *TGQRCodeImage(NSString *text, CGFloat maximumSide) {
 	CGContextRef context = CGBitmapContextCreate(NULL, (size_t)pixels,
 		(size_t)pixels, 8, (size_t)pixels, grey, (CGBitmapInfo)kCGImageAlphaNone);
 	CGColorSpaceRelease(grey);
-	if (!context) {
-		TGQRMatrixRelease(&matrix);
+	if (!context)
 		return nil;
-	}
 
 	CGContextSetGrayFillColor(context, 1.0f, 1.0f);
 	CGContextFillRect(context, CGRectMake(0, 0, pixels, pixels));
@@ -44,10 +44,10 @@ UIImage *TGQRCodeImage(NSString *text, CGFloat maximumSide) {
 	CGContextScaleCTM(context, 1, -1);
 	CGContextSetGrayFillColor(context, 0.0f, 1.0f);
 
-	for (NSInteger row = 0; row < matrix.size; row++) {
-		NSInteger start = -1;
-		for (NSInteger column = 0; column <= matrix.size; column++) {
-			BOOL dark = column < matrix.size && matrix.modules[row * matrix.size + column];
+	for (int row = 0; row < size; row++) {
+		int start = -1;
+		for (int column = 0; column <= size; column++) {
+			BOOL dark = column < size && qrcodegen_getModule(code, column, row);
 			if (dark && start < 0)
 				start = column;
 			if (!dark && start >= 0) {
@@ -56,7 +56,6 @@ UIImage *TGQRCodeImage(NSString *text, CGFloat maximumSide) {
 			}
 		}
 	}
-	TGQRMatrixRelease(&matrix);
 
 	CGImageRef bitmap = CGBitmapContextCreateImage(context);
 	CGContextRelease(context);

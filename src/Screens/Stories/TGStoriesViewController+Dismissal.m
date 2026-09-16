@@ -117,7 +117,7 @@
 		return YES;
 
 	CGPoint velocity = [(UIPanGestureRecognizer *)recognizer velocityInView:self.view];
-	return velocity.y > 0.0f && fabsf((float)velocity.y) > fabsf((float)velocity.x);
+	return velocity.y > 0.0f && fabs((float)velocity.y) > fabs((float)velocity.x);
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)recognizer shouldReceiveTouch:(UITouch *)touch {
