@@ -11,7 +11,6 @@ from conan.tools.scm import Git
 
 _EMUTLS_DIR = "compiler-rt-builtins"
 _EMULATED_TLS_VERSION = "9.0"
-_SYSTEM_CALLS = ("clock_gettime", "fdopendir")
 
 
 class TdlibConan(ConanFile):
@@ -87,7 +86,7 @@ class TdlibConan(ConanFile):
         libcxx = self.dependencies["libcxx"].cpp_info.components
         headers, runtime = libcxx["headers"], libcxx["runtime"]
         openssl = self.dependencies["openssl"].cpp_info.components
-        compat = [self.dependencies["apple-compat"].cpp_info.components[call] for call in _SYSTEM_CALLS]
+        compat = list(self.dependencies["apple-compat"].cpp_info.components.values())
 
         toolchain = CMakeToolchain(self)
         toolchain.blocks.remove("find_paths")
@@ -179,7 +178,10 @@ class TdlibConan(ConanFile):
         copy(self, "td_api.tl", os.path.join(self.source_folder, "td", "generate", "scheme"),
              os.path.join(self.package_folder, "res"), keep_path=False)
 
+    def _compat_calls(self):
+        return list(self.dependencies["apple-compat"].cpp_info.components)
+
     def package_info(self):
         self.cpp_info.libs = ["tdjson"]
         self.cpp_info.requires = ["openssl::crypto", "openssl::ssl", "libcxx::runtime",
-                                  *(f"apple-compat::{call}" for call in _SYSTEM_CALLS)]
+                                  *(f"apple-compat::{call}" for call in self._compat_calls())]
