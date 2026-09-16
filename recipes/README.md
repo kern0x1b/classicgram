@@ -26,10 +26,11 @@ pkg-config still compare correctly and the version names the commit.
 The C++ runtime, the SDK, the armv7 linker and `ldid` are the `apple-ios` platform's packages
 (`libcxx`, `iphoneos-sdk`, `ld64`, `ldid`, all `@charon/stable`). libc++ is the newest release; the
 `aligned_alloc` its runtime calls unconditionally since 22.1, and which iOS below 13 does not have,
-comes from the platform's `apple-compat` layer, hidden inside the runtime. The same layer gives TDLib
-`clock_gettime` (below iOS 10) and `fdopendir` (below iOS 8), and libvpx's encoder timer
-`clock_gettime`, which both call unconditionally, as the `apple-compat::clock_gettime` and
-`apple-compat::fdopendir` components.
+comes from the platform's `apple-compat` layer, hidden inside the runtime. libvpx's encoder timer
+takes `clock_gettime` from the same layer. TDLib links every call the layer provides for the target:
+`clock_gettime` and `fdopendir`, which its source calls unconditionally, and `__sincos_stret`,
+`__strlcpy_chk` and `__strlcat_chk`, which exist only from iOS 7 and which the compiler and the SDK's
+fortify headers emit because TDLib compiles against iOS 9.0 for its thread-local storage.
 
 ## What is carried, and why
 
