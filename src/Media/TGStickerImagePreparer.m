@@ -1,6 +1,6 @@
 #import "TGStickerImagePreparer.h"
 #import "TGLocalization.h"
-#import "WebP.framework/Headers/encode.h"
+#import "webp/encode.h"
 
 static const NSInteger kStickerSide = 512;
 static const NSUInteger kStickerMaxBytes = 512 * 1024;

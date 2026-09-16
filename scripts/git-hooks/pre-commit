@@ -220,8 +220,16 @@ fi
 
 staged_unset_keys_relevant=$(printf '%s\n' "$staged_all" | grep -E '^src/.*\.(m|mm|h)$')
 if [ -n "$staged_unset_keys_relevant" ] && [ -f scripts/lint-unset-dictionary-keys.py ]; then
-	schema=third_party/tdlib/td/td/generate/scheme/td_api.tl
-	[ -f "$schema" ] || schema=$(git rev-parse --git-common-dir)/../third_party/tdlib/td/td/generate/scheme/td_api.tl
+	schema=""
+	for env in packaging/deps/build/conan/*/ios6-deps.env; do
+		[ -f "$env" ] || continue
+		candidate="$(sed -n 's/^IOS6_HOST_TDLIB=//p' "$env")/res/td_api.tl"
+		if [ -f "$candidate" ]; then schema="$candidate"; break; fi
+	done
+	if [ -z "$schema" ]; then
+		echo "commit refused: no td_api.tl to check against - run 'conan install packaging/deps' so the TDLib package is resolved"
+		exit 1
+	fi
 	python3 scripts/lint-unset-dictionary-keys.py src "$schema" scripts/baselines/unset-dictionary-keys.txt || {
 		echo "commit refused: a dictionary key is read that nothing ever writes, so it is always nil (see the lines above)"
 		exit 1

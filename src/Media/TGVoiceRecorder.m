@@ -2,7 +2,7 @@
 #import "TGLazyFramework.h"
 #import "TGCall.h"
 #import <AVFoundation/AVFoundation.h>
-#include "opusenc/opusenc.h"
+#include "opusenc.h"
 #include <math.h>
 
 NSString *const TGVoiceRecorderErrorDomain = @"TGVoiceRecorderErrorDomain";

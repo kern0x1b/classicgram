@@ -1,0 +1,13 @@
+sources:
+  tdlib:
+    url: "https://github.com/tdlib/td.git"
+    commit: "022d60202e446ad1287b9fb68e687c8a0760788b"
+  compiler-rt-builtins:
+    tag: "llvmorg-21.1.0"
+    url: "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-21.1.0/compiler-rt/lib/builtins"
+    files:
+      emutls.c: "a4437f3e329a0835adbc7df38e36df12f358d05c073b11813c409f849c2345d2"
+      int_lib.h: "d79f2a9f4756e89fdd7a786fea5361720f40563a6d7c34d078505a236892d28f"
+      int_types.h: "bc956eca1626fee5b6242053bafd92bf0b1def230140ee36a9725034aeb02fa8"
+      int_util.h: "63d06198ab720a75c20bfd84be895c2746581b129168bae6201e7384bbb0473b"
+      int_endianness.h: "ec5175561075845b7b16a92ad5ecdfd42a284de2736dd07e4ca7011b75c37709"

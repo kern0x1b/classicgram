@@ -1,5 +1,5 @@
 #import "UIImage+WebP.h"
-#import "WebP.framework/Headers/decode.h"
+#import "webp/decode.h"
 
 static void tgFreePixels(void *info, const void *data, size_t size) {
 	free((void *)data);

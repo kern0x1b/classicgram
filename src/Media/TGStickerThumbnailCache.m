@@ -3,7 +3,7 @@
 #import "TGFileDownloadService.h"
 #import "TGDiskCache.h"
 #import "TGImageDecode.h"
-#import "WebP.framework/Headers/decode.h"
+#import "webp/decode.h"
 
 static const NSUInteger kStickerThumbnailMemoryLimit = 3 * 1024 * 1024;
 

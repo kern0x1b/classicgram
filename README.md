@@ -364,9 +364,9 @@ telegram-classic/
 │   └── Resources/          # Info.plist, entitlements, images/, Localization/, Config/
 ├── daemon/relaunch/        # optional jailbreak LaunchDaemon: relaunches the app after a force-quit/jetsam kill
 ├── tweaks/                 # the SpringBoard call-UI tweak: a dylib injected into another process, shipped as .deb
-├── third_party/            # every vendored tree (libtgvoip, libvpx, opus, webp, …) — TDLib and
-│                           #   OpenSSL are fetched by Conan instead, see packaging/
-├── packaging/              # Conan recipes: tdlib, openssl, and the deps consumer the Makefile installs
+├── packaging/              # Conan recipes — every dependency is fetched from its own upstream at
+│                           #   build time and built into the Conan cache; no third-party source
+│                           #   is stored in this repository. See packaging/DEPENDENCIES.md
 ├── scripts/                # build, device-deployment and lint automation, flat and verb-first
 │   └── ui-automation/      # a SpringBoard driver injected for testing: unlock, tap, screenshot
 │                           #   plus baselines/ — the layer-lint baseline files the hook checks against
@@ -409,10 +409,11 @@ project, originally GPL-2.0-or-later and relicensed here under GPLv3 as that lic
 - **[TDLib](https://github.com/tdlib/td)**: Telegram's own open-source client library, which this
   app talks to via a dynamically loaded `libtdjson.dylib` — it is the entire networking and protocol
   layer, built vanilla from upstream through the Conan recipe under `packaging/tdlib`.
-- **Vendored third-party components** (`third_party/`, each under its own upstream licence): a fork
-  of **libtgvoip** for voice/video call transport; **libvpx** (VP8); **Opus**, **libogg** and
-  **opusfile**/**opusenc** for audio; **libwebp** for image decode; **quirc** for QR code decoding.
-  **OpenSSL** for TLS is built the same way as TDLib, through `packaging/openssl`.
+- **Third-party components**, each under its own upstream licence and each fetched from its own
+  upstream by a Conan recipe under `packaging/`, never stored here: **libtgvoip** for voice/video
+  call transport; **libvpx** (VP8); **Opus**, **libogg** and **opusfile** plus **opus-tools**'
+  header serialiser for audio; **libwebp** for image decode; **quirc** for QR code decoding;
+  **OpenSSL** for TLS. `packaging/DEPENDENCIES.md` records what each one is pinned to and why.
 - **This project**: maintained by kern0x1b and contributors.
 
 Classicgram is an independent, unofficial project and is not affiliated with, endorsed by, or sponsored by

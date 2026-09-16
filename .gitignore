@@ -2,14 +2,9 @@
 build/
 .theos/
 packages/
-!third_party/tdlib/build/
-!third_party/tdlib/build/weak_import_shims.c
-!third_party/libvpx/build/
-!third_party/libvpx/build/**
 build-aux/
 aclocal.m4
 configure
-!third_party/libvpx/configure
 COPYING
 INSTALL
 
@@ -38,17 +33,8 @@ config.status
 config.cache
 Makefile.in
 
-/third_party/tdlib/native-build
 .DS_Store
 /.zsign_cache
-
-# libtgvoip ships an autotools build we do not use - the root Makefile compiles it directly
-third_party/libtgvoip/.deps/
-third_party/libtgvoip/**/.deps/
-third_party/libtgvoip/**/.dirstamp
-third_party/libtgvoip/configure
-third_party/libtgvoip/libtool
-third_party/libtgvoip/stamp-h1
 
 daemon/relaunch/out/
 

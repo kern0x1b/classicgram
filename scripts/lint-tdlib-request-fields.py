@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import glob
 import os
 import re
 import sys
@@ -24,10 +25,27 @@ def main_checkout():
     return None
 
 
+def packaged_scheme():
+    for root in (ROOT, main_checkout()):
+        if not root:
+            continue
+        for env in glob.glob(os.path.join(root, "packaging", "deps", "build", "conan", "*",
+                                          "ios6-deps.env")):
+            for line in open(env, encoding="utf-8"):
+                if line.startswith("IOS6_HOST_TDLIB="):
+                    candidate = os.path.join(line.split("=", 1)[1].strip(), "res", "td_api.tl")
+                    if os.path.isfile(candidate):
+                        return candidate
+    return None
+
+
 def scheme_path():
     here = os.path.join(ROOT, SCHEME_UNDER_ROOT)
     if os.path.isfile(here):
         return here
+    packaged = packaged_scheme()
+    if packaged:
+        return packaged
     checkout = main_checkout()
     if checkout:
         shared = os.path.join(checkout, SCHEME_UNDER_ROOT)
