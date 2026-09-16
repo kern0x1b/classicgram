@@ -12,7 +12,7 @@ pkg-config still compare correctly and the version names the commit.
 | Recipe | Upstream | Pinned to | Built by |
 |---|---|---|---|
 | `tdlib` | github.com/tdlib/td | `master` (1.8.67) | its CMake project |
-| `openssl` | github.com/openssl/openssl | `openssl-4.0.2`, the newest release | its `Configure` (`ios-cross`, `ios64-cross`) |
+| `openssl` | github.com/openssl/openssl | `openssl-4.0.2`, the newest release | its `Configure` (`ios-xcrun`, `ios64-xcrun`) |
 | `libtgvoip` | github.com/telegramdesktop/libtgvoip | `tdesktop` head, the line Telegram ships for 2.4.4 calls | its source list |
 | `libvpx` | github.com/webmproject/libvpx | `main` | its `configure` |
 | `opus` | github.com/xiph/opus | `main` | its CMake project |
@@ -41,13 +41,14 @@ Each of these was checked against a flag or an upstream option first; none exist
   undefined symbol that 32-bit ARM Mach-O cannot relocate, so every one of them fails to assemble
   for armv7 iOS (openssl/openssl#26510). The patch makes the translator give a hidden external data
   symbol a local `.data` word holding its address on the `ios32` flavour only; every other flavour's
-  output is byte-identical. It is prepared as an upstream pull request.
+  output is byte-identical. Submitted upstream as openssl/openssl#32856.
 - **`openssl`: `-DBROKEN_CLANG_ATOMICS` on armv7.** OpenSSL's own switch; without it clang emits
   calls to out-of-line atomic helpers that a static iOS 6 link does not have.
 - **`libtgvoip`: `-includealgorithm`.** `Buffers.h` calls `std::fill` without including
   `<algorithm>`, which libc++ 23 headers no longer pull in transitively. The header is forced in on
   the command line rather than patched into the source, for the library's own build and, through the
   package's `cxxflags`, for every C++ file that includes `Buffers.h` through its public headers.
+  Submitted upstream as telegramdesktop/libtgvoip#39.
 - **`tdlib`: `patches/voip-primary-socket-callback.patch`.** Hands the app the file descriptor of
   TDLib's main primary connection, which iOS 6's VoIP background mode needs marked. TDLib has no API
   for it, and an in-process proxy could not tell that connection apart from the others to the same
