@@ -1340,13 +1340,6 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 
 	if (self.onFinish)
 		self.onFinish(path, duration, dimensions);
-	if ([self.delegate respondsToSelector:
-				@selector(videoCaptureController:didFinishWithPath:duration:dimensions:round:)])
-		[self.delegate videoCaptureController:self
-							didFinishWithPath:path
-									 duration:duration
-								   dimensions:dimensions
-										round:self.roundVideoNote];
 	[self dismiss];
 }
 
@@ -1374,8 +1367,6 @@ static UIImage *TGNotePlateImage(NSString *name, UIColor *tint) {
 	[self stopSession];
 	if (self.onCancel)
 		self.onCancel();
-	if ([self.delegate respondsToSelector:@selector(videoCaptureControllerDidCancel:)])
-		[self.delegate videoCaptureControllerDidCancel:self];
 	[self dismiss];
 }
 

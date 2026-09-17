@@ -4,7 +4,7 @@ set_policy("package.requires_lock", true)
 set_policy("package.librarydeps.strict_compatibility", true)
 
 add_repositories("charon https://github.com/kern0x1b/charon.git main")
-add_addons("charon v0.7.1")
+add_addons("charon v0.8.1")
 set_config("apple_minimum", "6.0")
 includes("@addon/charon/apple-ios")
 
@@ -249,9 +249,9 @@ package_end()
 
 package("tdlib")
     set_homepage("https://github.com/tdlib/td")
-    set_description("TDLib's libtdjson, fetched vanilla from upstream with this port's backgrounded VoIP socket hook as a patch, built by its own CMake project with emulated thread-local storage wherever the target compiler lacks real __thread")
+    set_description("TDLib's libtdjson, fetched vanilla from upstream with this port's backgrounded VoIP socket hook as a patch, built by its own CMake project at the port's real minimum, with the emulated thread-local storage the toolchain provides below iOS 9")
     set_license("BSL-1.0")
-    revision("5")
+    revision("6")
     add_urls("https://github.com/tdlib/td.git")
     add_versions("1.8.67", "d1085f9cebc5a62379991ae1652673954f229c1f")
     add_patches("1.8.67", path.join(os.scriptdir(), "patches", "tdlib", "voip-primary-socket-callback.patch"), "95a9228262968a9861ebf5b95449497f4f22e7c2ea24fc903bd3b07464223440")
@@ -263,7 +263,6 @@ package("tdlib")
     add_links("tdjson")
     on_install("iphoneos", function (package)
         local cmake = import("@addon.charon.apple.cmake")
-        local toolchain = cmake.toolchain(package)
         local root = os.curdir()
         if not os.isdir("native-build") then
             os.mkdir("native-build")
@@ -272,19 +271,6 @@ package("tdlib")
         end
         local shims = import("@addon.charon.apple.compat").force_includes(package:dep("apple-compat"), {"clock_gettime", "fdopendir"})
         local opt = {cflags = table.copy(shims), cxxflags = table.copy(shims), deps = {"libcxx", "apple-compat"}, targets = {"tdjson"}, install = false}
-        local probe = path.join(root, "build_charon_tls_probe.cpp")
-        io.writefile(probe, "static __thread int x;\nint main() { x = 1; return x; }\n")
-        local real_thread_local = try { function ()
-            os.vrunv("xcrun", {"clang++", "-target", package:arch() .. "-apple-ios", "-miphoneos-version-min=" .. toolchain:config("deployment"),
-                               "-isysroot", toolchain:config("sdkdir"), "-fsyntax-only", probe})
-            return true
-        end }
-        if not real_thread_local then
-            print("no real __thread at iOS %s: compiling against iOS 9.0 with -femulated-tls, taking __emutls_get_address from the compiler's own runtime and recording iOS %s in the Mach-O", toolchain:config("deployment"), toolchain:config("deployment"))
-            table.insert(opt.cflags, "-femulated-tls")
-            table.insert(opt.cxxflags, "-femulated-tls")
-            opt.compile_deployment = "9.0"
-        end
         os.tryrm("build_charon")
         local openssl = package:dep("openssl")
         local builddir = cmake.install(package, {
@@ -317,7 +303,7 @@ package("tgcalls")
     set_homepage("https://github.com/TelegramMessenger/tgcalls")
     set_description("tgcalls, the engine behind Telegram's one-to-one calls, at the commit Telegram-iOS pins, on the WebRTC of Telegram Desktop's tg_owt, compiled from its own source list into one archive")
     set_license("LGPL-3.0")
-    revision("2")
+    revision("3")
     add_urls("https://github.com/TelegramMessenger/tgcalls.git")
     add_versions("2026.6.15+e306932", "e3069322a3d1e16ecb11a5e302242e59ddd7f09e")
     add_patches("2026.6.15+e306932", path.join(os.scriptdir(), "patches", "tgcalls", "audio-session-on-ios-6.patch"), "f457021a627703851a451efd33e3991abcaa3a7ee3a786860aec1033cd059a8b")
