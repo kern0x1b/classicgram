@@ -4,7 +4,7 @@ set_policy("package.requires_lock", true)
 set_policy("package.librarydeps.strict_compatibility", true)
 
 add_repositories("charon https://github.com/kern0x1b/charon.git main")
-add_addons("charon v0.6.0")
+add_addons("charon v0.7.0")
 set_config("apple_minimum", "6.0")
 includes("@addon/charon/apple-ios")
 
@@ -108,9 +108,9 @@ package_end()
 
 package("libvpx")
     set_homepage("https://chromium.googlesource.com/webm/libvpx")
-    set_description("libvpx, a VP8-only realtime build through its own configure")
+    set_description("libvpx through its own configure: VP8 both ways for calls, and the VP9 decoder video stickers need")
     set_license("BSD-3-Clause")
-    revision("5")
+    revision("6")
     add_urls("https://github.com/webmproject/libvpx.git")
     add_versions("1.17.0+60.gfcc9ba8", "fcc9ba864d5540a94c6dceb859c35d42dfddf50b")
     add_deps("charon@apple-compat", {alias = "apple-compat"})
@@ -132,7 +132,7 @@ package("libvpx")
         os.vrunv("../configure", {"--target=" .. target, "--extra-cflags=" .. table.concat(extra, " "),
             "--enable-neon", "--enable-static", "--disable-shared",
             "--disable-examples", "--disable-tools", "--disable-docs", "--disable-unit-tests",
-            "--disable-vp9", "--enable-vp8", "--enable-realtime-only", "--disable-runtime-cpu-detect"}, {envs = envs})
+            "--enable-vp8", "--enable-vp9-decoder", "--disable-vp9-encoder", "--enable-realtime-only", "--disable-runtime-cpu-detect"}, {envs = envs})
         os.vrunv("make", {"-j" .. os.cpuinfo("ncpu"), "libvpx.a"}, {envs = envs})
         os.cp("libvpx.a", package:installdir("lib") .. "/")
         os.cp("vpx_version.h", package:installdir("include/vpx") .. "/")
@@ -164,6 +164,86 @@ package("libopusenc")
     end)
     on_test(function (package)
         assert(package:has_cfuncs("ope_comments_create", {includes = "opusenc.h"}))
+    end)
+package_end()
+
+package("libwebm")
+    set_homepage("https://github.com/webmproject/libwebm")
+    set_description("libwebm's webm_parser, the callback parser that surfaces BlockAdditions, where a WebM video carries its VP9 alpha channel")
+    set_license("BSD-3-Clause")
+    revision("1")
+    add_urls("https://github.com/webmproject/libwebm.git")
+    add_versions("1.0.0.32+7.g6184f44", "6184f4484a826724b5293837134ab9492261b941")
+    add_deps("charon@libcxx", {alias = "libcxx"})
+    add_links("webm")
+    on_install("iphoneos", function (package)
+        import("@addon.charon.apple.sources").static(package, {
+            name = "webm",
+            files = {"webm_parser/src/*.cc"},
+            includedirs = {".", "webm_parser", "webm_parser/include"},
+            flags = {"-Os"},
+            cxxflags = {"-std=c++17"},
+            deps = {"libcxx"},
+            licenses = {"LICENSE.TXT", "PATENTS.TXT"}
+        })
+        os.cp("webm_parser/include/webm", package:installdir("include") .. "/")
+    end)
+package_end()
+
+package("libyuv")
+    set_homepage("https://chromium.googlesource.com/libyuv/libyuv")
+    set_description("libyuv, Chromium's colour conversion and scaling library, with the NEON rows for the architecture being built; on arm64 the dot-product kernels get their own archive and flags, as upstream's CMake builds them, and are chosen at run time")
+    set_license("BSD-3-Clause")
+    revision("2")
+    add_urls("https://chromium.googlesource.com/libyuv/libyuv.git")
+    add_versions("1971+2dd4257", "2dd4257364d39c38d79465c4ddc4b93137fe729b")
+    add_deps("charon@libcxx", {alias = "libcxx"})
+    on_load(function (package)
+        package:add("links", "yuv")
+        if package:arch() == "arm64" then
+            package:add("links", "yuv_neon64")
+        end
+    end)
+    on_install("iphoneos", function (package)
+        local arch = package:arch()
+        if arch ~= "armv7" and arch ~= "arm64" then
+            raise("libyuv has no NEON rows for %s", arch)
+        end
+        local defines = {"LIBYUV_DISABLE_SVE", "LIBYUV_DISABLE_SME"}
+        local sources = import("@addon.charon.apple.sources")
+        local common = {
+            name = "yuv",
+            files = {"source/*.cc|*_gcc.cc|*_win.cc|*_msa.cc|*_lsx.cc|*_lasx.cc|*_rvv.cc|*_sve.cc|*_sme.cc|*_neon.cc|*_neon64.cc|mjpeg_*.cc|convert_jpeg.cc"},
+            includedirs = {"include"},
+            defines = defines,
+            flags = {"-O2"},
+            cxxflags = {"-std=c++17"},
+            deps = {"libcxx"},
+            headers = {"include/**.h"},
+            licenses = {"LICENSE", "PATENTS"}
+        }
+        if arch == "armv7" then
+            table.insert(common.files, "source/*_neon.cc")
+            table.insert(common.defines, "LIBYUV_NEON")
+            table.insert(common.flags, "-mfpu=neon")
+            sources.static(package, common)
+        else
+            sources.static(package, common)
+            sources.static(package, {
+                name = "yuv_neon64",
+                files = {"source/*_neon64.cc"},
+                includedirs = {"include"},
+                defines = defines,
+                flags = {"-O2", "-march=armv8.2-a+dotprod+i8mm"},
+                cxxflags = {"-std=c++17"},
+                deps = {"libcxx"}
+            })
+        end
+        os.mv(path.join(package:installdir("include"), "include", "*"), package:installdir("include") .. "/")
+        os.rm(path.join(package:installdir("include"), "include"))
+    end)
+    on_test(function (package)
+        assert(package:check_cxxsnippets({test = "void test() { auto convert = &libyuv::I420AlphaToARGB; (void)convert; }"}, {includes = "libyuv.h"}))
     end)
 package_end()
 
@@ -430,6 +510,8 @@ local dependencies = {
     {"libopusenc", "0.3+14.g3c65f44"},
     {"webp", "1.6.0+258.g6ff2f43"},
     {"libvpx", "1.17.0+60.gfcc9ba8"},
+    {"libwebm", "1.0.0.32+7.g6184f44"},
+    {"libyuv", "1971+2dd4257"},
     {"tdlib", "1.8.67"},
     {"quirc", "1.2+7.g927d680"},
     {"qrcodegen", "1.8.0+31.g3c6d0b3"},
@@ -467,6 +549,7 @@ end
 target("TGCallsEngine")
     add_rules("@addon/charon/library")
     set_license("GPL-3.0")
+    set_policy("check.target_package_licenses", false)
     add_files("src/CallsEngine/*.mm")
     add_includedirs("src/CallsEngine", "src/Calls")
     add_packages("tgcalls", "opus", "libvpx", "openssl", "libcxx")

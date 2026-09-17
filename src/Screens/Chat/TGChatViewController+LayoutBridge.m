@@ -18,6 +18,7 @@
 #import "TGChatMessageLayout.h"
 #import "TGClient+ChatList.h"
 #import "TGMessageRowCell.h"
+#import "TGAnimatedStickerFormat.h"
 
 @implementation TGChatViewController (LayoutBridge)
 
@@ -143,7 +144,7 @@
 	resolved.mediaBadgeText = [self mediaBadgeTextFor:m];
 
 	NSNumber *lottieDocId = [m[@"docId"] isKindOfClass:NSNumber.class] ? m[@"docId"] : nil;
-	if (lottieDocId && [m[@"docName"] isEqualToString:@"tgs"])
+	if (lottieDocId && TGIsAnimatedStickerDocName(m[@"docName"]))
 		resolved.lottiePath = self.lottiePaths[lottieDocId];
 
 	NSString *rowKind = m[@"kind"];

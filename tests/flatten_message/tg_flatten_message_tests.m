@@ -519,6 +519,42 @@ TGTestOutcome TGFlattenMessageTestFlattensDice(void) {
 	return outcome;
 }
 
+TGTestOutcome TGFlattenMessageTestFlattensVideoSticker(void) {
+	TGTestOutcome outcome = TGTestOutcomeZero;
+
+	NSDictionary *message = @{
+		@"@type" : @"message",
+		@"id" : @5000000015,
+		@"sender_id" : @{@"@type" : @"messageSenderUser", @"user_id" : @1001},
+		@"chat_id" : @2001,
+		@"is_outgoing" : @NO,
+		@"date" : @1700000004,
+		@"content" : @{
+			@"@type" : @"messageSticker",
+			@"sticker" : @{
+				@"@type" : @"sticker",
+				@"format" : @{@"@type" : @"stickerFormatWebm"},
+				@"sticker" : @{@"@type" : @"file", @"id" : @777},
+				@"thumbnail" : @{@"@type" : @"thumbnail", @"file" : @{@"@type" : @"file", @"id" : @778}},
+				@"width" : @512, @"height" : @512, @"set_id" : @321, @"emoji" : @"\U0001F600",
+			},
+		},
+	};
+
+	NSDictionary *flat = TGFlattenMessage(message, TGFlattenMessageTestContext());
+
+	TGTestExpectTrue(&outcome, [flat[@"docName"] isEqualToString:@"webm"],
+			"a WebM sticker is marked as the playable webm kind, not left a still picture");
+	TGTestExpectEqualLongLong(&outcome, [flat[@"docId"] longLongValue], 777,
+			"the video file itself must be the document the chat downloads and plays");
+	TGTestExpectEqualLongLong(&outcome, [flat[@"photoId"] longLongValue], 778,
+			"the still thumbnail stays the picture shown until the video is ready");
+	TGTestExpectEqualLongLong(&outcome, [flat[@"stickerSetId"] longLongValue], 321,
+			"the sticker's set id must round-trip");
+
+	return outcome;
+}
+
 TGTestOutcome TGFlattenMessageTestFlattensServiceActions(void) {
 	TGTestOutcome outcome = TGTestOutcomeZero;
 

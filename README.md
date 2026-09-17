@@ -119,7 +119,7 @@ usually the SDK, the hardware, or a deliberate decision, never "not yet gotten t
 |---|---|---|
 | Photos, videos, GIFs, documents, voice messages, video messages | Supported | |
 | Sticker packs — static and animated (Lottie-style) stickers | Supported | |
-| Video/WebM stickers | Partial | Parsed and browsable, but no VP8/VP9 decode is wired for stickers specifically; a webm sticker falls back to its static thumbnail image instead of playing |
+| Video/WebM stickers | Supported | In chat they play and loop on the wallpaper like animated stickers: WebM parsed by libwebm, colour and alpha decoded as two VP9 streams by libvpx, composited by libyuv at the size shown. A sticker off screen frees its decoder. The sticker panel, sets and suggestions show the still thumbnail, as they do for animated stickers |
 | Masks | Partial | Browsing, installing and searching mask sticker sets works, and a mask can be dragged/scaled/rotated onto a still photo by hand; there is no camera face detection to place one automatically, the way Telegram's own mask feature does |
 | GIF search and trending GIFs | Supported | |
 | Instant View (in-app article reader) | Supported | |
@@ -417,7 +417,7 @@ project, originally GPL-2.0-or-later and relicensed here under GPLv3 as that lic
   layer, built from upstream by its package in `xmake.lua`.
 - **Third-party components**, each under its own upstream licence and each fetched from its own
   upstream by its package in `xmake.lua`, never stored here: **tgcalls** with Telegram Desktop's
-  **tg_owt** WebRTC for voice/video calls; **libvpx** (VP8); **Opus**, **libogg**, **opusfile** and **libopusenc** for audio;
+  **tg_owt** WebRTC for voice/video calls; **libvpx** (VP8 for calls, VP9 decode for video stickers); **libwebm** and **libyuv** for video stickers; **Opus**, **libogg**, **opusfile** and **libopusenc** for audio;
   **libwebp** for image decode; **quirc** for QR code decoding and **Project Nayuki's QR Code
   generator** for encoding; **OpenSSL** for TLS; **LLVM's libc++** as the bundled C++ runtime.
   `xmake.lua` records the commit each one is pinned to.
