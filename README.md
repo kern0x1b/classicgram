@@ -153,10 +153,10 @@ usually the SDK, the hardware, or a deliberate decision, never "not yet gotten t
 
 | Feature | Status | Comment |
 |---|---|---|
-| 1:1 voice calls — outgoing, incoming, mute, speakerphone, emoji-key verification, call rating | Supported | Own vendored `libtgvoip`, not a stub |
+| 1:1 voice calls — outgoing, incoming, mute, speakerphone, emoji-key verification, call rating | Supported | `tgcalls` on WebRTC, the engine current Telegram clients speak (protocols 7.0.0–13.0.0), in a bundled `libTGCallsEngine.dylib` loaded only when a call starts |
 | Call bubbles in chat history, call-back, call log with clear/filter | Supported | |
-| 1:1 video calls | Partial | The wiring is there and reachable: a Video Call tile on any one-to-one profile, and "Telegram Video Call" on a long-pressed phone number, both pass `video:YES` through to the call. VideoToolbox does not exist on iOS 6, so encoding and decoding fall back to the vendored VP8 software codec, which is compiled in. Whether a call is watchable end to end on an A5 has not been measured — treat it as untested, not as promised |
-| Group calls / video chats — joining, speaking, muting, hand-raise | Not supported | Needs `tgcalls` (a WebRTC media engine), which isn't vendored anywhere in this repo, and this project also refuses on principle to ever place or join a real call |
+| 1:1 video calls | Partial | The wiring is there and reachable: a Video Call tile on any one-to-one profile, and "Telegram Video Call" on a long-pressed phone number, both pass `video:YES` through to the call. VideoToolbox does not exist on iOS 6, so video is WebRTC's VP8 in software through libvpx; VP9 is left off because an A5 cannot encode it in real time. Whether a call is watchable end to end on an A5 has not been measured — treat it as untested, not as promised |
+| Group calls / video chats — joining, speaking, muting, hand-raise | Not supported | The `tgcalls` engine is built for one-to-one calls only; its group-call instance is not compiled in |
 | Group call / video chat viewing — title, live state, participant count, recent speakers, a live indicator in the chat header | Supported | Read-only by design; see the row above for why joining is out |
 | System-style incoming-call screen on the lock screen | Supported, via optional jailbreak tweak | `tweaks/system-call` is a separate MobileSubstrate package; nothing it needs is compiled into the app binary itself |
 
@@ -297,8 +297,10 @@ bundle, under `Frameworks/`, because iOS 6's own libc++ predates the headers the
 What the dependencies carry on top of upstream is small and stated where it is declared: TDLib takes
 one patch, `patches/tdlib/voip-primary-socket-callback.patch`, handing the app the socket iOS 6's
 VoIP background mode needs marked, and builds with emulated thread-local storage because clang
-refuses `__thread` below iOS 9.0; libtgvoip gets `<algorithm>` force-included
-(telegramdesktop/libtgvoip#39); OpenSSL is Charon's own package, which carries the armv7 perlasm fix
+refuses `__thread` below iOS 9.0; tgcalls takes one patch,
+`patches/tgcalls/audio-session-on-ios-6.patch`, replacing its audio session's single `thread_local`
+with a pthread key and guarding the two iOS 7/8 notifications and channel-count setters it reaches
+on every call; OpenSSL is Charon's own package, which carries the armv7 perlasm fix
 submitted as openssl/openssl#32856.
 
 No test framework is vendored. `xmake build -y host-tests` then `xmake run host-tests` compiles a table
@@ -414,8 +416,8 @@ project, originally GPL-2.0-or-later and relicensed here under GPLv3 as that lic
   app talks to via a dynamically loaded `libtdjson.dylib` — it is the entire networking and protocol
   layer, built from upstream by its package in `xmake.lua`.
 - **Third-party components**, each under its own upstream licence and each fetched from its own
-  upstream by its package in `xmake.lua`, never stored here: **libtgvoip** for voice/video
-  call transport; **libvpx** (VP8); **Opus**, **libogg**, **opusfile** and **libopusenc** for audio;
+  upstream by its package in `xmake.lua`, never stored here: **tgcalls** with Telegram Desktop's
+  **tg_owt** WebRTC for voice/video calls; **libvpx** (VP8); **Opus**, **libogg**, **opusfile** and **libopusenc** for audio;
   **libwebp** for image decode; **quirc** for QR code decoding and **Project Nayuki's QR Code
   generator** for encoding; **OpenSSL** for TLS; **LLVM's libc++** as the bundled C++ runtime.
   `xmake.lua` records the commit each one is pinned to.

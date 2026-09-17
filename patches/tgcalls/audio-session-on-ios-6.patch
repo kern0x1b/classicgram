@@ -1,0 +1,122 @@
+diff --git a/tgcalls/platform/darwin/iOS/RTCAudioSession+Configuration.mm b/tgcalls/platform/darwin/iOS/RTCAudioSession+Configuration.mm
+index 81b595d..cd5a7be 100644
+--- a/tgcalls/platform/darwin/iOS/RTCAudioSession+Configuration.mm
++++ b/tgcalls/platform/darwin/iOS/RTCAudioSession+Configuration.mm
+@@ -143,7 +143,8 @@ - (BOOL)setConfiguration:(RTC_OBJC_TYPE(RTCAudioSessionConfiguration) *)configur
+     // must be done after setting the audio session’s category and mode and
+     // activating the session.
+     NSInteger inputNumberOfChannels = configuration.inputNumberOfChannels;
+-    if (self.inputNumberOfChannels != inputNumberOfChannels) {
++    if (self.inputNumberOfChannels != inputNumberOfChannels &&
++        [self.session respondsToSelector:@selector(setPreferredInputNumberOfChannels:error:)]) {
+       NSError *inputChannelsError = nil;
+       if (![self setPreferredInputNumberOfChannels:inputNumberOfChannels
+                                              error:&inputChannelsError]) {
+@@ -158,7 +159,8 @@ - (BOOL)setConfiguration:(RTC_OBJC_TYPE(RTCAudioSessionConfiguration) *)configur
+       }
+     }
+     NSInteger outputNumberOfChannels = configuration.outputNumberOfChannels;
+-    if (self.outputNumberOfChannels != outputNumberOfChannels) {
++    if (self.outputNumberOfChannels != outputNumberOfChannels &&
++        [self.session respondsToSelector:@selector(setPreferredOutputNumberOfChannels:error:)]) {
+       NSError *outputChannelsError = nil;
+       if (![self setPreferredOutputNumberOfChannels:outputNumberOfChannels
+                                               error:&outputChannelsError]) {
+diff --git a/tgcalls/platform/darwin/iOS/RTCAudioSession.mm b/tgcalls/platform/darwin/iOS/RTCAudioSession.mm
+index 2528f71..d65ca5c 100644
+--- a/tgcalls/platform/darwin/iOS/RTCAudioSession.mm
++++ b/tgcalls/platform/darwin/iOS/RTCAudioSession.mm
+@@ -22,9 +22,7 @@
+ #import "RTCAudioSessionConfiguration.h"
+ #import "base/RTCLogging.h"
+ 
+-#if !defined(ABSL_HAVE_THREAD_LOCAL)
+-#error ABSL_HAVE_THREAD_LOCAL should be defined for MacOS / iOS Targets.
+-#endif
++#include <pthread.h>
+ 
+ NSString *const kRTCAudioSessionErrorDomain = @"org.webrtc.RTC_OBJC_TYPE(RTCAudioSession)";
+ NSInteger const kRTCAudioSessionErrorLockRequired = -1;
+@@ -34,7 +32,21 @@
+ namespace {
+ // Since webrtc::Mutex is not a reentrant lock and cannot check if the mutex is locked,
+ // we need a separate variable to check that the mutex is locked in the RTCAudioSession.
+-ABSL_CONST_INIT thread_local bool mutex_locked = false;
++pthread_key_t MutexLockedKey() {
++  static pthread_key_t key;
++  static pthread_once_t once = PTHREAD_ONCE_INIT;
++  pthread_once(&once, [] { pthread_key_create(&key, nullptr); });
++  return key;
++}
++
++bool MutexLocked() {
++  return pthread_getspecific(MutexLockedKey()) != nullptr;
++}
++
++void SetMutexLocked(bool locked) {
++  static char marker;
++  pthread_setspecific(MutexLockedKey(), locked ? &marker : nullptr);
++}
+ }  // namespace
+ 
+ @interface RTC_OBJC_TYPE (RTCAudioSession)
+@@ -89,10 +101,12 @@ - (instancetype)initWithAudioSession:(id)audioSession {
+                selector:@selector(handleRouteChangeNotification:)
+                    name:AVAudioSessionRouteChangeNotification
+                  object:nil];
+-    [center addObserver:self
+-               selector:@selector(handleMediaServicesWereLost:)
+-                   name:AVAudioSessionMediaServicesWereLostNotification
+-                 object:nil];
++    if (&AVAudioSessionMediaServicesWereLostNotification != NULL) {
++      [center addObserver:self
++                 selector:@selector(handleMediaServicesWereLost:)
++                     name:AVAudioSessionMediaServicesWereLostNotification
++                   object:nil];
++    }
+     [center addObserver:self
+                selector:@selector(handleMediaServicesWereReset:)
+                    name:AVAudioSessionMediaServicesWereResetNotification
+@@ -100,10 +114,12 @@ - (instancetype)initWithAudioSession:(id)audioSession {
+     // Posted on the main thread when the primary audio from other applications
+     // starts and stops. Foreground applications may use this notification as a
+     // hint to enable or disable audio that is secondary.
+-    [center addObserver:self
+-               selector:@selector(handleSilenceSecondaryAudioHintNotification:)
+-                   name:AVAudioSessionSilenceSecondaryAudioHintNotification
+-                 object:nil];
++    if (&AVAudioSessionSilenceSecondaryAudioHintNotification != NULL) {
++      [center addObserver:self
++                 selector:@selector(handleSilenceSecondaryAudioHintNotification:)
++                     name:AVAudioSessionSilenceSecondaryAudioHintNotification
++                   object:nil];
++    }
+     // Also track foreground event in order to deal with interruption ended situation.
+     [center addObserver:self
+                selector:@selector(handleApplicationDidBecomeActive:)
+@@ -240,13 +256,13 @@ - (void)removeDelegate:(id<RTC_OBJC_TYPE(RTCAudioSessionDelegate)>)delegate {
+ #pragma clang diagnostic ignored "-Wthread-safety-analysis"
+ 
+ - (void)lockForConfiguration {
+-  RTC_CHECK(!mutex_locked);
++  RTC_CHECK(!MutexLocked());
+   _mutex.Lock();
+-  mutex_locked = true;
++  SetMutexLocked(true);
+ }
+ 
+ - (void)unlockForConfiguration {
+-  mutex_locked = false;
++  SetMutexLocked(false);
+   _mutex.Unlock();
+ }
+ 
+@@ -680,7 +696,7 @@ - (void)setIsInterrupted:(BOOL)isInterrupted {
+ }
+ 
+ - (BOOL)checkLock:(NSError **)outError {
+-  if (!mutex_locked) {
++  if (!MutexLocked()) {
+     if (outError) {
+       *outError = [RTC_OBJC_TYPE(RTCAudioSession) lockError];
+     }

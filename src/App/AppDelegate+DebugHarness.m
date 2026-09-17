@@ -17,7 +17,6 @@
 #import "TGSearchViewController.h"
 #import "TGSnackbar.h"
 #import "TGDeviceViewController.h"
-#import "TGVideoLoopback.h"
 #import "TGLocalization.h"
 #import "AppDelegate+I18nDump.h"
 #import "TGPasscodeLock.h"
@@ -820,16 +819,6 @@ static NSString *const TGHarnessCommandPath = @"/tmp/tgcmd";
 			UINavigationController *nc = tabs.viewControllers[tabs.selectedIndex];
 			[nc popToRootViewControllerAnimated:NO];
 			[nc pushViewController:[[TGDeviceViewController alloc] init] animated:NO];
-		});
-		return YES;
-	}
-
-	if ([host isEqualToString:@"videoloop"]) {
-		NSArray *parts = [arg componentsSeparatedByString:@"x"];
-		unsigned int width = parts.count == 2 ? (unsigned int)[parts[0] integerValue] : 320;
-		unsigned int height = parts.count == 2 ? (unsigned int)[parts[1] integerValue] : 240;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[TGVideoLoopback runAtWidth:width height:height seconds:8.0];
 		});
 		return YES;
 	}

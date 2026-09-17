@@ -1,6 +1,7 @@
 #import "TGClient+ChatState.h"
 #import "TGTDLibInt64.h"
 #import "TGClient+Calls.h"
+#import "TGCall.h"
 #import "TGClient+Private.h"
 #import "TGFlattenCalls.h"
 
@@ -157,11 +158,11 @@ static NSDictionary *TGCallsDictionary(id value) {
 static NSDictionary *TGCallProtocol(void) {
 	return @{
 		@"@type" : @"callProtocol",
-		@"udp_p2p" : @NO,
+		@"udp_p2p" : @YES,
 		@"udp_reflector" : @YES,
 		@"min_layer" : @(65),
-		@"max_layer" : @(92),
-		@"library_versions" : @[ @"9.0.0", @"3.0.0", @"2.4.4" ],
+		@"max_layer" : @([TGCall maxLayer]),
+		@"library_versions" : [TGCall libraryVersions],
 	};
 }
 

@@ -1,0 +1,15 @@
+#ifndef TG_HOST_TESTS_CALL_RTC_SERVERS_TESTS_H
+#define TG_HOST_TESTS_CALL_RTC_SERVERS_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGCallRtcServersTestReflectorBecomesTurnWithHexPeerTag(void);
+TGTestOutcome TGCallRtcServersTestReflectorIdsAreRankedByServerId(void);
+TGTestOutcome TGCallRtcServersTestReflectorWithBothAddressesYieldsTwoEntries(void);
+TGTestOutcome TGCallRtcServersTestTcpReflectorIsSkippedOutsideVersionTwelve(void);
+TGTestOutcome TGCallRtcServersTestTcpReflectorIsKeptForVersionTwelve(void);
+TGTestOutcome TGCallRtcServersTestWebrtcServerSplitsIntoStunAndTurn(void);
+TGTestOutcome TGCallRtcServersTestDuplicateServersAppearOnce(void);
+TGTestOutcome TGCallRtcServersTestMalformedInputYieldsNoServers(void);
+
+#endif

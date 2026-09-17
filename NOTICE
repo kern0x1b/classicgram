@@ -47,12 +47,6 @@ Material taken from Twelve:
       list rebuild is held back and replayed as one batch when the
       application becomes active again.
 
-  src/TGCall.mm
-      The call audio-session latency setting, from Telegraph/TGCallSession.mm.
-      The preferred IO buffer duration is pinned to 5 ms while a call is up
-      and released back to the system default on teardown, because the iOS 6
-      default buffer adds audible latency to a voice call.
-
   src/TGStoriesViewController.m
       The poster-frame selection, from Telegraph/TGVideoThumbnailDataSource.m
       (TGIOS6VideoFrameImage and TGIOS6ImageLooksBlack). The first frame of a
