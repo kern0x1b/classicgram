@@ -162,7 +162,7 @@ static void TGVoipMarkPrimarySocket(int fd) {
 		(TGSetPrimarySocketCallbackFn)dlsym(handle, "td_ios_set_primary_socket_callback");
 	if (!setter) {
 		NSLog(@"BGSESSION no td_ios_set_primary_socket_callback in libtdjson.dylib - "
-			   "it was built without recipes/tdlib's voip-primary-socket-callback patch");
+			   "it was built without patches/tdlib/voip-primary-socket-callback.patch");
 		return;
 	}
 

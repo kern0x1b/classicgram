@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import os
+import subprocess
 import collections
 import sys
 from PIL import Image
@@ -439,7 +441,27 @@ def drop_nested(regions):
 	return kept
 
 
+def commit_gate(staged):
+	if not staged:
+		print("check-bubble-geometry: no bubble-cell source given, nothing to gate")
+		sys.exit(0)
+	shots = os.environ.get("BUBBLE_SCREENSHOT", "").split()
+	if shots:
+		status = 0
+		for shot in shots:
+			status = subprocess.run([sys.executable, __file__, shot]).returncode or status
+		sys.exit(status)
+	print("commit refused: this commit touches bubble-cell geometry:")
+	for path in staged:
+		print("  " + path)
+	print("a screenshot check cannot run inside a commit hook by itself - capture one on device (see the look-verify skill), then:")
+	print("  BUBBLE_SCREENSHOT=/path/to/shot.png git commit ...")
+	sys.exit(1)
+
+
 def main():
+	if "--commit-gate" in sys.argv:
+		commit_gate([a for a in sys.argv[1:] if a != "--commit-gate"])
 	if len(sys.argv) < 2:
 		print("usage: check-bubble-geometry.py <screenshot.png> [--from-x <pixels>]")
 		sys.exit(2)

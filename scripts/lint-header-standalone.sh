@@ -5,14 +5,18 @@ ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT_DIR" || exit 1
 
 MODE="full"
-case "${1:-}" in
-	--changed) MODE="changed" ;;
-	--full|"") MODE="full" ;;
-	*)
-		echo "usage: $0 [--changed|--full]" >&2
-		exit 2
-		;;
-esac
+GIVEN=()
+for argument in "$@"; do
+	case "$argument" in
+		--full) MODE="full" ;;
+		--changed) MODE="changed" ;;
+		-*)
+			echo "usage: $0 [--full|--changed|HEADER...]" >&2
+			exit 2
+			;;
+		*) MODE="given"; GIVEN+=("$argument") ;;
+	esac
+done
 
 WORK_DIR=$(mktemp -d)
 CONFIG_HEADER="$ROOT_DIR/src/Resources/Config/tg_config.h"
@@ -28,27 +32,23 @@ cleanup() {
 }
 trap cleanup EXIT
 
-PROJECT="$ROOT_DIR/build/armv7/application"
-if [ ! -f "$PROJECT/build.ninja" ]; then
-	echo "lint-header-standalone: no application build tree at build/armv7/application - run 'charon build --variant armv7' first" >&2
-	exit 1
-fi
-
-ninja -C "$PROJECT" -t commands > "$WORK_DIR/commands.txt" 2>/dev/null || {
-	echo "lint-header-standalone: ninja could not list the application's compile commands" >&2
+xmake project -P "$ROOT_DIR" -k compile_commands "$WORK_DIR" >/dev/null 2>&1 < /dev/null || {
+	echo "lint-header-standalone: xmake could not write the application's compile commands; configure the project with 'xmake f -P . -p iphoneos -a armv7 -y' first" >&2
 	exit 1
 }
 
-python3 - "$WORK_DIR/commands.txt" "$WORK_DIR" <<'PY' || exit 1
-import shlex, sys
+python3 - "$WORK_DIR/compile_commands.json" "$WORK_DIR" <<'PY' || exit 1
+import json, shlex, sys
 commands, out = sys.argv[1], sys.argv[2]
 wanted = {".m": "objc", ".mm": "objcxx"}
 found = {}
-for line in open(commands, encoding="utf-8"):
-    words = shlex.split(line)
-    if not words or "-c" not in words:
+for entry in json.load(open(commands, encoding="utf-8")):
+    words = entry.get("arguments") or shlex.split(entry.get("command", ""))
+    if not words or "-c" not in words or "/src/" not in "/" + entry.get("file", ""):
         continue
-    source = words[words.index("-c") + 1]
+    if not any("-apple-ios" in word for word in words):
+        continue
+    source = entry.get("file", words[words.index("-c") + 1])
     language = next((name for suffix, name in wanted.items() if source.endswith(suffix)), None)
     if not language or language in found:
         continue
@@ -68,7 +68,7 @@ for line in open(commands, encoding="utf-8"):
         break
 missing = [name for name in wanted.values() if name not in found]
 if missing:
-    sys.exit("lint-header-standalone: the build tree compiles no " + " or ".join(missing) + " source")
+    sys.exit("lint-header-standalone: the compile commands hold no " + " or ".join(missing) + " source")
 for language, (compiler, flags) in found.items():
     with open(f"{out}/{language}.flags", "w") as handle:
         handle.write(shlex.join(flags))
@@ -80,7 +80,18 @@ CLANG=$(cat "$WORK_DIR/compiler")
 OBJC_FLAGS=$(cat "$WORK_DIR/objc.flags")
 OBJCXX_FLAGS=$(cat "$WORK_DIR/objcxx.flags")
 
-if [ "$MODE" = "changed" ]; then
+if [ "$MODE" = "given" ]; then
+	HEADERS=()
+	for f in "${GIVEN[@]}"; do
+		case "$f" in
+			src/*.h) HEADERS+=("$f") ;;
+		esac
+	done
+	if [ ${#HEADERS[@]} -eq 0 ]; then
+		echo "lint-header-standalone: no headers under src/ given, nothing to check."
+		exit 0
+	fi
+elif [ "$MODE" = "changed" ]; then
 	HEADERS=()
 	while IFS= read -r f; do
 		case "$f" in
@@ -157,7 +168,7 @@ ELAPSED=$((END_TS - START_TS))
 
 FAILED_HEADERS=$(find "$FAIL_DIR" -name '*.txt' | wc -l | tr -d ' ')
 
-echo "lint-header-standalone: checked ${#HEADERS[@]} header(s) in ${ELAPSED}s (mode: $MODE, $NPROC parallel jobs, flags of build/armv7/application)"
+echo "lint-header-standalone: checked ${#HEADERS[@]} header(s) in ${ELAPSED}s (mode: $MODE, $NPROC parallel jobs, flags of the xmake compile commands)"
 
 if [ "$FAILED_HEADERS" -gt 0 ]; then
 	echo ""

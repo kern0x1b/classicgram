@@ -1,5 +1,0 @@
-sources:
-  2.4.4+124.g2d25928:
-    branch: tdesktop
-    commit: 2d2592860478e60d972b96e67ee034b8a71bb57a
-    url: https://github.com/telegramdesktop/libtgvoip.git

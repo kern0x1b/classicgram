@@ -8,7 +8,6 @@
 #include <mach/mach.h>
 #include <stdlib.h>
 
-
 static NSString *TGDevicePasscode(void) {
 	const char *env = getenv("TG_DEVICE_PASSCODE");
 	return env ? [NSString stringWithUTF8String:env] : @"";
@@ -17,7 +16,6 @@ static NSString *TGDevicePasscode(void) {
 static FILE *L;
 static void lg(const char *fmt, ...) { va_list ap; va_start(ap,fmt); if(L){vfprintf(L,fmt,ap);fputc('\n',L);fflush(L);} va_end(ap); }
 
-// ---- GSEvent hardware touch injection ----
 typedef void (*GSSendEventFn)(const void *record, mach_port_t port);
 typedef uint64_t (*GSTimestampFn)(void);
 typedef mach_port_t (*GSPortFn)(void);
@@ -45,34 +43,33 @@ static void loadGS(void) {
 static inline void wI(uint8_t *b, int off, int v){ *(int*)(b+off)=v; }
 static inline void wF(uint8_t *b, int off, float v){ *(float*)(b+off)=v; }
 
-// handType: 0=down, 5=up ; proximity: 3=touching, 0=not
 static void sendGSTouch(CGPoint p, int handType, int proximity) {
 	loadGS();
 	if (!gGSSendEvent || !gGSPort) { lg("GS fns missing"); return; }
 	uint8_t buf[BUF_SZ]; memset(buf, 0, sizeof(buf));
-	// record
-	wI(buf, 0, 3001);              // type = kGSEventHand
-	wI(buf, 4, 0);                 // subtype
-	wF(buf, 8, p.x); wF(buf, 12, p.y);       // location
-	wF(buf, 16, p.x); wF(buf, 20, p.y);      // windowLocation
-	wI(buf, 24, 0);               // windowContextId
-	*(uint64_t*)(buf+28) = gGSTimestamp ? gGSTimestamp() : 0; // timestamp @28
-	*(void**)(buf+36) = NULL;     // window
-	wI(buf, 40, 0);               // flags
-	wI(buf, 44, getpid());        // senderPID
-	wI(buf, 48, 60);              // infoSize = hand(36)+path(24)
-	// hand @52
+
+	wI(buf, 0, 3001);
+	wI(buf, 4, 0);
+	wF(buf, 8, p.x); wF(buf, 12, p.y);
+	wF(buf, 16, p.x); wF(buf, 20, p.y);
+	wI(buf, 24, 0);
+	*(uint64_t*)(buf+28) = gGSTimestamp ? gGSTimestamp() : 0;
+	*(void**)(buf+36) = NULL;
+	wI(buf, 40, 0);
+	wI(buf, 44, getpid());
+	wI(buf, 48, 60);
+
 	wI(buf, HAND_OFF+0, handType);
-	// deltas/floats zero; width/height zero
-	buf[HAND_OFF+33] = 1;         // pathInfosCount @ hand+33 (0x5D)
-	// path @88
-	buf[PATH_OFF+0] = 1;          // pathIndex
-	buf[PATH_OFF+1] = 2;          // pathIdentity
-	buf[PATH_OFF+2] = (uint8_t)proximity; // pathProximity
-	wF(buf, PATH_OFF+4, proximity ? 1.0f : 0.0f); // pathPressure
-	wF(buf, PATH_OFF+8, 0.0f);    // pathMajorRadius
-	wF(buf, PATH_OFF+12, p.x); wF(buf, PATH_OFF+16, p.y); // pathLocation
-	*(void**)(buf+PATH_OFF+20) = NULL; // pathWindow
+
+	buf[HAND_OFF+33] = 1;
+
+	buf[PATH_OFF+0] = 1;
+	buf[PATH_OFF+1] = 2;
+	buf[PATH_OFF+2] = (uint8_t)proximity;
+	wF(buf, PATH_OFF+4, proximity ? 1.0f : 0.0f);
+	wF(buf, PATH_OFF+8, 0.0f);
+	wF(buf, PATH_OFF+12, p.x); wF(buf, PATH_OFF+16, p.y);
+	*(void**)(buf+PATH_OFF+20) = NULL;
 	gGSSendEvent(buf, gGSPort());
 	lg("GSSendEvent handType=%d prox=%d at (%.0f,%.0f)", handType, proximity, p.x, p.y);
 }
@@ -82,45 +79,43 @@ static mach_port_t sysPort(void) {
 	GSPortFn f = (GSPortFn)dlsym(gs, "GSGetPurpleSystemEventPort");
 	return f ? f() : 0;
 }
-// send a bare record (no info) of the given type to the system port
+
 static void sendGSSimple(int type) {
 	loadGS();
 	uint8_t buf[BUF_SZ]; memset(buf, 0, sizeof(buf));
 	wI(buf, 0, type);
 	*(uint64_t*)(buf+28) = gGSTimestamp ? gGSTimestamp() : 0;
 	wI(buf, 44, getpid());
-	wI(buf, 48, 0); // infoSize 0
+	wI(buf, 48, 0);
 	mach_port_t sp = sysPort();
 	if (gGSSendEvent) gGSSendEvent(buf, sp);
 	lg("sendGSSimple type=%d sysport=%u", type, sp);
 }
 
 static void doGTap(CGPoint p) {
-	sendGSTouch(p, 0, 3);  // down
+	sendGSTouch(p, 0, 3);
 	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.06*NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-		sendGSTouch(p, 5, 0); // up
+		sendGSTouch(p, 5, 0);
 	});
 }
 
-// drag: down at a, N moved steps to b, up at b — each step scheduled so the runloop animates it
 static void doGSwipe(CGPoint a, CGPoint b, double dur) {
 	const int STEPS = 20;
-	sendGSTouch(a, 0, 3); // down
+	sendGSTouch(a, 0, 3);
 	for (int i = 1; i <= STEPS; i++) {
 		double frac = (double)i / STEPS;
 		CGPoint p = CGPointMake(a.x + (b.x-a.x)*frac, a.y + (b.y-a.y)*frac);
 		int last = (i == STEPS);
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)((dur*frac)*NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-			sendGSTouch(p, 1, 3); // dragged
+			sendGSTouch(p, 1, 3);
 			if (last)
 				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.02*NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-					sendGSTouch(p, 5, 0); // up
+					sendGSTouch(p, 5, 0);
 				});
 		});
 	}
 }
 
-// hitTest across all windows, highest windowLevel first
 static UIView *hitAt(CGPoint p) {
 	NSArray *ws = [[UIApplication sharedApplication] windows];
 	NSArray *sorted = [ws sortedArrayUsingComparator:^NSComparisonResult(UIWindow *a, UIWindow *b){
@@ -166,15 +161,15 @@ static void doTap(CGPoint p) {
 	CGPoint locWin = [win convertPoint:p fromWindow:nil];
 	UIApplication *app = [UIApplication sharedApplication];
 
-	UITouch *touch = synthTouch(win, hit, locWin, 0 /*UITouchPhaseBegan*/);
+	UITouch *touch = synthTouch(win, hit, locWin, 0 );
 	UIEvent *ev = [app performSelector:@selector(_touchesEvent)];
-	// try to register the touch with the event so allTouches works
+
 	if ([ev respondsToSelector:sel_registerName("_addTouch:forDelayedDelivery:")])
 		((void(*)(id,SEL,id,BOOL))objc_msgSend)(ev, sel_registerName("_addTouch:forDelayedDelivery:"), touch, NO);
 	NSSet *set = [NSSet setWithObject:touch];
 
 	[hit touchesBegan:set withEvent:ev];
-	int endedPhase = 3; /*UITouchPhaseEnded*/
+	int endedPhase = 3;
 	setScalarIvar(touch, "_phase", &endedPhase, sizeof(endedPhase));
 	[hit touchesEnded:set withEvent:ev];
 	lg("  delivered began/ended to %s", class_getName([hit class]));
@@ -226,7 +221,7 @@ static void run(void) {
 				((void(*)(id,SEL,BOOL,int,BOOL))objc_msgSend)(ac, sel_registerName("_finishUnlockWithSound:unlockSource:isAutoUnlock:"), NO,0,NO);
 				((void(*)(id,SEL))objc_msgSend)(ac, sel_registerName("deactivate"));
 				lg("after deactivate isLocked=%d", LK());
-				// SBUIController: restore home screen
+
 				Class UIC = objc_getClass("SBUIController");
 				id uic = nil;
 				for (const char *acc = "sharedInstance"; acc;) {
@@ -242,7 +237,7 @@ static void run(void) {
 					SEL fu = sel_registerName("finishedUnscattering");
 					if ([uic respondsToSelector:fu]) { ((void(*)(id,SEL))objc_msgSend)(uic, fu); lg("finishedUnscattering done"); }
 				}
-				// tear down the away view window
+
 				SEL avfo = sel_registerName("_awayViewFinishedAnimatingOut:");
 				if ([ac respondsToSelector:avfo]) { ((void(*)(id,SEL,id))objc_msgSend)(ac, avfo, nil); lg("_awayViewFinishedAnimatingOut done"); }
 				SEL dfao = sel_registerName("didFinishAnimatingOut");
@@ -254,7 +249,7 @@ static void run(void) {
 				lg("awayView=%p window=%p", awayView, awin);
 				if ([ac respondsToSelector:rav]) { ((void(*)(id,SEL))objc_msgSend)(ac, rav); lg("_releaseAwayView done"); }
 				if (awin) { awin.hidden = YES; lg("away window hidden"); }
-				// force the home root view visible
+
 				for (UIWindow *w in [[UIApplication sharedApplication] windows]) {
 					if ([w isKindOfClass:objc_getClass("SBAppWindow")] || w.windowLevel < 0) {
 						for (UIView *sv in w.subviews) {
@@ -282,7 +277,7 @@ static void run(void) {
 				SEL isL = sel_registerName("isLocked");
 				#define LOCKED() ((BOOL(*)(id,SEL))objc_msgSend)(ac, isL)
 				lg("isLocked start=%d", LOCKED());
-				// re-unlock keybag
+
 				id dlc = [objc_getClass("SBDeviceLockController") performSelector:@selector(sharedController)];
 				BOOL kb = ((BOOL(*)(id,SEL,id,BOOL))objc_msgSend)(dlc, sel_registerName("attemptDeviceUnlockWithPassword:appRequested:"), TGDevicePasscode(), NO);
 				lg("keybag unlock=%d", kb);
@@ -311,7 +306,7 @@ static void run(void) {
 					((void(*)(id,SEL))objc_msgSend)(ac, sd);
 					lg("deactivate done isLocked=%d", LOCKED());
 				}
-				// now isLocked should be 0: reveal home by completing the unlock
+
 				SEL sfs = sel_registerName("attemptUnlockFromSource:");
 				if ([ac respondsToSelector:sfs]) {
 					((void(*)(id,SEL,int))objc_msgSend)(ac, sfs, 0);
@@ -322,7 +317,7 @@ static void run(void) {
 					((void(*)(id,SEL))objc_msgSend)(ac, au);
 					lg("attemptUnlock isLocked=%d", LOCKED());
 				}
-				// report away view / window visibility
+
 				SEL av = sel_registerName("awayView");
 				if ([ac respondsToSelector:av]) {
 					UIView *awayView = ((UIView*(*)(id,SEL))objc_msgSend)(ac, av);

@@ -1,4 +1,0 @@
-sources:
-  1.17.0+60.gfcc9ba8:
-    commit: fcc9ba864d5540a94c6dceb859c35d42dfddf50b
-    url: https://github.com/webmproject/libvpx.git

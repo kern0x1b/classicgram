@@ -1,5 +1,4 @@
 #!/bin/zsh
-# Drive the SpringBoard UI over SSH by injecting sbdriver.dylib into SpringBoard.
 # Usage:
 #   drive.sh <command> [out.png]
 # Commands understood by sbdriver:
@@ -17,7 +16,10 @@ SCP=(sshpass -p "${TG_DEVICE_PASSWORD:?set TG_DEVICE_PASSWORD}" scp -o HostKeyAl
 HERE=${0:A:h}
 CMD="$1"
 OUT="${2:-shot.png}"
-"${SCP[@]}" "$HERE/sbdriver.dylib" root@$IP:/tmp/sbdriver.dylib >/dev/null 2>&1
+ROOT=${HERE}/../..
+xmake build -P "$ROOT" -y sbdriver </dev/null >/dev/null || { echo "drive.sh: xmake build sbdriver failed"; exit 1; }
+DYLIB=$(find "$ROOT/build/iphoneos/armv7" -name sbdriver.dylib -type f | head -1)
+"${SCP[@]}" "$DYLIB" root@$IP:/tmp/sbdriver.dylib >/dev/null 2>&1
 SB=$("${SSH[@]}" "launchctl list | grep com.apple.SpringBoard" | grep -oE '^[0-9]+')
 U="/tmp/sbdriver_$$_$RANDOM.dylib"
 "${SSH[@]}" "printf '%s' \"$CMD\" > /tmp/sbcmd; cp /tmp/sbdriver.dylib $U; /tmp/undim >/dev/null 2>&1; /usr/bin/cynject $SB $U 2>&1; sleep 1; rm -f $U; echo '---OUT---'; cat /tmp/sbcmd.out 2>&1; /tmp/screenshot /tmp/shot.png >/dev/null 2>&1"

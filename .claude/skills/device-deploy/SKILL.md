@@ -74,8 +74,10 @@ pipe through the missing ones — use `ls -t` and read output directly instead o
 
 ## Deploy procedure
 
-1. `charon build --variant harness` builds the armv7 bundle with the debug harness to
-   `build/harness/Telegram.app`, signed with `src/Resources/entitlements.plist`. See the
+1. `xmake build -y Telegram-harness` builds the armv7 bundle with the debug harness to
+   `build/harness/Telegram.app`, signed with `src/Resources/entitlements.plist`. For the
+   production package on a device whose installed app is `com.kern0x1b.telegram`,
+   `xmake device install -y` installs the `.deb` and refuses an app with another identifier. See the
    `build-and-verify` skill for what a finished build has already checked.
 2. `ldid -S/tmp/entitlements.plist build/harness/Telegram.app/Telegram` - resign with an
    entitlements file whose `application-identifier` and `keychain-access-groups` name the bundle
@@ -116,7 +118,7 @@ happened" when something did.
 
 The in-process `telegramdev://screenshot` handler is window-only. For a screenshot that includes
 the status bar, use the standalone `UIGetScreenImage()`-based binary at `/tmp/screenshot` on the
-device (pushed once from `scripts/device-grab-screenshot.m`; survives until an actual reboot since it's just a
+device (built by `xmake build -y screenshot` from `tools/device/screenshot.m` and pushed once; survives until an actual reboot since it's just a
 file under `/tmp`) — `/tmp/screenshot /tmp/out.png` over SSH, then `scp` the PNG back. See the
 `look-verify` skill for how to inspect the result honestly, and always zoom with nearest-neighbor,
 never a smoothed resize.
