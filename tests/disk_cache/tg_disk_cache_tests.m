@@ -336,3 +336,43 @@ TGTestOutcome TGDiskCacheTestImageForKeyWithCorruptFileRemovesIt(void) {
 
 	return outcome;
 }
+
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryLivesInLockableCaches(void) {
+	TGTestOutcome outcome = TGTestOutcomeZero;
+
+	NSString *scope = TGTestUniqueScope(@"lockable");
+	NSString *path = [TGDiskCache databaseDirectoryForScope:scope];
+	NSString *caches = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+	NSString *owner = [[NSBundle mainBundle] bundleIdentifier] ?: [[NSProcessInfo processInfo] processName];
+
+	TGTestExpectTrue(&outcome, [path hasPrefix:[[caches stringByAppendingPathComponent:owner] stringByAppendingString:@"/"]],
+			"a database directory must sit under Caches/<bundle identifier>, the only place a suspended system app may hold a file lock");
+
+	[TGDiskCache discardDatabaseForScope:scope];
+
+	return outcome;
+}
+
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryAdoptsTheApplicationSupportCopy(void) {
+	TGTestOutcome outcome = TGTestOutcomeZero;
+
+	NSFileManager *files = [NSFileManager defaultManager];
+	NSString *scope = TGTestUniqueScope(@"adopt");
+	NSString *support = [[[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+		stringByAppendingPathComponent:@"tdlib-"] stringByAppendingString:scope];
+	[files createDirectoryAtPath:support withIntermediateDirectories:YES attributes:nil error:NULL];
+	NSData *binlog = [@"session" dataUsingEncoding:NSUTF8StringEncoding];
+	[binlog writeToFile:[support stringByAppendingPathComponent:@"td.binlog"] atomically:YES];
+
+	NSString *path = [TGDiskCache databaseDirectoryForScope:scope];
+
+	TGTestExpectTrue(&outcome, [[NSData dataWithContentsOfFile:[path stringByAppendingPathComponent:@"td.binlog"]] isEqualToData:binlog],
+			"the session already in Application Support must move with its binlog, not be replaced by an empty database");
+	TGTestExpectTrue(&outcome, ![files fileExistsAtPath:support],
+			"the Application Support copy must be moved, not left behind to be read again");
+
+	[TGDiskCache discardDatabaseForScope:scope];
+	[files removeItemAtPath:support error:NULL];
+
+	return outcome;
+}

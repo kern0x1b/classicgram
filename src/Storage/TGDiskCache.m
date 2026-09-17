@@ -32,6 +32,46 @@ static dispatch_queue_t TGDiskCacheQueue(void) {
 	return queue;
 }
 
+static NSString *TGDiskCacheLockableRoot(void) {
+	NSString *owner = [[NSBundle mainBundle] bundleIdentifier] ?: [[NSProcessInfo processInfo] processName];
+	NSString *caches = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)
+		objectAtIndex:0];
+	return [caches stringByAppendingPathComponent:owner];
+}
+
+static BOOL TGDiskCacheDirectoryHoldsFiles(NSString *path) {
+	BOOL isDirectory = NO;
+	return [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && isDirectory &&
+		[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL].count > 0;
+}
+
+static NSString *TGDiskCacheAdoptDatabase(NSString *name, NSArray *previousLocations) {
+	NSFileManager *files = [NSFileManager defaultManager];
+	NSString *destination = [TGDiskCacheLockableRoot() stringByAppendingPathComponent:name];
+	if (!TGDiskCacheDirectoryHoldsFiles(destination)) {
+		for (NSString *previous in previousLocations) {
+			if (!TGDiskCacheDirectoryHoldsFiles(previous))
+				continue;
+			[files createDirectoryAtPath:TGDiskCacheLockableRoot()
+				withIntermediateDirectories:YES
+								 attributes:@{NSFileProtectionKey : TGDiskCacheDatabaseProtection()}
+									  error:NULL];
+			[files removeItemAtPath:destination error:NULL];
+			NSError *error = nil;
+			if ([files moveItemAtPath:previous toPath:destination error:&error])
+				NSLog(@"TGDiskCache: moved the database from %@ to %@, where the system lets it stay locked while suspended", previous, destination);
+			else
+				NSLog(@"TGDiskCache: could not move the database from %@ to %@: %@", previous, destination, error);
+			break;
+		}
+	}
+	[files createDirectoryAtPath:destination
+		withIntermediateDirectories:YES
+						 attributes:@{NSFileProtectionKey : TGDiskCacheDatabaseProtection()}
+							  error:NULL];
+	return destination;
+}
+
 static NSString *TGDiskCacheLibrarySubdirectory(NSSearchPathDirectory which,
 	NSString *name,
 	NSString *protection) {
@@ -163,9 +203,10 @@ static void TGDiskCacheStamp(NSString *path, NSTimeInterval when) {
 	if (!scope.length)
 		return [self primaryDatabaseDirectory];
 
-	NSString *path = TGDiskCacheLibrarySubdirectory(NSApplicationSupportDirectory,
-		[@"tdlib-" stringByAppendingString:TGDiskCacheSafeName(scope)],
-		TGDiskCacheDatabaseProtection());
+	NSString *name = [@"tdlib-" stringByAppendingString:TGDiskCacheSafeName(scope)];
+	NSString *support = [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)
+		objectAtIndex:0] stringByAppendingPathComponent:name];
+	NSString *path = TGDiskCacheAdoptDatabase(name, @[ support ]);
 	[self reassertDatabaseProtectionAtPath:path];
 	NSURL *url = [NSURL fileURLWithPath:path];
 	[url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
@@ -193,33 +234,15 @@ static void TGDiskCacheStamp(NSString *path, NSTimeInterval when) {
 	static NSString *dir = nil;
 	static dispatch_once_t once;
 	dispatch_once(&once, ^{
-		NSFileManager *fm = [NSFileManager defaultManager];
-		NSString *support = TGDiskCacheLibrarySubdirectory(NSApplicationSupportDirectory, @"tdlib",
-			TGDiskCacheDatabaseProtection());
-		NSString *legacy = [[NSSearchPathForDirectoriesInDomains(
-			NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
-			stringByAppendingPathComponent:@"tdlib"];
-
-		BOOL legacyIsDirectory = NO;
-		BOOL hasLegacy = [fm fileExistsAtPath:legacy isDirectory:&legacyIsDirectory] && legacyIsDirectory;
-		BOOL supportIsEmpty = [fm contentsOfDirectoryAtPath:support error:NULL].count == 0;
-		if (hasLegacy && supportIsEmpty) {
-			[fm removeItemAtPath:support error:NULL];
-			NSError *moveError = nil;
-			if ([fm moveItemAtPath:legacy toPath:support error:&moveError])
-				NSLog(@"TGDiskCache: moved the database out of Documents");
-			else
-				NSLog(@"TGDiskCache: database move failed: %@", moveError);
-			[fm createDirectoryAtPath:support
-				withIntermediateDirectories:YES
-								 attributes:@{NSFileProtectionKey : TGDiskCacheDatabaseProtection()}
-									  error:NULL];
-		}
-
-		[self reassertDatabaseProtectionAtPath:support];
-		NSURL *url = [NSURL fileURLWithPath:support];
+		NSString *support = [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)
+			objectAtIndex:0] stringByAppendingPathComponent:@"tdlib"];
+		NSString *documents = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)
+			objectAtIndex:0] stringByAppendingPathComponent:@"tdlib"];
+		NSString *path = TGDiskCacheAdoptDatabase(@"tdlib", @[ support, documents ]);
+		[self reassertDatabaseProtectionAtPath:path];
+		NSURL *url = [NSURL fileURLWithPath:path];
 		[url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:NULL];
-		dir = support;
+		dir = path;
 	});
 	return dir;
 }
