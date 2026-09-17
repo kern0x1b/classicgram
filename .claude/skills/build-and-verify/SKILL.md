@@ -1,6 +1,6 @@
 ---
 name: build-and-verify
-description: Use when building this project with charon, setting up a new git worktree for it, reading a build failure, checking for duplicate method definitions after moving code between files, or running the layer/comment lint scripts. Covers what the build's binary checks refuse, and why a naive duplicate scan misses real duplicates.
+description: Use when building this project with xmake and the Charon addon, setting up a new git worktree for it, reading a build failure, checking for duplicate method definitions after moving code between files, or running the layer/comment lint scripts. Covers what the build's binary checks refuse, and why a naive duplicate scan misses real duplicates.
 ---
 
 # Build and verify

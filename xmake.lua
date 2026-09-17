@@ -4,7 +4,7 @@ set_policy("package.requires_lock", true)
 set_policy("package.librarydeps.strict_compatibility", true)
 
 add_repositories("charon https://github.com/kern0x1b/charon.git main")
-add_addons("charon v0.3.3")
+add_addons("charon v0.4.1")
 set_config("apple_minimum", "6.0")
 includes("@addon/charon/apple-ios")
 
@@ -13,11 +13,15 @@ set_allowedarchs("iphoneos|armv7", "iphoneos|arm64")
 set_defaultplat("iphoneos")
 set_defaultarchs("iphoneos|armv7")
 
+local function revision(value)
+    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = value, type = "string", readonly = true})
+end
+
 package("ogg")
     set_homepage("https://github.com/xiph/ogg")
     set_description("libogg, the Ogg container format library, built by its own CMake project")
     set_license("BSD-3-Clause")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("2")
     add_urls("https://github.com/xiph/ogg.git")
     add_versions("1.3.6+7.g06a5e02", "06a5e0262cdc28aa4ae6797627a783b5010440f0")
     add_deps("cmake", "ninja", {kind = "binary"})
@@ -27,9 +31,7 @@ package("ogg")
             "-DINSTALL_DOCS=OFF",
             "-DINSTALL_PKG_CONFIG_MODULE=ON",
             "-DINSTALL_CMAKE_PACKAGE_MODULE=ON",
-        })
-        os.tryrm(package:installdir("share"))
-        os.cp("COPYING", package:installdir("licenses") .. "/")
+        }, {prune = {"share"}, licenses = {"COPYING"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("ogg_sync_init", {includes = "ogg/ogg.h"}))
@@ -40,7 +42,7 @@ package("opus")
     set_homepage("https://opus-codec.org")
     set_description("libopus, the Opus audio codec, built by its own CMake project")
     set_license("BSD-3-Clause")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("2")
     add_urls("https://github.com/xiph/opus.git")
     add_versions("1.6.1+68.g503d81b", "503d81b138d76621aae4b12786e90de48aa8db3a")
     add_deps("cmake", "ninja", {kind = "binary"})
@@ -53,9 +55,7 @@ package("opus")
             "-DOPUS_BUILD_PROGRAMS=OFF",
             "-DOPUS_INSTALL_PKG_CONFIG_MODULE=ON",
             "-DOPUS_INSTALL_CMAKE_CONFIG_MODULE=ON",
-        })
-        os.tryrm(package:installdir("share"))
-        os.cp("COPYING", package:installdir("licenses") .. "/")
+        }, {prune = {"share"}, licenses = {"COPYING"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("opus_encoder_create", {includes = "opus.h"}))
@@ -66,7 +66,7 @@ package("opusfile")
     set_homepage("https://opus-codec.org")
     set_description("libopusfile, reading Ogg Opus files, built by its own CMake project without HTTP")
     set_license("BSD-3-Clause")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("2")
     add_urls("https://github.com/xiph/opusfile.git")
     add_versions("0.12+59.g6dfd29e", "6dfd29e7adb87f2e193575fc3fa88cbf1a0b27df")
     add_deps("cmake", "ninja", {kind = "binary"})
@@ -78,11 +78,7 @@ package("opusfile")
             "-DOP_DISABLE_HTTP=ON",
             "-DOP_DISABLE_EXAMPLES=ON",
             "-DOP_DISABLE_DOCS=ON",
-        })
-        os.tryrm(package:installdir("lib/cmake"))
-        os.tryrm(package:installdir("lib/pkgconfig"))
-        os.tryrm(package:installdir("share"))
-        os.cp("COPYING", package:installdir("licenses") .. "/")
+        }, {prune = {"share", "lib/cmake", "lib/pkgconfig"}, licenses = {"COPYING"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("op_open_memory", {includes = "opusfile.h"}))
@@ -93,22 +89,17 @@ package("webp")
     set_homepage("https://developers.google.com/speed/webp")
     set_description("libwebp's decoding and encoding libraries, built by its own CMake project without its tools")
     set_license("BSD-3-Clause")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("2")
     add_urls("https://chromium.googlesource.com/webm/libwebp.git")
     add_versions("1.6.0+258.g6ff2f43", "6ff2f43acb05d4c78b3eebe4956e4afd22f14452")
     add_deps("cmake", "ninja", {kind = "binary"})
     add_links("webpdemux", "webpdecoder", "webp", "sharpyuv")
     on_install("iphoneos", function (package)
-        local tools = {"ANIM_UTILS", "CWEBP", "DWEBP", "GIF2WEBP", "IMG2WEBP", "VWEBP", "WEBPINFO", "LIBWEBPMUX", "WEBPMUX", "EXTRAS", "FUZZTEST"}
         local configs = {"-DWEBP_LINK_STATIC=ON"}
-        for _, tool in ipairs(tools) do
+        for _, tool in ipairs({"ANIM_UTILS", "CWEBP", "DWEBP", "GIF2WEBP", "IMG2WEBP", "VWEBP", "WEBPINFO", "LIBWEBPMUX", "WEBPMUX", "EXTRAS", "FUZZTEST"}) do
             table.insert(configs, "-DWEBP_BUILD_" .. tool .. "=OFF")
         end
-        import("@addon.charon.apple.cmake").install(package, configs)
-        os.tryrm(package:installdir("lib/cmake"))
-        os.tryrm(package:installdir("lib/pkgconfig"))
-        os.tryrm(package:installdir("share"))
-        os.cp("COPYING", package:installdir("licenses") .. "/")
+        import("@addon.charon.apple.cmake").install(package, configs, {prune = {"share", "lib/cmake", "lib/pkgconfig"}, licenses = {"COPYING"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("WebPDecodeRGBA", {includes = "webp/decode.h"}))
@@ -119,7 +110,7 @@ package("libvpx")
     set_homepage("https://chromium.googlesource.com/webm/libvpx")
     set_description("libvpx, a VP8-only realtime build through its own configure")
     set_license("BSD-3-Clause")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "4", type = "string", readonly = true})
+    revision("5")
     add_urls("https://github.com/webmproject/libvpx.git")
     add_versions("1.17.0+60.gfcc9ba8", "fcc9ba864d5540a94c6dceb859c35d42dfddf50b")
     add_deps("charon@apple-compat", {alias = "apple-compat"})
@@ -131,11 +122,10 @@ package("libvpx")
             raise("libvpx has no configure target for %s", package:arch())
         end
         local envs = import("@addon.charon.apple.envs").build(package, import("package.tools.autoconf").buildenvs(package))
-        local compat = package:dep("apple-compat")
         local toolchain = package:toolchains()[1]
         toolchain:load()
-        local extra = {"-miphoneos-version-min=" .. toolchain:config("deployment")}
-        table.join2(extra, import("@addon.charon.apple.compat").force_includes(compat, {"clock_gettime"}))
+        local extra = table.join({"-miphoneos-version-min=" .. toolchain:config("deployment")},
+            import("@addon.charon.apple.compat").force_includes(package:dep("apple-compat"), {"clock_gettime"}))
         os.tryrm("build_charon")
         os.mkdir("build_charon")
         os.cd("build_charon")
@@ -148,8 +138,7 @@ package("libvpx")
         os.cp("vpx_version.h", package:installdir("include/vpx") .. "/")
         os.cd("..")
         os.cp("vpx/*.h", package:installdir("include/vpx") .. "/")
-        os.cp("LICENSE", package:installdir("licenses") .. "/")
-        os.cp("PATENTS", package:installdir("licenses") .. "/")
+        import("@addon.charon.apple.install").finish(package, {licenses = {"LICENSE", "PATENTS"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("vpx_codec_version", {includes = "vpx/vpx_codec.h"}))
@@ -160,7 +149,7 @@ package("libopusenc")
     set_homepage("https://opus-codec.org")
     set_description("libopusenc, writing Ogg Opus files, built by its own autotools project")
     set_license("BSD-3-Clause")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "2", type = "string", readonly = true})
+    revision("3")
     add_urls("https://github.com/xiph/libopusenc.git")
     add_versions("0.3+14.g3c65f44", "3c65f440baff6220872ec11b0cbde37ef7a48f78")
     add_deps("autoconf", "automake", "libtool", "pkgconf", {kind = "binary"})
@@ -171,10 +160,7 @@ package("libopusenc")
         local envs = import("@addon.charon.apple.envs").build(package, autoconf.buildenvs(package))
         envs.PKG_CONFIG = path.join(package:dep("pkgconf"):installdir("bin"), "pkgconf")
         autoconf.install(package, {"--enable-static", "--disable-shared", "--disable-examples", "--disable-doc"}, {envs = envs})
-        os.tryrm(package:installdir("lib/*.la"))
-        os.tryrm(package:installdir("lib/pkgconfig"))
-        os.tryrm(package:installdir("share"))
-        os.cp("COPYING", package:installdir("licenses") .. "/")
+        import("@addon.charon.apple.install").finish(package, {prune = {"lib/*.la", "lib/pkgconfig", "share"}, licenses = {"COPYING"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("ope_comments_create", {includes = "opusenc.h"}))
@@ -185,43 +171,39 @@ package("libtgvoip")
     set_homepage("https://github.com/telegramdesktop/libtgvoip")
     set_description("libtgvoip from Telegram Desktop's tdesktop branch, the line Telegram ships for 2.4.4 calls, compiled from its own source list against libc++ 23")
     set_license("Unlicense")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("2")
     add_urls("https://github.com/telegramdesktop/libtgvoip.git")
     add_versions("2.4.4+124.g2d25928", "2d2592860478e60d972b96e67ee034b8a71bb57a")
-    add_deps("opus", "charon@libcxx")
+    add_deps("opus")
+    add_deps("charon@libcxx", {alias = "libcxx"})
     add_includedirs("include", "include/libtgvoip")
     add_links("tgvoip")
+    add_defines("TGVOIP_NO_DSP", "WEBRTC_POSIX", "TGVOIP_USE_CUSTOM_CRYPTO")
     add_cxxflags("-includealgorithm")
     add_mxxflags("-includealgorithm")
-    local sources = {
-        "VoIPController.cpp", "VoIPServerConfig.cpp", "logging.cpp", "json11.cpp",
-        "video/ScreamCongestionController.cpp", "JitterBuffer.cpp", "OpusEncoder.cpp", "OpusDecoder.cpp",
-        "NetworkSocket.cpp", "CongestionControl.cpp", "EchoCanceller.cpp", "MessageThread.cpp",
-        "Buffers.cpp", "BlockingQueue.cpp", "MediaStreamItf.cpp", "PacketReassembler.cpp",
-        "audio/AudioIO.cpp", "audio/AudioInput.cpp", "audio/AudioOutput.cpp", "audio/Resampler.cpp",
-        "os/darwin/AudioUnitIO.cpp", "os/darwin/AudioInputAudioUnit.cpp",
-        "os/darwin/AudioOutputAudioUnit.cpp", "os/posix/NetworkSocketPosix.cpp",
-        "os/darwin/DarwinSpecific.mm"
-    }
     on_install("iphoneos", function (package)
-        local envs = import("package.tools.autoconf").buildenvs(package)
-        local root = os.curdir()
-        local flags = table.join(os.argv(envs.CXXFLAGS or ""), os.argv(envs.CPPFLAGS or ""), {
-            "-std=c++14", "-includealgorithm", "-DTGVOIP_NO_DSP", "-DWEBRTC_POSIX", "-DTGVOIP_USE_CUSTOM_CRYPTO",
-            "-I" .. root, "-I" .. path.join(package:dep("opus"):installdir("include"), "opus")})
-        local objects = {}
-        for _, source in ipairs(sources) do
-            local object = path.join(root, "build_charon", source:gsub("/", "_") .. ".o")
-            os.mkdir(path.directory(object))
-            local language = source:endswith(".mm") and {"-fobjc-arc"} or {}
-            os.vrunv(envs.CXX, table.join(flags, language, {"-c", path.join(root, source), "-o", object}), {envs = envs})
-            table.insert(objects, object)
-        end
-        os.vrunv("ar", table.join({"rcs", package:installdir("lib") .. "/libtgvoip.a"}, objects))
-        for _, header in ipairs(os.files("**.h|webrtc_dsp/**|client/**|os/android/**|os/linux/**|os/windows/**|build_charon/**")) do
-            os.cp(header, path.join(package:installdir("include/libtgvoip"), header))
-        end
-        os.cp("UNLICENSE", package:installdir("licenses") .. "/")
+        local cxx = {"-std=c++14", "-includealgorithm"}
+        import("@addon.charon.apple.sources").static(package, {
+            name = "tgvoip",
+            files = {
+                "VoIPController.cpp", "VoIPServerConfig.cpp", "logging.cpp", "json11.cpp",
+                "video/ScreamCongestionController.cpp", "JitterBuffer.cpp", "OpusEncoder.cpp", "OpusDecoder.cpp",
+                "NetworkSocket.cpp", "CongestionControl.cpp", "EchoCanceller.cpp", "MessageThread.cpp",
+                "Buffers.cpp", "BlockingQueue.cpp", "MediaStreamItf.cpp", "PacketReassembler.cpp",
+                "audio/AudioIO.cpp", "audio/AudioInput.cpp", "audio/AudioOutput.cpp", "audio/Resampler.cpp",
+                "os/darwin/AudioUnitIO.cpp", "os/darwin/AudioInputAudioUnit.cpp",
+                "os/darwin/AudioOutputAudioUnit.cpp", "os/posix/NetworkSocketPosix.cpp",
+                "os/darwin/DarwinSpecific.mm"
+            },
+            includedirs = {".", path.join(package:dep("opus"):installdir("include"), "opus")},
+            defines = {"TGVOIP_NO_DSP", "WEBRTC_POSIX", "TGVOIP_USE_CUSTOM_CRYPTO"},
+            cxxflags = cxx,
+            mxxflags = table.join(cxx, {"-fobjc-arc"}),
+            deps = {"opus", "libcxx"},
+            headers = {"**.h|webrtc_dsp/**|client/**|os/android/**|os/linux/**|os/windows/**|build_charon/**"},
+            headers_prefix = "libtgvoip",
+            licenses = {"UNLICENSE"}
+        })
     end)
 package_end()
 
@@ -229,7 +211,7 @@ package("tdlib")
     set_homepage("https://github.com/tdlib/td")
     set_description("TDLib's libtdjson, fetched vanilla from upstream with this port's backgrounded VoIP socket hook as a patch, built by its own CMake project with emulated thread-local storage wherever the target compiler lacks real __thread")
     set_license("BSL-1.0")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "4", type = "string", readonly = true})
+    revision("5")
     add_urls("https://github.com/tdlib/td.git")
     add_versions("1.8.67", "d1085f9cebc5a62379991ae1652673954f229c1f")
     add_patches("1.8.67", path.join(os.scriptdir(), "patches", "tdlib", "voip-primary-socket-callback.patch"), "95a9228262968a9861ebf5b95449497f4f22e7c2ea24fc903bd3b07464223440")
@@ -248,30 +230,23 @@ package("tdlib")
             os.vrunv("cmake", {"-DTD_GENERATE_SOURCE_FILES=ON", root}, {curdir = path.join(root, "native-build")})
             os.vrunv("cmake", {"--build", ".", "--target", "prepare_cross_compiling"}, {curdir = path.join(root, "native-build")})
         end
-        local libcxx = package:dep("libcxx")
-        local compat = package:dep("apple-compat")
-        local openssl = package:dep("openssl")
-        local cflags = import("@addon.charon.apple.compat").force_includes(compat, {"clock_gettime", "fdopendir"})
-        local cxxflags = table.join(cflags, {"-nostdinc++", "-isystem", path.join(libcxx:installdir("include"), "c++", "v1"), "-D_LIBCPP_DISABLE_AVAILABILITY"})
-        local shflags = {"-nostdlib++", "-L" .. libcxx:installdir("lib"), "-lc++", "-lc++abi"}
-        if os.isfile(path.join(compat:installdir("lib"), "libapple-compat.a")) then
-            table.join2(shflags, {"-L" .. compat:installdir("lib"), "-lapple-compat"})
-        end
-        local opt = {cflags = cflags, cxxflags = cxxflags, shflags = shflags, targets = {"tdjson"}, install = false}
+        local shims = import("@addon.charon.apple.compat").force_includes(package:dep("apple-compat"), {"clock_gettime", "fdopendir"})
+        local opt = {cflags = table.copy(shims), cxxflags = table.copy(shims), deps = {"libcxx", "apple-compat"}, targets = {"tdjson"}, install = false}
         local probe = path.join(root, "build_charon_tls_probe.cpp")
         io.writefile(probe, "static __thread int x;\nint main() { x = 1; return x; }\n")
-        local ok = try { function ()
+        local real_thread_local = try { function ()
             os.vrunv("xcrun", {"clang++", "-target", package:arch() .. "-apple-ios", "-miphoneos-version-min=" .. toolchain:config("deployment"),
                                "-isysroot", toolchain:config("sdkdir"), "-fsyntax-only", probe})
             return true
         end }
-        if not ok then
+        if not real_thread_local then
             print("no real __thread at iOS %s: compiling against iOS 9.0 with -femulated-tls, taking __emutls_get_address from the compiler's own runtime and recording iOS %s in the Mach-O", toolchain:config("deployment"), toolchain:config("deployment"))
             table.insert(opt.cflags, "-femulated-tls")
             table.insert(opt.cxxflags, "-femulated-tls")
             opt.compile_deployment = "9.0"
         end
         os.tryrm("build_charon")
+        local openssl = package:dep("openssl")
         local builddir = cmake.install(package, {
             "-DBUILD_SHARED_LIBS=ON",
             "-DTD_ENABLE_LTO=OFF",
@@ -283,8 +258,7 @@ package("tdlib")
             "-DOPENSSL_SSL_LIBRARY=" .. path.join(openssl:installdir("lib"), "libssl.a"),
         }, opt)
         local built
-        local built_dir = builddir or "build_charon"
-        for _, file in ipairs(table.join(os.files(path.join(built_dir, "libtdjson*.dylib")), os.files(path.join(built_dir, "**", "libtdjson*.dylib")))) do
+        for _, file in ipairs(table.join(os.files(path.join(builddir, "libtdjson*.dylib")), os.files(path.join(builddir, "**", "libtdjson*.dylib")))) do
             if not os.islink(file) then
                 built = file
             end
@@ -295,7 +269,7 @@ package("tdlib")
         os.vrunv("xcrun", {"install_name_tool", "-id", "@rpath/libtdjson.dylib", dylib})
         os.cp("td/telegram/*.h", package:installdir("include/td/telegram") .. "/")
         os.cp("td/generate/scheme/td_api.tl", package:installdir("res") .. "/")
-        os.cp("LICENSE_1_0.txt", package:installdir("licenses") .. "/")
+        import("@addon.charon.apple.install").finish(package, {licenses = {"LICENSE_1_0.txt"}})
     end)
 package_end()
 
@@ -303,14 +277,14 @@ package("quirc")
     set_homepage("https://github.com/dlbeer/quirc")
     set_description("quirc, a QR-code recognition library, built by its own Makefile")
     set_license("ISC")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("2")
     add_urls("https://github.com/dlbeer/quirc.git")
     add_versions("1.2+7.g927d680", "927d680904dc95fdff4cd9d022eb374b438ff8f2")
     on_install(function (package)
         import("package.tools.make").build(package, {"libquirc.a", "SDL_CFLAGS=", "OPENCV_CFLAGS="})
         os.cp("libquirc.a", package:installdir("lib"))
         os.cp("lib/quirc.h", package:installdir("include"))
-        os.cp("LICENSE", package:installdir("licenses"))
+        import("@addon.charon.apple.install").finish(package, {licenses = {"LICENSE"}})
     end)
     on_test(function (package)
         assert(package:has_cfuncs("quirc_new", {includes = "quirc.h"}))
@@ -321,7 +295,7 @@ package("qrcodegen")
     set_homepage("https://github.com/nayuki/QR-Code-generator")
     set_description("Project Nayuki's QR Code generator, its C library, compiled by its own Makefile and archived")
     set_license("MIT")
-    add_configs("revision", {description = "Raised whenever this package script changes, so the change rebuilds it.", default = "1", type = "string", readonly = true})
+    revision("1")
     add_urls("https://github.com/nayuki/QR-Code-generator.git")
     add_versions("1.8.0+31.g3c6d0b3", "3c6d0b3cefb4e049dc337e82237c9644399716a8")
     on_install(function (package)
@@ -339,12 +313,26 @@ package("qrcodegen")
     end)
 package_end()
 
-add_requires("ogg 1.3.6+7.g06a5e02", "opus 1.6.1+68.g503d81b", "opusfile 0.12+59.g6dfd29e", "libopusenc 0.3+14.g3c65f44", "webp 1.6.0+258.g6ff2f43", "libvpx 1.17.0+60.gfcc9ba8", "libtgvoip 2.4.4+124.g2d25928", "tdlib 1.8.67", "quirc 1.2+7.g927d680", "qrcodegen 1.8.0+31.g3c6d0b3")
-add_requires("charon@openssl 4.0.2", {alias = "openssl"})
-add_requires("charon@libcxx 23.1.1", {alias = "libcxx"})
-add_requireconfs("**.pkgconf", {system = false})
+local dependencies = {
+    {"ogg", "1.3.6+7.g06a5e02"},
+    {"opus", "1.6.1+68.g503d81b"},
+    {"opusfile", "0.12+59.g6dfd29e"},
+    {"libopusenc", "0.3+14.g3c65f44"},
+    {"webp", "1.6.0+258.g6ff2f43"},
+    {"libvpx", "1.17.0+60.gfcc9ba8"},
+    {"libtgvoip", "2.4.4+124.g2d25928"},
+    {"tdlib", "1.8.67"},
+    {"quirc", "1.2+7.g927d680"},
+    {"qrcodegen", "1.8.0+31.g3c6d0b3"},
+    {"openssl", "4.0.2", "charon@"},
+    {"libcxx", "23.1.1", "charon@"},
+}
 
-local packages = {"libcxx", "openssl", "ogg", "opus", "opusfile", "libopusenc", "quirc", "qrcodegen", "libvpx", "libtgvoip", "webp", "tdlib"}
+local packages = {}
+for _, dependency in ipairs(dependencies) do
+    add_requires((dependency[3] or "") .. dependency[1] .. " " .. dependency[2], {alias = dependency[1]})
+    table.insert(packages, dependency[1])
+end
 
 local function source_include_dirs()
     local skipped = {"src/Resources/images", "src/Resources/AppIcon", "src/Resources/Localization"}
@@ -380,16 +368,15 @@ local function telegram_application(harness)
         add_values("charon.licenses", "LICENSE", "NOTICE")
     end
     add_includedirs(source_include_dirs())
-    add_cxflags("-O2", "-fPIC", "-fno-modules", "-Wall", "-Wconditional-uninitialized", "-Wunreachable-code", "-Wno-macro-redefined", "-Wno-deprecated-declarations", "-Wno-error")
-    add_mxflags("-O2", "-fPIC", "-fno-modules", "-Wall", "-Wconditional-uninitialized", "-Wunreachable-code", "-Wobjc-missing-super-calls", "-Wno-macro-redefined", "-Wno-deprecated-declarations", "-Wno-error", "-fobjc-arc")
+    local common = {"-O2", "-fPIC", "-fno-modules", "-Wall", "-Wconditional-uninitialized", "-Wunreachable-code", "-Wno-macro-redefined", "-Wno-deprecated-declarations", "-Wno-error"}
+    add_cxflags(table.unpack(common))
+    add_mxflags(table.unpack(table.join(common, {"-Wobjc-missing-super-calls", "-fobjc-arc"})))
     add_mxxflags("-fno-cxx-modules", "-std=c++14")
-    add_defines("TGVOIP_NO_DSP", "WEBRTC_POSIX", "TGVOIP_USE_CUSTOM_CRYPTO")
     add_ldflags("-Wl,-dead_strip", "-nostdlib++", "-ObjC")
     add_frameworks("UIKit", "Foundation", "CoreGraphics", "QuartzCore", "AudioToolbox", "AVFoundation", "CoreMedia", "CoreVideo", "AddressBook", "AddressBookUI", "MobileCoreServices", "CoreTelephony", "ImageIO", "CoreText", "CFNetwork", "SystemConfiguration", "Security", "MapKit", "CoreLocation")
     add_syslinks("z", "pthread")
     add_packages(table.unpack(packages))
     set_values("app.plist-file", "src/Resources/Info.plist")
-    add_values("app.plist", "CFBundleDisplayName=Telegram", "CFBundleName=Telegram")
     add_values("app.resources", "src/Resources/images", "src/Resources/Localization", "src/Resources/AppIcon")
     add_values("app.frameworks", "libcxx", "tdlib")
     set_values("charon.entitlements", "src/Resources/entitlements.plist")
@@ -416,6 +403,7 @@ target("TelegramSystemCall")
     add_mflags("-O2", "-Wall", "-Wextra", "-Wno-unused-parameter", "-Wno-deprecated-declarations", "-fobjc-exceptions")
     set_values("tweak.filter", "tweaks/system-call/packaging/TelegramSystemCall.plist")
     set_values("charon.control", "tweaks/system-call/packaging/control")
+    set_values("charon.version", "1.0")
     set_values("charon.maintainer-scripts", "tweaks/system-call/packaging/DEBIAN")
     after_link(function (target)
         local linked = os.iorunv("xcrun", {"otool", "-L", target:targetfile()})
@@ -434,6 +422,7 @@ target("telegramd")
     add_installfiles("daemon/relaunch/com.kern0x1b.telegramd.plist", {prefixdir = "Library/LaunchDaemons"})
     add_installfiles("daemon/relaunch/telegramd.conf", {prefixdir = "etc"})
     set_values("charon.control", "daemon/relaunch/packaging/control")
+    set_values("charon.version", "1.0")
     set_values("charon.maintainer-scripts", "daemon/relaunch/packaging/DEBIAN")
 target_end()
 
@@ -457,61 +446,66 @@ target_end()
 
 local sources = {"src/**.m", "src/**.mm", "src/**.h", "src/**.c"}
 local implementation = {"src/**.m", "src/**.mm"}
+local headers_and_implementation = {"src/**.m", "src/**.mm", "src/**.h"}
+local wire = {"src/TDLibClient/**.m", "src/TDLibClient/**.mm", "src/Wire/**.m", "src/Wire/**.mm"}
+local english = "src/Resources/Localization/en.lproj/Localizable.strings"
 local strings = "src/Resources/Localization/**.strings"
 
-local checks = {
-    {"source-comments", {"python3", "scripts/lint-source-comments.py", "--check"}, {"**.m", "**.mm", "**.h", "**.c"}, true},
-    {"sdk-ceiling", {"python3", "scripts/lint-sdk-ceiling.py"}, sources},
-    {"fallback-markdown", {"python3", "scripts/lint-fallback-markdown.py"}, sources},
-    {"strings-escapes", {"python3", "scripts/lint-strings-escapes.py"}, sources},
-    {"recursive-setters", {"python3", "scripts/lint-recursive-setters.py"}, sources},
-    {"layer-imports", {"python3", "scripts/lint-layer-imports.py", "--baseline-rank", "scripts/baselines/layer-rank.txt", "--baseline-screen-wall", "scripts/baselines/layer-screen-wall.txt", "--baseline-tdlib-schema", "scripts/baselines/tdlib-schema.txt"}, sources},
-    {"plural-keys", {"python3", "scripts/lint-plural-keys.py"}, table.join(implementation, {"src/Resources/Localization/en.lproj/Localizable.strings"})},
-    {"bare-ui-strings", {"python3", "scripts/lint-bare-ui-strings.py"}, table.join(implementation, {"src/Resources/Localization/en.lproj/Localizable.strings"})},
-    {"dead-client-api", {"python3", "scripts/lint-dead-client-api.py"}, {"src/TDLibClient/**.h", "src/TDLibClient/**.m"}},
-    {"dead-declarations", {"python3", "scripts/lint-dead-declarations.py", "src"}, {"src/**.m", "src/**.mm", "src/**.h"}},
-    {"tdlib-type-names", {"python3", "scripts/lint-tdlib-type-names.py", "src"}, implementation},
-    {"tdlib-request-fields", {"python3", "scripts/lint-tdlib-request-fields.py"}, {"src/TDLibClient/**.m", "src/TDLibClient/**.mm", "src/Wire/**.m", "src/Wire/**.mm"}},
-    {"tdlib-int64-reads", {"python3", "scripts/lint-tdlib-int64-reads.py"}, {"src/TDLibClient/**.m", "src/TDLibClient/**.mm", "src/Wire/**.m", "src/Wire/**.mm"}},
-    {"topic-threading", {"python3", "scripts/lint-topic-threading.py", "src"}, {"src/TDLibClient/**.m", "src/TDLibClient/**.mm", "src/Wire/**.m", "src/Wire/**.mm"}},
-    {"english-fallbacks", {"python3", "scripts/lint-english-fallbacks.py", "src"}, {"src/Screens/**.m", "src/Screens/**.mm", "src/Views/**.m", "src/Views/**.mm", "src/App/**.m", "src/App/**.mm", "src/Companions/**.m", "src/Companions/**.mm"}},
-    {"translation-placeholders", {"python3", "scripts/lint-translation-placeholders.py"}, table.join(implementation, {strings})},
-    {"fallback-drift", {"python3", "scripts/lint-fallback-drift.py", "src"}, table.join(implementation, {"src/**.h", strings})},
-    {"format-arguments", {"python3", "scripts/lint-format-arguments.py", "src"}, table.join(implementation, {strings})},
-    {"text-truncation", {"python3", "scripts/lint-text-truncation.py", "src"}, implementation},
-    {"navbar-buttons", {"python3", "scripts/lint-navbar-buttons.py", "src"}, implementation},
-    {"grouped-background", {"python3", "scripts/lint-grouped-background.py", "src"}, implementation},
-    {"row-colours", {"python3", "scripts/lint-row-colours.py", "src"}, implementation},
-    {"grouped-classes-self-test", {"python3", "scripts/tg_grouped_classes.py"}, {}},
-    {"grouped-row-font", {"python3", "scripts/lint-grouped-row-font.py", "src"}, implementation},
-    {"text-field-style", {"python3", "scripts/lint-text-field-style.py", "src"}, implementation},
-    {"screen-backgrounds", {"python3", "scripts/lint-screen-backgrounds.py", "src", "scripts/baselines/screen-backgrounds.txt"}, implementation},
-    {"unset-dictionary-keys", {"python3", "scripts/lint-unset-dictionary-keys.py", "src", "", "scripts/baselines/unset-dictionary-keys.txt"}, {"src/**.m", "src/**.mm", "src/**.h"}},
-    {"centred-action-rows", {"python3", "scripts/lint-centred-action-rows.py", "src"}, implementation},
-    {"destructive-rows", {"python3", "scripts/lint-destructive-rows.py", "src"}, implementation},
-    {"grouped-captions", {"python3", "scripts/lint-grouped-captions.py", "src"}, implementation},
-    {"caption-reads", {"python3", "scripts/lint-caption-reads.py", "src"}, implementation},
-    {"preview-tables", {"python3", "scripts/lint-preview-tables.py", "src"}, implementation},
-    {"date-formatting", {"python3", "scripts/lint-date-formatting.py", "src"}, implementation},
-    {"duplicate-selectors", {"python3", "scripts/lint-duplicate-selectors.py"}, {"src/**.m"}},
-    {"duplicate-declarations", {"python3", "scripts/lint-duplicate-declarations.py"}, {"src/**.h"}},
-    {"header-standalone", {"bash", "scripts/lint-header-standalone.sh"}, {"src/**.h"}, true},
-    {"bubble-geometry", {"python3", "scripts/check-bubble-geometry.py", "--commit-gate"}, {"src/Screens/Chat/Cells/**.m", "src/Screens/Chat/Cells/**.h", "src/Views/Cells/TGBubbleCell.m", "src/Views/Cells/TGBubbleCell.h"}, true},
-    {"image-scales", {"python3", "scripts/lint-image-scales.py"}, {"src/Resources/images/**.png"}},
-    {"unused-strings", {"python3", "scripts/lint-unused-strings.py", "--missing-keys"}, {"src/**.m", "src/Resources/Localization/en.lproj/Localizable.strings"}},
-}
-
-for _, check in ipairs(checks) do
-    target("check-" .. check[1])
+local function check(name, script, files, opt)
+    opt = opt or {}
+    target("check-" .. name)
         add_rules("@addon/charon/check")
-        set_values("check.command", table.unpack(check[2]))
-        if #check[3] > 0 then
-            add_values("check.files", table.unpack(check[3]))
+        set_values("check.script", table.unpack(script))
+        if #files > 0 then
+            add_values("check.files", table.unpack(files))
         end
-        if check[4] then
+        if opt.pass_files then
             set_values("check.pass-files", true)
+        end
+        if opt.needs_files then
+            set_values("check.needs-files", true)
         end
     target_end()
 end
+
+check("source-comments", {"scripts/lint-source-comments.py", "--check"}, {"**.m", "**.mm", "**.h", "**.c"}, {pass_files = true, needs_files = true})
+check("sdk-ceiling", {"scripts/lint-sdk-ceiling.py"}, sources)
+check("fallback-markdown", {"scripts/lint-fallback-markdown.py"}, sources)
+check("strings-escapes", {"scripts/lint-strings-escapes.py"}, sources)
+check("recursive-setters", {"scripts/lint-recursive-setters.py"}, sources)
+check("layer-imports", {"scripts/lint-layer-imports.py", "--baseline-rank", "scripts/baselines/layer-rank.txt", "--baseline-screen-wall", "scripts/baselines/layer-screen-wall.txt", "--baseline-tdlib-schema", "scripts/baselines/tdlib-schema.txt"}, sources)
+check("plural-keys", {"scripts/lint-plural-keys.py"}, table.join(implementation, {english}))
+check("bare-ui-strings", {"scripts/lint-bare-ui-strings.py"}, table.join(implementation, {english}))
+check("dead-client-api", {"scripts/lint-dead-client-api.py"}, {"src/TDLibClient/**.h", "src/TDLibClient/**.m"})
+check("dead-declarations", {"scripts/lint-dead-declarations.py", "src"}, headers_and_implementation)
+check("tdlib-type-names", {"scripts/lint-tdlib-type-names.py", "src"}, implementation)
+check("tdlib-request-fields", {"scripts/lint-tdlib-request-fields.py"}, wire)
+check("tdlib-int64-reads", {"scripts/lint-tdlib-int64-reads.py"}, wire)
+check("topic-threading", {"scripts/lint-topic-threading.py", "src"}, wire)
+check("english-fallbacks", {"scripts/lint-english-fallbacks.py", "src"}, {"src/Screens/**.m", "src/Screens/**.mm", "src/Views/**.m", "src/Views/**.mm", "src/App/**.m", "src/App/**.mm", "src/Companions/**.m", "src/Companions/**.mm"})
+check("translation-placeholders", {"scripts/lint-translation-placeholders.py"}, table.join(implementation, {strings}))
+check("fallback-drift", {"scripts/lint-fallback-drift.py", "src"}, table.join(headers_and_implementation, {strings}))
+check("format-arguments", {"scripts/lint-format-arguments.py", "src"}, table.join(implementation, {strings}))
+check("text-truncation", {"scripts/lint-text-truncation.py", "src"}, implementation)
+check("navbar-buttons", {"scripts/lint-navbar-buttons.py", "src"}, implementation)
+check("grouped-background", {"scripts/lint-grouped-background.py", "src"}, implementation)
+check("row-colours", {"scripts/lint-row-colours.py", "src"}, implementation)
+check("grouped-classes-self-test", {"scripts/tg_grouped_classes.py"}, {"scripts/tg_grouped_classes.py", "scripts/lint-grouped-*.py", "scripts/lint-centred-action-rows.py"})
+check("grouped-row-font", {"scripts/lint-grouped-row-font.py", "src"}, implementation)
+check("text-field-style", {"scripts/lint-text-field-style.py", "src"}, implementation)
+check("screen-backgrounds", {"scripts/lint-screen-backgrounds.py", "src", "scripts/baselines/screen-backgrounds.txt"}, implementation)
+check("unset-dictionary-keys", {"scripts/lint-unset-dictionary-keys.py", "src", "", "scripts/baselines/unset-dictionary-keys.txt"}, headers_and_implementation)
+check("centred-action-rows", {"scripts/lint-centred-action-rows.py", "src"}, implementation)
+check("destructive-rows", {"scripts/lint-destructive-rows.py", "src"}, implementation)
+check("grouped-captions", {"scripts/lint-grouped-captions.py", "src"}, implementation)
+check("caption-reads", {"scripts/lint-caption-reads.py", "src"}, implementation)
+check("preview-tables", {"scripts/lint-preview-tables.py", "src"}, implementation)
+check("date-formatting", {"scripts/lint-date-formatting.py", "src"}, implementation)
+check("duplicate-selectors", {"scripts/lint-duplicate-selectors.py"}, {"src/**.m"})
+check("duplicate-declarations", {"scripts/lint-duplicate-declarations.py"}, {"src/**.h"})
+check("header-standalone", {"scripts/lint-header-standalone.sh"}, {"src/**.h"}, {pass_files = true, needs_files = true})
+check("bubble-geometry", {"scripts/check-bubble-geometry.py", "--commit-gate"}, {"src/Screens/Chat/Cells/**.m", "src/Screens/Chat/Cells/**.h", "src/Views/Cells/TGBubbleCell.m", "src/Views/Cells/TGBubbleCell.h"}, {pass_files = true, needs_files = true})
+check("image-scales", {"scripts/lint-image-scales.py"}, {"src/Resources/images/**.png"})
+check("unused-strings", {"scripts/lint-unused-strings.py", "--missing-keys"}, {"src/**.m", english})
 
 includes("tests")

@@ -5,9 +5,9 @@
     charon = {
         repo = {
             branch = "main",
-            commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+            commit = "b668c2286ff9084ce0d89e1756fde61553bb94a4",
             url = "https://github.com/kern0x1b/charon.git"
         },
-        version = "v0.3.3"
+        version = "v0.4.1"
     }
 }

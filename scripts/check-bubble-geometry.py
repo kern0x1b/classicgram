@@ -441,9 +441,10 @@ def drop_nested(regions):
 	return kept
 
 
-def commit_gate(staged):
+def commit_gate(candidates):
+	indexed = subprocess.run(["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"], capture_output=True, text=True).stdout.split()
+	staged = [path for path in candidates if path in indexed]
 	if not staged:
-		print("check-bubble-geometry: no bubble-cell source given, nothing to gate")
 		sys.exit(0)
 	shots = os.environ.get("BUBBLE_SCREENSHOT", "").split()
 	if shots:

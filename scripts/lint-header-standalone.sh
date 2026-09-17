@@ -32,7 +32,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-xmake project -P "$ROOT_DIR" -k compile_commands "$WORK_DIR" >/dev/null 2>&1 < /dev/null || {
+xmake compile-commands -P "$ROOT_DIR" -o "$WORK_DIR/compile_commands.json" Telegram >/dev/null 2>&1 < /dev/null || {
 	echo "lint-header-standalone: xmake could not write the application's compile commands; configure the project with 'xmake f -P . -p iphoneos -a armv7 -y' first" >&2
 	exit 1
 }
@@ -45,8 +45,6 @@ found = {}
 for entry in json.load(open(commands, encoding="utf-8")):
     words = entry.get("arguments") or shlex.split(entry.get("command", ""))
     if not words or "-c" not in words or "/src/" not in "/" + entry.get("file", ""):
-        continue
-    if not any("-apple-ios" in word for word in words):
         continue
     source = entry.get("file", words[words.index("-c") + 1])
     language = next((name for suffix, name in wanted.items() if source.endswith(suffix)), None)
