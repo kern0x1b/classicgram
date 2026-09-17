@@ -22,7 +22,7 @@
         ["charon@apple-compat#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "latest"
@@ -30,7 +30,7 @@
         ["charon@iphoneos-sdk 16.4#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "16.4"
@@ -38,7 +38,7 @@
         ["charon@ld64 956.6#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "956.6"
@@ -46,7 +46,7 @@
         ["charon@ldid 2.1.5-procursus7+23.gaf86971#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.1.5-procursus7+23.gaf86971"
@@ -54,7 +54,7 @@
         ["charon@libcxx#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "23.1.1"
@@ -62,7 +62,7 @@
         ["charon@libplist 2.7.0#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.7.0"
@@ -70,7 +70,7 @@
         ["charon@openssl 4.0.2#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -78,7 +78,7 @@
         ["charon@openssl#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -182,7 +182,7 @@
         ["charon@apple-compat#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "latest"
@@ -190,7 +190,7 @@
         ["charon@iphoneos-sdk 16.4#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "16.4"
@@ -198,7 +198,7 @@
         ["charon@ld64 956.6#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "956.6"
@@ -206,7 +206,7 @@
         ["charon@ldid 2.1.5-procursus7+23.gaf86971#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.1.5-procursus7+23.gaf86971"
@@ -214,7 +214,7 @@
         ["charon@libcxx#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "23.1.1"
@@ -222,7 +222,7 @@
         ["charon@libplist 2.7.0#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.7.0"
@@ -230,7 +230,7 @@
         ["charon@openssl 4.0.2#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -238,7 +238,7 @@
         ["charon@openssl#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "35fab0041082e69791289f3eb2883e5a32b9a9a2",
+                commit = "e92c859bec31e39e512c4358acfaa9b8d0d3b2a9",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
