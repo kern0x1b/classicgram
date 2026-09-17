@@ -1556,7 +1556,6 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 		UIDevice *dev = [UIDevice currentDevice];
 
 	self.parametersSent = YES;
-	BOOL cachesEnabled = !self.diskCachesDisabledForBackgroundLaunch;
 	NSData *encryptionKey = [TGDatabaseEncryptionKey obtainKeyForDatabaseDirectory:db scope:scope];
 	NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
 	parameters[@"@type"] = @"setTdlibParameters";
@@ -1564,10 +1563,9 @@ static void TGPostMessageChange(TGClient *client, int64_t chatId, NSDictionary *
 	parameters[@"files_directory"] = [db stringByAppendingPathComponent:@"files"];
 	if (encryptionKey.length)
 		parameters[@"database_encryption_key"] = TGBase64Encode(encryptionKey);
-	self.parametersUsedDiskCaches = cachesEnabled;
-	parameters[@"use_file_database"] = @(cachesEnabled);
-	parameters[@"use_chat_info_database"] = @(cachesEnabled);
-	parameters[@"use_message_database"] = @(cachesEnabled);
+	parameters[@"use_file_database"] = @YES;
+	parameters[@"use_chat_info_database"] = @YES;
+	parameters[@"use_message_database"] = @YES;
 	parameters[@"use_secret_chats"] = @YES;
 	parameters[@"api_id"] = @(apiId);
 	parameters[@"api_hash"] = [NSString stringWithUTF8String:apiHash];

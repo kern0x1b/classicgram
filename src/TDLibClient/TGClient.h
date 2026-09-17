@@ -141,7 +141,6 @@ NSInteger TGResultFloodWaitSeconds(NSDictionary *result);
 
 - (void)suspendForBackgroundWithCompletion:(nullable void (^)(void))completion;
 - (void)resumeFromBackground;
-- (void)reopenForDiskCachesIfNeededWhileCallInProgress:(BOOL)callInProgress;
 
 @property (nonatomic, copy) NSString *pendingEmailAddressPattern;
 @property (nonatomic, copy) NSString *pendingPasswordHint;

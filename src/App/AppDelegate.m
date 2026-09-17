@@ -642,7 +642,6 @@ static void TGWatchForIncomingCalls(void) {
 - (void)buildWindowAndInitialUI {
 	if (self.window)
 		return;
-	[TGClient shared].diskCachesDisabledForBackgroundLaunch = NO;
 	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	TGAuthState knownState = [TGClient shared].authState;
 	BOOL wasSignedIn = [NSUserDefaults.standardUserDefaults boolForKey:@"tgWasSignedIn"];
@@ -730,7 +729,6 @@ static void TGWatchForIncomingCalls(void) {
 
 	if (isBackgroundLaunch) {
 		self.deferredUIBuild = YES;
-		[TGClient shared].diskCachesDisabledForBackgroundLaunch = YES;
 		TGMarkLaunchStage(@"UI build deferred - background launch");
 	} else {
 		[self buildWindowAndInitialUI];
@@ -911,7 +909,6 @@ static void TGWatchForIncomingCalls(void) {
 	[[TGBackgroundSession shared] applicationWillEnterForeground:application];
 	TGEndBackgroundTask();
 	[[TGClient shared] resumeFromBackground];
-	[[TGClient shared] reopenForDiskCachesIfNeededWhileCallInProgress:TGHasActiveCall()];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
