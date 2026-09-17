@@ -4,7 +4,7 @@ set_policy("package.requires_lock", true)
 set_policy("package.librarydeps.strict_compatibility", true)
 
 add_repositories("charon https://github.com/kern0x1b/charon.git main")
-add_addons("charon v0.4.1")
+add_addons("charon v0.5.0")
 set_config("apple_minimum", "6.0")
 includes("@addon/charon/apple-ios")
 
@@ -167,46 +167,6 @@ package("libopusenc")
     end)
 package_end()
 
-package("libtgvoip")
-    set_homepage("https://github.com/telegramdesktop/libtgvoip")
-    set_description("libtgvoip from Telegram Desktop's tdesktop branch, the line Telegram ships for 2.4.4 calls, compiled from its own source list against libc++ 23")
-    set_license("Unlicense")
-    revision("2")
-    add_urls("https://github.com/telegramdesktop/libtgvoip.git")
-    add_versions("2.4.4+124.g2d25928", "2d2592860478e60d972b96e67ee034b8a71bb57a")
-    add_deps("opus")
-    add_deps("charon@libcxx", {alias = "libcxx"})
-    add_includedirs("include", "include/libtgvoip")
-    add_links("tgvoip")
-    add_defines("TGVOIP_NO_DSP", "WEBRTC_POSIX", "TGVOIP_USE_CUSTOM_CRYPTO")
-    add_cxxflags("-includealgorithm")
-    add_mxxflags("-includealgorithm")
-    on_install("iphoneos", function (package)
-        local cxx = {"-std=c++14", "-includealgorithm"}
-        import("@addon.charon.apple.sources").static(package, {
-            name = "tgvoip",
-            files = {
-                "VoIPController.cpp", "VoIPServerConfig.cpp", "logging.cpp", "json11.cpp",
-                "video/ScreamCongestionController.cpp", "JitterBuffer.cpp", "OpusEncoder.cpp", "OpusDecoder.cpp",
-                "NetworkSocket.cpp", "CongestionControl.cpp", "EchoCanceller.cpp", "MessageThread.cpp",
-                "Buffers.cpp", "BlockingQueue.cpp", "MediaStreamItf.cpp", "PacketReassembler.cpp",
-                "audio/AudioIO.cpp", "audio/AudioInput.cpp", "audio/AudioOutput.cpp", "audio/Resampler.cpp",
-                "os/darwin/AudioUnitIO.cpp", "os/darwin/AudioInputAudioUnit.cpp",
-                "os/darwin/AudioOutputAudioUnit.cpp", "os/posix/NetworkSocketPosix.cpp",
-                "os/darwin/DarwinSpecific.mm"
-            },
-            includedirs = {".", path.join(package:dep("opus"):installdir("include"), "opus")},
-            defines = {"TGVOIP_NO_DSP", "WEBRTC_POSIX", "TGVOIP_USE_CUSTOM_CRYPTO"},
-            cxxflags = cxx,
-            mxxflags = table.join(cxx, {"-fobjc-arc"}),
-            deps = {"opus", "libcxx"},
-            headers = {"**.h|webrtc_dsp/**|client/**|os/android/**|os/linux/**|os/windows/**|build_charon/**"},
-            headers_prefix = "libtgvoip",
-            licenses = {"UNLICENSE"}
-        })
-    end)
-package_end()
-
 package("tdlib")
     set_homepage("https://github.com/tdlib/td")
     set_description("TDLib's libtdjson, fetched vanilla from upstream with this port's backgrounded VoIP socket hook as a patch, built by its own CMake project with emulated thread-local storage wherever the target compiler lacks real __thread")
@@ -273,6 +233,156 @@ package("tdlib")
     end)
 package_end()
 
+package("tgcalls")
+    set_homepage("https://github.com/TelegramMessenger/tgcalls")
+    set_description("tgcalls, the engine behind Telegram's one-to-one calls, at the commit Telegram-iOS pins, on the WebRTC of Telegram Desktop's tg_owt, compiled from its own source list into one archive")
+    set_license("LGPL-3.0")
+    revision("2")
+    add_urls("https://github.com/TelegramMessenger/tgcalls.git")
+    add_versions("2026.6.15+e306932", "e3069322a3d1e16ecb11a5e302242e59ddd7f09e")
+    add_patches("2026.6.15+e306932", path.join(os.scriptdir(), "patches", "tgcalls", "audio-session-on-ios-6.patch"), "f457021a627703851a451efd33e3991abcaa3a7ee3a786860aec1033cd059a8b")
+    add_deps("opus", "libvpx")
+    add_deps("charon@openssl", {alias = "openssl"})
+    add_deps("charon@libcxx", {alias = "libcxx"})
+    add_links("tgcalls")
+    add_includedirs("include", "include/tgcalls", "include/webrtc", "include/webrtc/third_party/abseil-cpp", "include/webrtc/third_party/libyuv/include", "include/webrtc/sdk/objc", "include/webrtc/sdk/objc/base")
+    add_frameworks("AVFoundation", "AudioToolbox", "CoreAudio", "UIKit", "Security", "SystemConfiguration", "CFNetwork")
+    add_syslinks("z")
+    local defines = {"WEBRTC_POSIX", "WEBRTC_MAC", "WEBRTC_IOS", "WEBRTC_ENABLE_PROTOBUF=0", "WEBRTC_APM_DEBUG_DUMP=0", "WEBRTC_LIBRARY_IMPL",
+        "WEBRTC_NON_STATIC_TRACE_EVENT_HANDLERS=1", "RTC_DISABLE_TRACE_EVENTS", "BWE_TEST_LOGGING_COMPILE_TIME_ENABLE=0", "HAVE_SCTP", "ABSL_ALLOCATOR_NOTHROW=1",
+        "WEBRTC_USE_BUILTIN_ISAC_FLOAT", "WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE", "WEBRTC_HAVE_DCSCTP", "WEBRTC_HAVE_SCTP", "NO_MAIN_THREAD_WRAPPING",
+        "HAVE_WEBRTC_VIDEO", "PFFFT_SIMD_DISABLE", "WEBRTC_DUMMY_AUDIO_BUILD", "WEBRTC_OPUS_VARIABLE_COMPLEXITY=0", "WEBRTC_OPUS_SUPPORT_120MS_PTIME=1", "WEBRTC_HAS_NEON"}
+    local arch_defines = {armv7 = {"WEBRTC_ARCH_ARM", "WEBRTC_ARCH_ARM_V7", "LIBYUV_NEON"}, arm64 = {"WEBRTC_ARCH_ARM64"}}
+    on_load(function (package)
+        package:add("defines", table.unpack(table.join(defines, arch_defines[package:arch()] or {})))
+    end)
+    on_install("iphoneos", function (package)
+        local arch = package:arch()
+        if not arch_defines[arch] then
+            raise("tgcalls has no WebRTC configuration for %s", arch)
+        end
+        os.tryrm("tg_owt")
+        os.tryrm("gen")
+        os.mkdir("gen/experiments")
+        os.mkdir("gen/crc32c")
+        os.vrunv("git", {"clone", "--no-checkout", "--filter=blob:none", "https://github.com/desktop-app/tg_owt.git", "tg_owt"})
+        os.vrunv("git", {"-C", "tg_owt", "checkout", "19d51d3c19632a63fdbe17c62f10332d978cb940"})
+        os.vrunv("git", {"-C", "tg_owt", "submodule", "update", "--init", "--depth", "1"})
+        os.vrunv("python3", {"tg_owt/src/experiments/field_trials.py", "header", "--output", "gen/experiments/registered_field_trials.h"})
+        io.writefile("gen/crc32c/crc32c_config.h", table.concat({"#ifndef CRC32C_CRC32C_CONFIG_H_", "#define CRC32C_CRC32C_CONFIG_H_",
+            "#define BYTE_ORDER_BIG_ENDIAN 0", "#define HAVE_BUILTIN_PREFETCH 1", "#define HAVE_MM_PREFETCH 0", "#define HAVE_SSE42 0",
+            "#define HAVE_ARM64_CRC32C 0", "#define HAVE_STRONG_GETAUXVAL 0", "#define HAVE_WEAK_GETAUXVAL 0",
+            "#define CRC32C_TESTS_BUILT_WITH_GLOG 0", "#endif", ""}, "\n"))
+        local tests = "*_unittest*|*_test.*|*_tests.*|*test_*|*mock*|*fuzz*|*benchmark*|*_perftest*|*integrationtest*|*loopback*"
+        local files = {}
+        for _, pattern in ipairs({
+            "api/*.cc|wrapping_async_dns_resolver.cc", "api/adaptation/*.cc", "api/audio/*.cc|echo_detector_creator.cc", "api/audio_codecs/*.cc",
+            "api/audio_codecs/L16/*.cc", "api/audio_codecs/g711/*.cc", "api/audio_codecs/g722/*.cc", "api/audio_codecs/ilbc/*.cc",
+            "api/audio_codecs/opus/*.cc", "api/call/*.cc", "api/crypto/*.cc", "api/environment/*.cc", "api/neteq/*.cc", "api/numerics/*.cc",
+            "api/rtc_event_log/*.cc", "api/task_queue/default_task_queue_factory_stdlib.cc", "api/task_queue/pending_task_safety_flag.cc",
+            "api/task_queue/task_queue_base.cc", "api/transport/*.cc", "api/transport/rtp/*.cc", "api/units/*.cc", "api/video/*.cc",
+            "api/video_codecs/*.cc|spatial_layer.cc", "audio/*.cc", "audio/utility/*.cc", "audio/voip/audio_egress.cc", "call/*.cc",
+            "call/adaptation/*.cc", "common_audio/*.c", "common_audio/*.cc|fir_filter_avx2.cc|fir_filter_sse.cc",
+            "common_audio/resampler/*.cc|sinc_resampler_avx2.cc|sinc_resampler_sse.cc",
+            "common_audio/signal_processing/*.c|complex_bit_reverse_mips.c|complex_fft_mips.c|cross_correlation_mips.c|downsample_fast_mips.c|filter_ar_fast_q12_mips.c|min_max_operations_mips.c|resample_by_2_mips.c|vector_scaling_operations_mips.c",
+            "common_audio/signal_processing/*.cc", "common_audio/third_party/ooura/fft_size_128/ooura_fft.cc",
+            "common_audio/third_party/ooura/fft_size_128/ooura_fft_neon.cc", "common_audio/third_party/ooura/fft_size_256/*.cc",
+            "common_audio/third_party/spl_sqrt_floor/spl_sqrt_floor.c", "common_audio/vad/*.c", "common_audio/vad/*.cc", "common_video/*.cc",
+            "common_video/generic_frame_descriptor/*.cc", "common_video/h264/*.cc", "common_video/h265/*.cc", "common_video/libyuv/*.cc",
+            "logging/rtc_event_log/ice_logger.cc", "logging/rtc_event_log/rtc_stream_config.cc",
+            "logging/rtc_event_log/encoder/*.cc|rtc_event_log_encoder_legacy.cc|rtc_event_log_encoder_new_format.cc",
+            "logging/rtc_event_log/events/*.cc|rtc_event_frame_decoded.cc",
+            "media/base/*.cc|fake_frame_source.cc|fake_media_engine.cc|fake_rtp.cc|fake_video_renderer.cc",
+            "media/engine/*.cc|fake_video_codec_factory.cc|fake_webrtc_call.cc|fake_webrtc_video_engine.cc", "media/sctp/*.cc",
+            "modules/async_audio_processing/*.cc", "modules/audio_coding/acm2/*.cc",
+            "modules/audio_coding/audio_network_adaptor/*.cc|frame_length_controller_v2.cc", "modules/audio_coding/codecs/*.cc",
+            "modules/audio_coding/codecs/cng/*.cc", "modules/audio_coding/codecs/g711/*.c", "modules/audio_coding/codecs/g711/*.cc",
+            "modules/audio_coding/codecs/g722/*.c", "modules/audio_coding/codecs/g722/*.cc", "modules/audio_coding/codecs/ilbc/*.c",
+            "modules/audio_coding/codecs/ilbc/*.cc", "modules/audio_coding/codecs/isac/main/source/*.c", "modules/audio_coding/codecs/opus/*.cc",
+            "modules/audio_coding/codecs/pcm16b/*.c", "modules/audio_coding/codecs/pcm16b/*.cc", "modules/audio_coding/codecs/red/*.cc",
+            "modules/audio_coding/neteq/*.cc", "modules/audio_device/*.cc", "modules/audio_device/dummy/*.cc|file_audio_device_factory.cc",
+            "modules/audio_mixer/*.cc", "modules/audio_processing/*.cc",
+            "modules/audio_processing/aec3/*.cc|adaptive_fir_filter_avx2.cc|adaptive_fir_filter_erl_avx2.cc|fft_data_avx2.cc|matched_filter_avx2.cc|vector_math_avx2.cc",
+            "modules/audio_processing/aec_dump/null_aec_dump_factory.cc", "modules/audio_processing/aecm/*.cc|aecm_core_mips.cc",
+            "modules/audio_processing/agc/*.cc", "modules/audio_processing/agc/legacy/*.cc", "modules/audio_processing/agc2/*.cc",
+            "modules/audio_processing/agc2/rnn_vad/*.cc|rnn_vad_tool.cc|vector_math_avx2.cc",
+            "modules/audio_processing/capture_levels_adjuster/*.cc", "modules/audio_processing/echo_detector/*.cc",
+            "modules/audio_processing/include/*.cc", "modules/audio_processing/logging/*.cc", "modules/audio_processing/ns/*.cc",
+            "modules/audio_processing/transient/*.cc|click_annotate.cc", "modules/audio_processing/utility/*.cc",
+            "modules/audio_processing/vad/*.cc", "modules/congestion_controller/*.cc", "modules/congestion_controller/goog_cc/*.cc",
+            "modules/congestion_controller/pcc/*.cc", "modules/congestion_controller/rtp/*.cc", "modules/pacing/*.cc",
+            "modules/remote_bitrate_estimator/*.cc", "modules/rtp_rtcp/include/*.cc",
+            "modules/rtp_rtcp/source/*.cc|rtcp_transceiver.cc|rtcp_transceiver_config.cc|rtcp_transceiver_impl.cc",
+            "modules/rtp_rtcp/source/deprecated/*.cc", "modules/rtp_rtcp/source/rtcp_packet/*.cc", "modules/third_party/fft/*.c",
+            "modules/third_party/g711/*.c", "modules/third_party/g722/*.c", "modules/third_party/portaudio/*.c",
+            "modules/video_capture/*.cc|video_capture_factory_null.cc", "modules/video_coding/*.cc|video_coding_impl.cc|video_receiver.cc",
+            "modules/video_coding/codecs/av1/av1_svc_config.cc", "modules/video_coding/codecs/h264/h264.cc",
+            "modules/video_coding/codecs/interface/*.cc", "modules/video_coding/codecs/multiplex/*.cc", "modules/video_coding/codecs/vp8/*.cc",
+            "modules/video_coding/codecs/vp9/*.cc", "modules/video_coding/deprecated/*.cc", "modules/video_coding/include/*.cc",
+            "modules/video_coding/svc/*.cc", "modules/video_coding/timing/*.cc", "modules/video_coding/utility/*.cc", "net/dcsctp/packet/*.cc",
+            "net/dcsctp/packet/chunk/*.cc", "net/dcsctp/packet/error_cause/*.cc", "net/dcsctp/packet/parameter/*.cc", "net/dcsctp/public/*.cc",
+            "net/dcsctp/rx/*.cc|reassembly_streams.cc", "net/dcsctp/socket/*.cc", "net/dcsctp/timer/*.cc", "net/dcsctp/tx/*.cc", "p2p/base/*.cc",
+            "p2p/client/*.cc", "p2p/stunprober/*.cc", "pc/*.cc|peer_connection_wrapper.cc",
+            "rtc_base/*.cc|boringssl_certificate.cc|boringssl_identity.cc|cpu_time.cc|fake_clock.cc|fake_ssl_identity.cc|firewall_socket_server.cc|ifaddrs_android.cc|log_sinks.cc|memory_stream.cc|memory_usage.cc|nat_server.cc|nat_socket_factory.cc|nat_types.cc|network_monitor_factory.cc|proxy_server.cc|server_socket_adapters.cc|socket_stream.cc|task_queue_gcd.cc|task_queue_libevent.cc|task_queue_win.cc|virtual_socket_server.cc|win32.cc",
+            "rtc_base/containers/*.cc", "rtc_base/deprecated/*.cc", "rtc_base/experiments/*.cc", "rtc_base/internal/*.cc", "rtc_base/memory/*.cc",
+            "rtc_base/network/*.cc", "rtc_base/numerics/*.cc", "rtc_base/strings/*.cc|json.cc", "rtc_base/synchronization/*.cc",
+            "rtc_base/system/file_wrapper.cc", "rtc_base/system/*.mm", "rtc_base/task_utils/*.cc", "rtc_base/third_party/base64/*.cc",
+            "rtc_base/third_party/sigslot/*.cc", "sdk/*.cc", "sdk/objc/base/RTCLogging.mm", "sdk/objc/native/src/audio/helpers.mm", "stats/*.cc",
+            "system_wrappers/source/*.cc|cpu_features_android.cc|cpu_features_linux.cc", "third_party/abseil-cpp/absl/base/internal/raw_logging.cc",
+            "third_party/abseil-cpp/absl/base/internal/throw_delegate.cc", "third_party/abseil-cpp/absl/numeric/*.cc",
+            "third_party/abseil-cpp/absl/strings/*.cc|cord_analysis.cc|cord_buffer.cc",
+            "third_party/abseil-cpp/absl/strings/internal/charconv_bigint.cc", "third_party/abseil-cpp/absl/strings/internal/charconv_parse.cc",
+            "third_party/abseil-cpp/absl/strings/internal/escaping.cc", "third_party/abseil-cpp/absl/strings/internal/memutil.cc",
+            "third_party/abseil-cpp/absl/strings/internal/ostringstream.cc", "third_party/abseil-cpp/absl/strings/internal/pow10_helper.cc",
+            "third_party/abseil-cpp/absl/strings/internal/utf8.cc", "third_party/abseil-cpp/absl/strings/internal/str_format/*.cc",
+            "third_party/abseil-cpp/absl/types/*.cc|bad_any_cast.cc", "third_party/crc32c/src/src/crc32c.cc",
+            "third_party/crc32c/src/src/crc32c_portable.cc", "third_party/libsrtp/crypto/cipher/aes_gcm_ossl.c",
+            "third_party/libsrtp/crypto/cipher/aes_icm_ossl.c", "third_party/libsrtp/crypto/cipher/cipher.c",
+            "third_party/libsrtp/crypto/cipher/cipher_test_cases.c", "third_party/libsrtp/crypto/cipher/null_cipher.c",
+            "third_party/libsrtp/crypto/hash/auth.c", "third_party/libsrtp/crypto/hash/auth_test_cases.c",
+            "third_party/libsrtp/crypto/hash/hmac_ossl.c", "third_party/libsrtp/crypto/hash/null_auth.c", "third_party/libsrtp/crypto/kernel/*.c",
+            "third_party/libsrtp/crypto/math/*.c", "third_party/libsrtp/crypto/replay/*.c", "third_party/libsrtp/srtp/*.c",
+            "third_party/libyuv/source/*.cc|*_gcc.cc|*_msa.cc|*_win.cc|*_lsx.cc|*_lasx.cc|*_rvv.cc|*_neon.cc|*_neon64.cc|scale_rgb.cc",
+            "third_party/pffft/src/*.c", "third_party/rnnoise/src/*.cc", "video/*.cc|video_analyzer.cc", "video/adaptation/*.cc",
+            "video/config/*.cc", "video/render/*.cc",
+            arch == "arm64" and "third_party/libyuv/source/*_neon64.cc" or "third_party/libyuv/source/*_neon.cc"}) do
+            table.insert(files, "tg_owt/src/" .. pattern .. (pattern:find("*", 1, true) and "|" .. tests or ""))
+        end
+        for _, pattern in ipairs({"tgcalls/*.cpp", "tgcalls/platform/darwin/iOS/*.mm", "tgcalls/third-party/*.cpp", "tgcalls/utils/*.cpp", "tgcalls/v2/*.cpp"}) do
+            table.insert(files, pattern)
+        end
+        local webrtc = "tg_owt/src"
+        local cxx = {"-std=c++20", "-Wno-deprecated-declarations", "-Wno-deprecated-volatile", "-Wno-deprecated-anon-enum-enum-conversion"}
+        import("@addon.charon.apple.sources").static(package, {
+            name = "tgcalls",
+            files = files,
+            includedirs = {".", "tgcalls", "tgcalls/platform/darwin/iOS", "gen", webrtc, webrtc .. "/third_party/abseil-cpp",
+                webrtc .. "/third_party/libyuv/include", webrtc .. "/third_party/libsrtp/include", webrtc .. "/third_party/libsrtp/crypto/include",
+                webrtc .. "/third_party/libsrtp_config", webrtc .. "/third_party/crc32c/src/include", webrtc .. "/sdk/objc", webrtc .. "/sdk/objc/base",
+                path.join(package:dep("opus"):installdir("include"), "opus")},
+            defines = table.join(defines, arch_defines[arch], {"NDEBUG", "HAVE_CONFIG_H", "HAVE_NETINET_IN_H", "_USE_MATH_DEFINES"}),
+            flags = table.join({"-Os"}, arch == "armv7" and {"-mfpu=neon"} or {}),
+            cxxflags = cxx,
+            mxxflags = table.join(cxx, {"-fobjc-arc"}),
+            mflags = {"-fobjc-arc"},
+            deps = {"opus", "libvpx", "openssl", "libcxx"},
+            licenses = {"LICENSE"}
+        })
+        for _, header in ipairs(table.join(os.files(path.join(webrtc, "**.h")), os.files(path.join(webrtc, "**.inc")))) do
+            local destination = path.join(package:installdir("include", "webrtc"), path.relative(header, webrtc))
+            os.mkdir(path.directory(destination))
+            os.cp(header, destination)
+        end
+        for _, header in ipairs(os.files("tgcalls/**.h")) do
+            local destination = path.join(package:installdir("include"), header)
+            os.mkdir(path.directory(destination))
+            os.cp(header, destination)
+        end
+        os.cp("gen/experiments", package:installdir("include", "experiments"))
+        os.cp("tg_owt/LICENSE", path.join(package:installdir("licenses"), "WebRTC-LICENSE"))
+    end)
+package_end()
+
 package("quirc")
     set_homepage("https://github.com/dlbeer/quirc")
     set_description("quirc, a QR-code recognition library, built by its own Makefile")
@@ -320,13 +430,14 @@ local dependencies = {
     {"libopusenc", "0.3+14.g3c65f44"},
     {"webp", "1.6.0+258.g6ff2f43"},
     {"libvpx", "1.17.0+60.gfcc9ba8"},
-    {"libtgvoip", "2.4.4+124.g2d25928"},
     {"tdlib", "1.8.67"},
     {"quirc", "1.2+7.g927d680"},
     {"qrcodegen", "1.8.0+31.g3c6d0b3"},
     {"openssl", "4.0.2", "charon@"},
     {"libcxx", "23.1.1", "charon@"},
 }
+
+add_requires("tgcalls 2026.6.15+e306932", {alias = "tgcalls"})
 
 local packages = {}
 for _, dependency in ipairs(dependencies) do
@@ -335,7 +446,7 @@ for _, dependency in ipairs(dependencies) do
 end
 
 local function source_include_dirs()
-    local skipped = {"src/Resources/images", "src/Resources/AppIcon", "src/Resources/Localization"}
+    local skipped = {"src/Resources/images", "src/Resources/AppIcon", "src/Resources/Localization", "src/CallsEngine"}
     local dirs = {}
     for _, dir in ipairs(os.dirs(path.join(os.scriptdir(), "src", "**"))) do
         local relative = path.relative(dir, os.scriptdir())
@@ -353,17 +464,30 @@ local function source_include_dirs()
     return dirs
 end
 
+target("TGCallsEngine")
+    add_rules("@addon/charon/library")
+    set_license("GPL-3.0")
+    add_files("src/CallsEngine/*.mm")
+    add_includedirs("src/CallsEngine", "src/Calls")
+    add_packages("tgcalls", "opus", "libvpx", "openssl", "libcxx")
+    set_languages("cxx20")
+    add_mxxflags("-Os", "-fPIC", "-fobjc-arc", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-Wall", "-Wno-deprecated-declarations")
+    add_frameworks("Foundation", "UIKit", "AVFoundation", "AudioToolbox", "CoreAudio", "CoreVideo", "CoreMedia", "Security", "SystemConfiguration", "CFNetwork")
+    add_syslinks("z")
+    add_shflags("-Wl,-dead_strip", "-nostdlib++", "-Wl,-exported_symbol,_OBJC_CLASS_$_TGCallsEngineSession", "-Wl,-exported_symbol,_OBJC_METACLASS_$_TGCallsEngineSession", {force = true})
+target_end()
+
 local function telegram_application(harness)
     add_rules("@addon/charon/app")
     set_basename("Telegram")
     if harness then
         set_default(false)
         set_targetdir("$(builddir)/harness")
-        add_files("src/**.m|Resources/**|App/AppDelegate+I18nDump.m", "src/**.c|Resources/**", "src/**.mm|Resources/**")
+        add_files("src/**.m|Resources/**|CallsEngine/**|App/AppDelegate+I18nDump.m", "src/**.c|Resources/**|CallsEngine/**", "src/**.mm|Resources/**|CallsEngine/**")
         add_values("app.resources", "src/Resources/CustomKeys.txt")
     else
         add_values("apple.architectures", "armv7", "arm64")
-        add_files("src/**.m|Resources/**|App/AppDelegate+DebugHarness.m|App/AppDelegate+I18nDump.m", "src/**.c|Resources/**", "src/**.mm|Resources/**")
+        add_files("src/**.m|Resources/**|CallsEngine/**|App/AppDelegate+DebugHarness.m|App/AppDelegate+I18nDump.m", "src/**.c|Resources/**|CallsEngine/**", "src/**.mm|Resources/**|CallsEngine/**")
         set_values("charon.control", "packaging/control")
         add_values("charon.licenses", "LICENSE", "NOTICE")
     end
@@ -378,7 +502,8 @@ local function telegram_application(harness)
     add_packages(table.unpack(packages))
     set_values("app.plist-file", "src/Resources/Info.plist")
     add_values("app.resources", "src/Resources/images", "src/Resources/Localization", "src/Resources/AppIcon")
-    add_values("app.frameworks", "libcxx", "tdlib")
+    add_deps("TGCallsEngine", {inherit = false})
+    add_values("app.frameworks", "libcxx", "tdlib", "TGCallsEngine")
     set_values("charon.entitlements", "src/Resources/entitlements.plist")
     set_values("charon.strip", "-S -x")
     on_config(function (target)

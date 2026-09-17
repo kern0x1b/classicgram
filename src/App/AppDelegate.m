@@ -37,7 +37,6 @@
 #import "TGDeviceViewController.h"
 #import "TGCall.h"
 #import "TGCallViewController.h"
-#import "TGVideoLoopback.h"
 #import "TGTabBar.h"
 #import "TGSystemCall.h"
 #import "TGChatViewController.h"

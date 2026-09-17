@@ -204,8 +204,7 @@ local host_sources = {
     "../src/Wire/Flatten/TGFlattenFiles.m",
     "../src/Wire/Flatten/TGFlattenGroups.m",
     "../src/Wire/Flatten/TGFlattenTranslation.m",
-    "../src/Calls/TGCallMessages.m",
-    "../src/Calls/TGCallStun.m",
+    "../src/Wire/Flatten/TGCallRtcServers.m",
     "../src/Stores/TGChatHistoryCache.m",
     "../src/Storage/TGDiskCache.m",
     "../src/Storage/TGAccountManager.m",
@@ -438,8 +437,7 @@ local host_tests = {
     "flatten_files/tg_flatten_files_tests.m",
     "flatten_groups/tg_flatten_groups_tests.m",
     "flatten_translation/tg_flatten_translation_tests.m",
-    "call_messages/tg_call_messages_tests.m",
-    "call_stun/tg_call_stun_tests.m",
+    "call_rtc_servers/tg_call_rtc_servers_tests.m",
     "chat_history_cache/tg_chat_history_cache_tests.m",
     "disk_cache/tg_disk_cache_tests.m",
     "database_encryption_key/tg_database_encryption_key_tests.m",
@@ -536,21 +534,9 @@ target("host-tests")
     add_mflags("-fobjc-arc", "-Wall", "-Wno-unused-parameter")
     add_mxxflags("-fobjc-arc", "-Wall", "-Wno-unused-parameter")
     add_frameworks("Foundation", "CoreGraphics", "CoreText", "Security", "SystemConfiguration")
-    add_syslinks("c++", "crypto", "z")
+    add_syslinks("c++", "z")
     add_tests("default")
     on_load(function (target)
-        local prefix
-        for _, formula in ipairs({"openssl@3", "openssl@1.1", "openssl"}) do
-            local found = try { function () return os.iorunv("brew", {"--prefix", formula}):trim() end }
-            if not prefix and found and os.isdir(path.join(found, "include", "openssl")) then
-                prefix = found
-            end
-        end
-        if not prefix then
-            raise("host-tests needs a host OpenSSL for TGCallStun's HMAC-SHA1, and Homebrew has none of openssl@3, openssl@1.1 or openssl")
-        end
-        target:add("includedirs", path.join(prefix, "include"))
-        target:add("linkdirs", path.join(prefix, "lib"))
         local home = path.absolute(path.join(target:targetdir(), "home"))
         os.mkdir(path.join(home, "Library", "Caches"))
         target:add("runenvs", "HOME", home)

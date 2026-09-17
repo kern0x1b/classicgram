@@ -20,6 +20,8 @@ typedef NS_ENUM(NSInteger, TGCallState) {
 + (instancetype)shared;
 
 + (BOOL)canSendVideo;
++ (NSArray *)libraryVersions;
++ (int32_t)maxLayer;
 
 @property (nonatomic, readonly) TGCallState state;
 @property (nonatomic, readonly) int32_t callId;
