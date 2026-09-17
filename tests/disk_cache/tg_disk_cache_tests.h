@@ -4,6 +4,8 @@
 #import "../support/tg_test.h"
 
 TGTestOutcome TGDiskCacheTestDatabaseDirectoryDiffersByScope(void);
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryLivesInLockableCaches(void);
+TGTestOutcome TGDiskCacheTestDatabaseDirectoryAdoptsTheApplicationSupportCopy(void);
 TGTestOutcome TGDiskCacheTestDatabaseDirectoryWithNoScopeIsPrimary(void);
 TGTestOutcome TGDiskCacheTestDatabaseDirectoryForScopeCreatesTheDirectory(void);
 TGTestOutcome TGDiskCacheTestDiscardDatabaseForScopeRemovesItsDirectory(void);
