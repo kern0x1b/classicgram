@@ -331,7 +331,7 @@ static BOOL TGStickerSuggestionExtractQuery(NSString *text, NSString **outQuery)
 	for (NSDictionary *sticker in stickers) {
 		if (![sticker isKindOfClass:[NSDictionary class]])
 			continue;
-		if ([sticker[@"isVideo"] boolValue])
+		if ([sticker[@"isVideo"] boolValue] && [sticker[@"thumbId"] longLongValue] <= 0)
 			continue;
 		[self.stickers addObject:sticker];
 	}
@@ -366,7 +366,7 @@ static BOOL TGStickerSuggestionExtractQuery(NSString *text, NSString **outQuery)
 	NSNumber *thumbId = sticker[@"thumbId"];
 	NSString *uniqueId = sticker[@"thumbUniqueId"];
 	long long fileId = [thumbId longLongValue];
-	if (fileId <= 0 && ![sticker[@"isAnimated"] boolValue]) {
+	if (fileId <= 0 && ![sticker[@"isAnimated"] boolValue] && ![sticker[@"isVideo"] boolValue]) {
 		fileId = [sticker[@"fileId"] longLongValue];
 		uniqueId = sticker[@"uniqueId"];
 	}

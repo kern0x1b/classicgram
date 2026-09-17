@@ -25,6 +25,7 @@
 #import "TGLiveLocationRehydration.h"
 #import "TGLinkPreviewFetchDecision.h"
 #import "TGChatUpgradeMarkerFilter.h"
+#import "TGAnimatedStickerFormat.h"
 
 @implementation TGChatViewController (Data)
 
@@ -1185,7 +1186,7 @@ static UIImage *TGMapCardWithPin(UIImage *tile, CGSize points) {
 	[self fetchMissingRichMessageCovers];
 
 	for (NSDictionary *m in self.messages) {
-		if (![m[@"docName"] isEqualToString:@"tgs"])
+		if (!TGIsAnimatedStickerDocName(m[@"docName"]))
 			continue;
 		NSNumber *docId = m[@"docId"];
 		if (![docId isKindOfClass:NSNumber.class] || self.lottiePaths[docId])

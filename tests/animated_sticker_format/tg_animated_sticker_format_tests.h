@@ -1,0 +1,12 @@
+#ifndef TG_HOST_TESTS_ANIMATED_STICKER_FORMAT_TESTS_H
+#define TG_HOST_TESTS_ANIMATED_STICKER_FORMAT_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGAnimatedStickerFormatTestEbmlHeaderIsWebM(void);
+TGTestOutcome TGAnimatedStickerFormatTestGzipHeaderIsTGS(void);
+TGTestOutcome TGAnimatedStickerFormatTestWebPAndShortInputAreUnknown(void);
+TGTestOutcome TGAnimatedStickerFormatTestFileSignatureIsReadFromDisk(void);
+TGTestOutcome TGAnimatedStickerFormatTestDocNamesThatPlay(void);
+
+#endif

@@ -1676,6 +1676,10 @@ NSDictionary *TGFlattenMessage(NSDictionary *m, TGFlattenContext *context) {
 			docName = @"tgs";
 		} else if ([format isEqualToString:@"stickerFormatWebp"]) {
 			photoFileId = sticker[@"sticker"][@"id"];
+		} else if ([format isEqualToString:@"stickerFormatWebm"]) {
+			docFileId = sticker[@"sticker"][@"id"];
+			photoFileId = sticker[@"thumbnail"][@"file"][@"id"];
+			docName = @"webm";
 		} else {
 			photoFileId = sticker[@"thumbnail"][@"file"][@"id"];
 		}
@@ -1791,6 +1795,10 @@ NSDictionary *TGFlattenMessage(NSDictionary *m, TGFlattenContext *context) {
 				docName = @"tgs";
 			} else if ([format isEqualToString:@"stickerFormatWebp"]) {
 				photoFileId = diceSticker[@"sticker"][@"id"];
+			} else if ([format isEqualToString:@"stickerFormatWebm"]) {
+				docFileId = diceSticker[@"sticker"][@"id"];
+				photoFileId = diceSticker[@"thumbnail"][@"file"][@"id"];
+				docName = @"webm";
 			} else {
 				photoFileId = diceSticker[@"thumbnail"][@"file"][@"id"];
 			}

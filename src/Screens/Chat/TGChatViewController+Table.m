@@ -15,6 +15,7 @@
 #import "TGFlattenMessage.h"
 #import "TGWallpaperRevertEligibility.h"
 #import "TGChatRowText.h"
+#import "TGAnimatedStickerFormat.h"
 
 extern UIColor *TGActiveChatThemeAccentColour(int64_t chatId);
 
@@ -323,11 +324,11 @@ extern UIColor *TGActiveChatThemeAccentColour(int64_t chatId);
 		return @"TGBubbleCell.Empty";
 	BOOL isAlbum = [self albumAtRow:indexPath.row] != nil &&
 		[self mosaicForRow:indexPath.row] != nil;
-	NSString *tgsPath = [m[@"docName"] isEqualToString:@"tgs"]
+	NSString *animatedStickerPath = TGIsAnimatedStickerDocName(m[@"docName"])
 		? self.lottiePaths[m[@"docId"]]
 		: nil;
 	return TGBubbleReuseIdentifierForKind(m[@"kind"], isAlbum, [m[@"service"] boolValue],
-		tgsPath != nil, [self messageIsSticker:m], [self messageBurnsOnOpening:m]);
+		animatedStickerPath != nil, [self messageIsSticker:m], [self messageBurnsOnOpening:m]);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

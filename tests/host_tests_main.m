@@ -206,6 +206,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "flatten_groups/tg_flatten_groups_tests.h"
 #import "flatten_translation/tg_flatten_translation_tests.h"
 #import "call_rtc_servers/tg_call_rtc_servers_tests.h"
+#import "animated_sticker_format/tg_animated_sticker_format_tests.h"
 #import "chat_history_cache/tg_chat_history_cache_tests.h"
 #import "disk_cache/tg_disk_cache_tests.h"
 #import "database_encryption_key/tg_database_encryption_key_tests.h"
@@ -300,6 +301,8 @@ int main(void) {
 				TGFlattenMessageTestPollOptionPercentagesSurviveFlatteningWithoutFloatTruncation},
 			{"flatten_message_flattens_dice",
 				TGFlattenMessageTestFlattensDice},
+			{"flatten_message_flattens_video_sticker",
+				TGFlattenMessageTestFlattensVideoSticker},
 			{"flatten_message_flattens_service_actions",
 				TGFlattenMessageTestFlattensServiceActions},
 			{"flatten_message_pin_message_descriptor_resolves_by_content_kind",
@@ -1036,6 +1039,16 @@ int main(void) {
 				TGBurnLabelLineTestVideoNoteKindUsesVideoMessageNoun},
 			{"burn_label_line_unknown_kind_falls_back_to_photo_noun",
 				TGBurnLabelLineTestUnknownKindFallsBackToPhotoNoun},
+			{"animated_sticker_format_ebml_header_is_webm",
+				TGAnimatedStickerFormatTestEbmlHeaderIsWebM},
+			{"animated_sticker_format_gzip_header_is_tgs",
+				TGAnimatedStickerFormatTestGzipHeaderIsTGS},
+			{"animated_sticker_format_webp_and_short_input_are_unknown",
+				TGAnimatedStickerFormatTestWebPAndShortInputAreUnknown},
+			{"animated_sticker_format_file_signature_is_read_from_disk",
+				TGAnimatedStickerFormatTestFileSignatureIsReadFromDisk},
+			{"animated_sticker_format_doc_names_that_play",
+				TGAnimatedStickerFormatTestDocNamesThatPlay},
 			{"call_rtc_servers_reflector_becomes_turn_with_hex_peer_tag",
 				TGCallRtcServersTestReflectorBecomesTurnWithHexPeerTag},
 			{"call_rtc_servers_reflector_ids_are_ranked_by_server_id",
