@@ -4,7 +4,7 @@ set_policy("package.requires_lock", true)
 set_policy("package.librarydeps.strict_compatibility", true)
 
 add_repositories("charon https://github.com/kern0x1b/charon.git main")
-add_addons("charon v0.5.0")
+add_addons("charon v0.6.0")
 set_config("apple_minimum", "6.0")
 includes("@addon/charon/apple-ios")
 
