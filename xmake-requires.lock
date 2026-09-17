@@ -6,23 +6,23 @@
         ["autoconf#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "2.72"
         },
         ["automake#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "1.17"
         },
         ["charon@apple-compat#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "latest"
@@ -30,7 +30,7 @@
         ["charon@firmware-tools#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "latest"
@@ -38,7 +38,7 @@
         ["charon@iphoneos-sdk 16.4#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "16.4"
@@ -46,7 +46,7 @@
         ["charon@ld64#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "956.6"
@@ -54,7 +54,7 @@
         ["charon@ldid 2.1.5-procursus7+23.gaf86971#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.1.5-procursus7+23.gaf86971"
@@ -62,7 +62,7 @@
         ["charon@libcxx#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "23.1.1"
@@ -70,15 +70,23 @@
         ["charon@libplist 2.7.0#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.7.0"
         },
+        ["charon@llvm 23.1.1#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "23.1.1"
+        },
         ["charon@openssl 4.0.2#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -86,7 +94,7 @@
         ["charon@openssl#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -94,16 +102,16 @@
         ["cmake#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "4.3.4"
         },
         ["gperf#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "3.2.1"
         },
@@ -113,8 +121,8 @@
         ["libtool#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "2.6.0"
         },
@@ -130,16 +138,16 @@
         ["m4#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "1.4.19"
         },
         ["ninja#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "v1.13.2"
         },
@@ -155,8 +163,8 @@
         ["pkgconf#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "2.5.1"
         },
@@ -180,23 +188,23 @@
         ["autoconf#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "2.72"
         },
         ["automake#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "1.17"
         },
         ["charon@apple-compat#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "latest"
@@ -204,7 +212,7 @@
         ["charon@firmware-tools#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "latest"
@@ -212,7 +220,7 @@
         ["charon@iphoneos-sdk 16.4#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "16.4"
@@ -220,7 +228,7 @@
         ["charon@ld64#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "956.6"
@@ -228,7 +236,7 @@
         ["charon@ldid 2.1.5-procursus7+23.gaf86971#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.1.5-procursus7+23.gaf86971"
@@ -236,7 +244,7 @@
         ["charon@libcxx#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "23.1.1"
@@ -244,15 +252,23 @@
         ["charon@libplist 2.7.0#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "2.7.0"
         },
+        ["charon@llvm 23.1.1#f56260b5"] = {
+            repo = {
+                branch = "main",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
+                url = "https://github.com/kern0x1b/charon.git"
+            },
+            version = "23.1.1"
+        },
         ["charon@openssl 4.0.2#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -260,7 +276,7 @@
         ["charon@openssl#f56260b5"] = {
             repo = {
                 branch = "main",
-                commit = "1f9d4d19ee81ccec9890cb89f5387d9cf386e572",
+                commit = "9882a4777a4692384f93cd49f35a1b05b5896bf2",
                 url = "https://github.com/kern0x1b/charon.git"
             },
             version = "4.0.2"
@@ -268,16 +284,16 @@
         ["cmake#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "4.3.4"
         },
         ["gperf#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "3.2.1"
         },
@@ -287,8 +303,8 @@
         ["libtool#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "2.6.0"
         },
@@ -304,16 +320,16 @@
         ["m4#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "1.4.19"
         },
         ["ninja#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "v1.13.2"
         },
@@ -329,8 +345,8 @@
         ["pkgconf#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "aec25d154ff4b8438f4288a94488f247706cb509",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "33acfba65dcf89dc71a4c7b75a2b1de89c1c824b",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
             version = "2.5.1"
         },
