@@ -166,7 +166,6 @@ static void TGInstallFatalSignalReporting(void) {
 #import "message_layout_cache/tg_message_layout_cache_tests.h"
 #import "storage_chat_titles/tg_storage_chat_titles_tests.h"
 #import "storage_kind_name/tg_storage_kind_name_tests.h"
-#import "session_restart/tg_session_restart_tests.h"
 #import "visible_alerts/tg_visible_alerts_tests.h"
 #import "profile_detail_row_height/tg_profile_detail_row_height_tests.h"
 #import "message_reply/tg_message_reply_tests.h"
@@ -1332,10 +1331,6 @@ int main(void) {
 				TGVisibleAlertsTestFindsAlertsAnywhereInTheWindows},
 			{"visible_alerts_dismisses_them_and_drops_their_delegates",
 				TGVisibleAlertsTestDismissesThemAndDropsTheirDelegates},
-			{"session_restart_restarts_the_cache_less_background_session",
-				TGSessionRestartTestRestartsTheCacheLessBackgroundSession},
-			{"session_restart_leaves_every_other_session_alone",
-				TGSessionRestartTestLeavesEveryOtherSessionAlone},
 			{"storage_kind_name_names_every_file_type_the_schema_has",
 				TGStorageKindNameTestNamesEveryFileTypeTheSchemaHas},
 			{"storage_chat_titles_asks_only_for_the_rows_without_a_title",

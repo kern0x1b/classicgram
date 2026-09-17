@@ -2,7 +2,6 @@
 #import "TGFloodWaitMessage.h"
 #import "TGRedactedRequestForLogging.h"
 #import "TGClient+Private.h"
-#import "TGClientSessionRestart.h"
 #import "TGClient+UpdateHandling.h"
 #import "TGClient+ChatState.h"
 #import "TGFlattenChatState.h"
@@ -291,19 +290,6 @@ static BOOL TGIsClosedAuthUpdate(NSDictionary *obj) {
 	NSLog(@"TGClient: reopening TDLib for the foreground");
 	if (![self start])
 		NSLog(@"TGClient: could not reopen TDLib");
-}
-
-- (void)reopenForDiskCachesIfNeededWhileCallInProgress:(BOOL)callInProgress {
-	if (!TGSessionNeedsRestartForDiskCaches(self.running, self.parametersSent,
-			self.parametersUsedDiskCaches, !self.diskCachesDisabledForBackgroundLaunch,
-			callInProgress))
-		return;
-
-	NSLog(@"TGClient: reopening TDLib so this foreground session gets its databases");
-	__weak typeof(self) weakSelf = self;
-	[self suspendForBackgroundWithCompletion:^{
-		[weakSelf resumeFromBackground];
-	}];
 }
 
 - (void)resetForAccountSwitch {

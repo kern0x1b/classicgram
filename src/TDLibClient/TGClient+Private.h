@@ -25,8 +25,6 @@ typedef void (*td_destroy_fn)(void *_Nonnull client);
 @property (nonatomic, assign) TGAuthState authState;
 @property (nonatomic, assign) BOOL available;
 @property (nonatomic, assign) BOOL running;
-@property (nonatomic, assign) BOOL diskCachesDisabledForBackgroundLaunch;
-@property (nonatomic, assign) BOOL parametersUsedDiskCaches;
 @property (nonatomic, copy, nullable) NSString *pendingPhoneNumber;
 @property (nonatomic, strong) NSMutableDictionary *chatsById;
 @property (nonatomic, strong) NSMutableDictionary *chatActionTimers;
