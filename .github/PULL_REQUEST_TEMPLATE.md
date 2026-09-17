@@ -8,8 +8,8 @@
 
 ## How it was verified
 
-- [ ] `charon build` finishes with its binary checks passing
-- [ ] `./scripts/run-host-tests.sh` passes
+- [ ] `xmake -y` finishes with its binary checks passing
+- [ ] `xmake build -y host-tests && xmake run host-tests` passes
 - [ ] Tested on hardware — device and iOS version: <!-- e.g. iPad 2, iOS 6.1.3 --> <!-- or: not tested on hardware -->
 
 ## Interface changes

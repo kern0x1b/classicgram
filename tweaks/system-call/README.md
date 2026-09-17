@@ -109,20 +109,20 @@ alert on the lock screen.
   constructor bails immediately if the `SpringBoard` class is absent.
 * `/var/lib/telegramsystemcall/disabled` switches it off without uninstalling.
 * The dylib links Foundation and libobjc only - no UIKit, no substrate. The
-  `links-neither-uikit-nor-substrate` task in the build pipeline enforces that.
+  `TelegramSystemCall` target refuses the link otherwise.
 
 ## Building
 
-This folder is its own Charon module, declared in `charon.toml`:
+The tweak is the `TelegramSystemCall` target in the repository's `xmake.lua`:
 
 ```
-charon build --root tweaks/system-call     # staged, signed TelegramSystemCall.dylib and its filter plist
-charon package --root tweaks/system-call   # com.kern0x1b.telegramsystemcall_<version>_iphoneos-arm.deb
+xmake build -y TelegramSystemCall   # the signed dylib and its filter plist
+xmake deb -y                        # among the packages, com.kern0x1b.telegramsystemcall_<version>_iphoneos-arm.deb
 ```
 
-The SDK, the armv7 linker and `ldid` come from the `apple-ios` platform's packages.
+The SDK, the armv7 linker and `ldid` come from the Charon addon's packages.
 
-The app half is already in the normal build - `charon build` at the repo root.
+The app half is already in the normal build - `xmake -y` at the repo root.
 **Both halves are needed.** An app without the tweak posts notifications nobody
 listens to and behaves exactly as before; a tweak without the app half never
 hears an incoming call.

@@ -1,4 +1,0 @@
-sources:
-  0.3+14.g3c65f44:
-    commit: 3c65f440baff6220872ec11b0cbde37ef7a48f78
-    url: https://github.com/xiph/libopusenc.git

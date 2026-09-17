@@ -8,7 +8,8 @@ prints one `RUN`/`OK`/`FAIL` line per case.
 ## Run it
 
 ```
-scripts/run-host-tests.sh
+xmake build -y host-tests
+xmake run host-tests
 ```
 
 ## Expect
@@ -221,12 +222,12 @@ with well-formed input; the fuzzer's job is to throw malformed and adversarial i
 and let AddressSanitizer/UndefinedBehaviorSanitizer catch what `isKindOfClass:` guards miss.
 
 ```
-scripts/run-fuzz-flatten-message.sh
+xmake build -y fuzz-flatten-message
+xmake run fuzz-flatten-message
 ```
 
-Xcode's own `clang` doesn't ship a libFuzzer runtime on macOS, so the script looks for a Homebrew
-LLVM install (`brew install llvm`) first and falls back to plain `clang` on `$PATH`, which will
-fail at the link step with a clear "libclang_rt.fuzzer_osx.a not found" if none is available.
+Apple's `clang` doesn't ship a libFuzzer runtime on macOS, so the target builds with Homebrew's
+LLVM (`brew install llvm`) and refuses with that sentence when it is not installed.
 Corpus and crash artifacts land in `tests/fuzz/corpus/` and `tests/fuzz/`, both gitignored — a
 found crash reproduces with `build/host-tests/fuzz-flatten-message tests/fuzz/crash-<hash>`.
 
@@ -236,6 +237,6 @@ dictionary itself is adversarial.
 
 ## Extending this for Stage 2
 
-When `src/Wire/Decode/` exists, add its sources to `pure_app_sources` in
-`scripts/run-host-tests.sh` and its test cases to the table in `tests/host_tests_main.m` the same
-way the two files here were added — nothing else in the script needs to change.
+When `src/Wire/Decode/` exists, add its sources to `host_sources` in
+`tests/xmake.lua` and its test cases to the table in `tests/host_tests_main.m` the same
+way the two files here were added — nothing else in the target needs to change.

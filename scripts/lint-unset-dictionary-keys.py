@@ -15,8 +15,19 @@ WRITES = (
 SKIP_FILES = ("TGLottieView",)
 
 
+def installed_schema():
+    import subprocess
+    try:
+        folder = subprocess.run(["xmake", "where", "-P", ".", "tdlib"], capture_output=True, text=True, check=True).stdout.strip().splitlines()[-1]
+    except (OSError, subprocess.CalledProcessError, IndexError):
+        sys.exit("lint-unset-dictionary-keys: no td_api.tl to check against; build once with xmake so the tdlib package is installed")
+    return os.path.join(folder, "res", "td_api.tl")
+
+
 def schema_fields(path):
-    if not path or not os.path.exists(path):
+    if not path:
+        path = installed_schema()
+    if not os.path.exists(path):
         return set()
     return set(re.findall(r'(\w+):[\w<>\.]+', open(path, encoding="utf-8", errors="replace").read()))
 

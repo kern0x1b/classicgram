@@ -16,7 +16,7 @@ Two layers do that:
 
 | layer | where | what it buys |
 | --- | --- | --- |
-| iOS 6 `voip` socket + keep-alive | inside the app (`src/Storage/TGBackgroundSession.m`, TDLib hook carried as `recipes/tdlib/all/patches/voip-primary-socket-callback.patch`) | app stays alive and connected while backgrounded, screen locked, indefinitely; the system relaunches it after a reboot |
+| iOS 6 `voip` socket + keep-alive | inside the app (`src/Storage/TGBackgroundSession.m`, TDLib hook carried as `patches/tdlib/voip-primary-socket-callback.patch`) | app stays alive and connected while backgrounded, screen locked, indefinitely; the system relaunches it after a reboot |
 | `telegramd` watchdog | this directory, a LaunchDaemon | closes the hole the first layer cannot: force-quit from the app switcher, and a jetsam kill |
 
 ---
@@ -168,11 +168,11 @@ and writes `/var/log/telegramd.log` (rotated at 256 KB to `.log.1`), plus
 
 ### Build
 
-This folder is its own Charon module, declared in `charon.toml`:
+The daemon is the `telegramd` target in the repository's `xmake.lua`:
 
 ```
-charon build --root daemon/relaunch     # telegramd staged into /usr/libexec with its plist and config
-charon package --root daemon/relaunch   # com.kern0x1b.telegramd_<version>_iphoneos-arm.deb
+xmake build -y telegramd   # telegramd for /usr/libexec, with its LaunchDaemons plist and config
+xmake deb -y               # among the packages, com.kern0x1b.telegramd_<version>_iphoneos-arm.deb
 ```
 
 armv7 at iOS 6.0, linked with the platform's ld64 and signed with

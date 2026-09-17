@@ -32,11 +32,11 @@ def main_checkout():
 
 def packaged_scheme():
     for root in (ROOT, main_checkout()):
-        if not root or not os.path.isfile(os.path.join(root, "charon.toml")):
+        if not root or not os.path.isfile(os.path.join(root, "xmake.lua")):
             continue
         try:
-            answer = subprocess.run(["charon", "--root", root, "where", "pkg:tdlib", "--variant", "armv7"],
-                                    capture_output=True, text=True, check=False)
+            answer = subprocess.run(["xmake", "where", "-P", root, "tdlib"],
+                                    capture_output=True, text=True, check=False, stdin=subprocess.DEVNULL)
         except FileNotFoundError:
             return None
         lines = answer.stdout.strip().splitlines()
@@ -95,8 +95,8 @@ def main():
         return self_test()
     scheme = packaged_scheme()
     if not scheme:
-        print("lint-tdlib-type-names: skipped, charon where pkg:tdlib names no packaged td_api.tl "
-              "(charon is not on PATH, or tdlib is not built yet)")
+        print("lint-tdlib-type-names: skipped, xmake where tdlib names no installed td_api.tl "
+              "(xmake is not on PATH, or tdlib is not built yet)")
         return 0
     types = declared_types(open(scheme, encoding="utf-8", errors="replace").read())
     root = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "src")

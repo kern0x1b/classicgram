@@ -7,22 +7,26 @@ description: Use when building this project with charon, setting up a new git wo
 
 ## Building
 
-The build is Charon, reading `charon.toml`:
+The build is xmake with the Charon addon, reading `xmake.lua`:
 
 ```
-charon build                      # build/universal/Telegram.app: armv7 + arm64, merged and signed
-charon build --variant armv7      # build/armv7/Telegram.app alone
-charon build --variant harness    # armv7 with the telegramdev:// debug harness, for device testing
+xmake f -p iphoneos -a armv7 -y        # once per checkout; inside a worktree add -P . to every call
+xmake -y                               # build/iphoneos/armv7/release/Telegram.app, plus the tweak and the daemon
+xmake build -y Telegram-harness        # armv7 with the telegramdev:// debug harness: build/harness/Telegram.app
+xmake deb -y                           # the .deb files; the app merged from armv7 and arm64
+xmake check                            # every check under scripts/, as declared in xmake.lua
 ```
 
-Every dependency comes from the Conan cache through `recipes/`; the SDK, the armv7 linker, `ldid`
-and the C++ runtime come from the `apple-ios` platform's packages, so nothing outside the checkout
-and `~/.conan2` is needed. `export LLVM_PREFIX="$(brew --prefix llvm)"` once per shell, before the
-first build on a machine: the ld64 package reads it when it has to be built from source.
+Every dependency is a `package()` in `xmake.lua`, built into xmake's shared cache
+(`~/.xmake/packages`); the SDK, the armv7 linker, `ldid`, libc++ and apple-compat come from the
+addon at the tag `add_addons` names. Run every unattended xmake call with `-y` and stdin from
+`/dev/null`: without `-y` it waits forever on a confirmation nobody answers. After a script change
+in a `package()`, raise its `revision` config, or the old build is reused.
 
-A build that exits 0 is one whose binary checks passed. Charon refuses, naming the file:
+A build that exits 0 is one whose binary checks passed. The addon refuses, naming the file:
 
-- an object or archive member recording a minimum iOS version other than the variant's;
+- an object or archive member recording a minimum iOS version other than the target's;
+- an import the device's own dyld cache does not export;
 - a rebased code pointer whose Thumb bit disagrees with the function it names;
 - a `__PAGEZERO` wrong for the architecture;
 - a bundled binary that loads a library the bundle carries from anywhere else;
@@ -32,10 +36,10 @@ There is no fixup step after the link any more; if one of these fails, the input
 
 ## Reading a build failure
 
-Charon prints the failing command's own output. After every build:
+xmake prints the failing command's own output (`-v` for every command line). After every build:
 
-1. Confirm the bundle is newer than your last edit: `ls -la build/universal/Telegram.app/Telegram`.
-   `ccache` can report success while reusing a stale object; if in doubt, `touch <file>.m` and look
+1. Confirm the bundle is newer than your last edit: `ls -la build/iphoneos/armv7/release/Telegram.app/Telegram`.
+   A build can report success while reusing a stale object; if in doubt, `touch <file>.m` and look
    for that file's compile line.
 2. Grep the whole log broadly - `grep -iE "error:|refus|Undefined symbols"` - since a check's
    refusal and a linker failure do not always contain `error:`.
@@ -61,8 +65,10 @@ next person opens the repository and sees the old tree.
 A `git worktree add` does not carry over untracked files. The one a build needs is
 `src/Resources/Config/tg_config.h`; `scripts/worktree-prepare.sh`, run from inside the new
 worktree, copies it from the main checkout and skips it if it is already there. Everything else a
-build uses lives in Conan's cache (`~/.conan2`), which every worktree on the machine shares, so a
-first build in a new worktree reuses what was already built instead of rebuilding it.
+build uses lives in xmake's package cache (`~/.xmake/packages`), which every worktree on the machine
+shares, so a first build in a new worktree reuses what was already built instead of rebuilding it.
+A worktree sits inside the main checkout, which has its own `xmake.lua`, so every xmake call there
+takes `-P .`; the addon refuses otherwise.
 
 `src/Resources/Config/tg_config.h` is gitignored too and no worktree gets it from `git worktree
 add`; copy it in from the main checkout or the build stops at the first include of it.

@@ -6,12 +6,15 @@ review.
 
 ## Before you write code
 
-- Build once and run the tests: `charon build`, then `./scripts/run-host-tests.sh`. The build refuses a
+- Build once and run the tests: `xmake f -p iphoneos -a armv7 -y`, `xmake -y`, then
+  `xmake build -y host-tests && xmake run host-tests`. The build refuses a
   binary the device could not launch - a wrong minimum iOS version, a mismatched Thumb pointer, a
   missing entitlement - so a build that finishes is one the checks passed.
-- Set up Charon once per machine, as its repository's README describes, then run `charon setup` here.
-- Install the hooks: `./scripts/install-git-hooks.sh`. The pre-commit hook runs the lint scripts
-  under `scripts/`, and it refuses the same things a reviewer would.
+- Install xmake, cmake and ninja (`brew install xmake cmake ninja`); `xmake.lua` names the Charon
+  addon at its tag and xmake fetches it on first use.
+- Install the hook: `xmake check --install-hook`. Before each commit it runs the checks whose files
+  are staged - the scripts under `scripts/`, declared in `xmake.lua` - and it refuses the same
+  things a reviewer would.
 - Work on a branch in a worktree under `.claude/worktree/`, not in the main checkout. See
   [`.claude/skills/build-and-verify/SKILL.md`](.claude/skills/build-and-verify/SKILL.md) for the
   one file a fresh worktree needs before its first build.

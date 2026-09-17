@@ -16,4 +16,4 @@ if [ -f "$main/src/Resources/Config/tg_config.h" ] && [ ! -f "$config_dir/tg_con
 	echo "worktree-prepare: copied src/Resources/Config/tg_config.h"
 fi
 
-echo "worktree-prepare: ready, run charon build"
+echo "worktree-prepare: ready, run xmake -P . -y"
