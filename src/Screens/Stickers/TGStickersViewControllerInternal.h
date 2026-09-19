@@ -181,6 +181,8 @@ NSString *TGStickersCacheKey(long long fileId, CGFloat side);
 - (UIImage *)scale:(UIImage *)image toSide:(CGFloat)side;
 - (BOOL)stickerIsStill:(NSDictionary *)sticker;
 - (UIImage *)imageForFileId:(long long)fileId side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
+- (UIImage *)thumbnailForItem:(NSDictionary *)item side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
+- (void)reloadRowAtIndexPath:(NSIndexPath *)indexPath;
 - (UIImage *)renderOutlinePaths:(NSArray *)paths width:(CGFloat)width height:(CGFloat)height side:(CGFloat)side;
 - (UIImage *)outlineForSticker:(NSDictionary *)sticker side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
 - (long long)coverFileIdForSet:(NSDictionary *)set;

@@ -306,6 +306,9 @@
 				image = [self imageForFileId:[sticker[@"fileId"] longLongValue]
 										side:kTrendCoverSide
 								   indexPath:indexPath];
+			else
+				image = [self thumbnailForItem:sticker side:kTrendCoverSide
+										indexPath:indexPath];
 			if (!image)
 				image = [self outlineForSticker:sticker side:kTrendCoverSide indexPath:indexPath];
 		}
