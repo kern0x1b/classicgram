@@ -14,6 +14,8 @@
 #import "TGStickerEmojiKeywordsViewController.h"
 #import "TGStickerTilesCell.h"
 #import "TGStickerTrendCell.h"
+#import "TGStickerThumbnailCache.h"
+#import "TGStickerCoverSource.h"
 #import "TGHexColour.h"
 
 @implementation TGStickersViewController (Loading)
@@ -566,8 +568,17 @@
 	return result;
 }
 
-- (BOOL)stickerIsStill:(NSDictionary *)sticker {
-	return !([sticker[@"isAnimated"] boolValue] || [sticker[@"isVideo"] boolValue]);
+- (void)reloadRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (!indexPath)
+		return;
+	if (indexPath.section >= [self.table numberOfSections])
+		return;
+	if (indexPath.row >= [self.table numberOfRowsInSection:indexPath.section])
+		return;
+	if (![self.table cellForRowAtIndexPath:indexPath])
+		return;
+	[self.table reloadRowsAtIndexPaths:@[ indexPath ]
+					  withRowAnimation:UITableViewRowAnimationNone];
 }
 
 - (UIImage *)imageForFileId:(long long)fileId side:(CGFloat)side
@@ -598,17 +609,50 @@
 		if (!small)
 			return;
 		[strongSelf storeCover:small forKey:key];
-		if (!indexPath)
-			return;
-		if (indexPath.section >= [strongSelf.table numberOfSections])
-			return;
-		if (indexPath.row >= [strongSelf.table numberOfRowsInSection:indexPath.section])
-			return;
-		if (![strongSelf.table cellForRowAtIndexPath:indexPath])
-			return;
-		[strongSelf.table reloadRowsAtIndexPaths:@[ indexPath ]
-								withRowAnimation:UITableViewRowAnimationNone];
+		[strongSelf reloadRowAtIndexPath:indexPath];
 	}];
+	return nil;
+}
+
+- (UIImage *)thumbnailForFileId:(long long)thumbId
+					   uniqueId:(NSString *)uniqueId
+						   side:(CGFloat)side
+					  indexPath:(NSIndexPath *)indexPath {
+	UIImage *cached = [TGStickerThumbnailCache cachedThumbnailForUniqueId:uniqueId side:side];
+	if (cached)
+		return cached;
+
+	NSString *key = [@"t" stringByAppendingString:TGStickersCacheKey(thumbId, side)];
+	if ([self.coversInFlight containsObject:key])
+		return nil;
+	[self.coversInFlight addObject:key];
+
+	__weak typeof(self) weakSelf = self;
+	[TGStickerThumbnailCache thumbnailForFileId:thumbId
+									   uniqueId:uniqueId
+										   side:side
+									 completion:^(UIImage *image) {
+		__strong typeof(weakSelf) strongSelf = weakSelf;
+		if (!strongSelf)
+			return;
+		[strongSelf.coversInFlight removeObject:key];
+		if (!image)
+			return;
+		[strongSelf reloadRowAtIndexPath:indexPath];
+	}];
+	return nil;
+}
+
+- (UIImage *)imageForSource:(TGStickerCoverSource *)source
+					   side:(CGFloat)side
+				  indexPath:(NSIndexPath *)indexPath {
+	if (source.kind == TGStickerCoverKindSticker)
+		return [self imageForFileId:source.fileId side:side indexPath:indexPath];
+	if (source.kind == TGStickerCoverKindThumbnail)
+		return [self thumbnailForFileId:source.fileId
+							   uniqueId:source.uniqueId
+								   side:side
+							  indexPath:indexPath];
 	return nil;
 }
 
@@ -696,32 +740,14 @@
 		if (!outline)
 			return;
 		[strongSelf storeCover:outline forKey:key];
-		if (!indexPath)
-			return;
-		if (indexPath.section >= [strongSelf.table numberOfSections])
-			return;
-		if (indexPath.row >= [strongSelf.table numberOfRowsInSection:indexPath.section])
-			return;
-		if (![strongSelf.table cellForRowAtIndexPath:indexPath])
-			return;
-		[strongSelf.table reloadRowsAtIndexPaths:@[ indexPath ]
-								withRowAnimation:UITableViewRowAnimationNone];
+		[strongSelf reloadRowAtIndexPath:indexPath];
 	}];
 	return nil;
 }
 
-- (long long)coverFileIdForSet:(NSDictionary *)set {
-	NSArray *covers = set[@"covers"];
-	for (NSDictionary *sticker in covers) {
-		if (![self stickerIsStill:sticker])
-			continue;
-		return [sticker[@"fileId"] longLongValue];
-	}
-	return 0;
-}
-
 - (UIImage *)coverForSet:(NSDictionary *)set atIndexPath:(NSIndexPath *)indexPath {
-	return [self imageForFileId:[self coverFileIdForSet:set] side:kCoverSide
+	return [self imageForSource:[TGStickerCoverSource sourceForSet:set]
+						   side:kCoverSide
 					  indexPath:indexPath];
 }
 
@@ -769,10 +795,9 @@
 		[tile addTarget:self action:@selector(tileTapped:)
 			forControlEvents:UIControlEventTouchUpInside];
 
-		UIImage *image = nil;
-		if ([self stickerIsStill:sticker])
-			image = [self imageForFileId:[sticker[@"fileId"] longLongValue] side:kTileSide
-							   indexPath:indexPath];
+		UIImage *image = [self imageForSource:[TGStickerCoverSource sourceForSticker:sticker]
+										 side:kTileSide
+									indexPath:indexPath];
 		if (!image)
 			image = [self outlineForSticker:sticker side:kTileSide indexPath:indexPath];
 		if (image) {

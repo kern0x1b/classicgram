@@ -75,6 +75,7 @@ static void TGInstallFatalSignalReporting(void) {
 #import "exceptions_list_text/tg_exceptions_list_text_tests.h"
 #import "list_state_text/tg_list_state_text_tests.h"
 #import "sticker_favourite_action/tg_sticker_favourite_action_tests.h"
+#import "sticker_cover_source/tg_sticker_cover_source_tests.h"
 #import "count_after_read/tg_count_after_read_tests.h"
 #import "password_check_outcome/tg_password_check_outcome_tests.h"
 #import "call_peer_state/tg_call_peer_state_tests.h"
@@ -489,6 +490,14 @@ int main(void) {
 				TGListStateTextTestTheOrderOfTheThreeStates},
 			{"sticker_favourite_action_a_failed_read_offers_neither",
 				TGStickerFavouriteActionTestAFailedReadOffersNeither},
+			{"sticker_cover_source_still_sticker_uses_its_own_file",
+				TGStickerCoverSourceTestStillStickerUsesItsOwnFile},
+			{"sticker_cover_source_animated_and_video_use_their_thumbnail",
+				TGStickerCoverSourceTestAnimatedAndVideoUseTheirThumbnail},
+			{"sticker_cover_source_set_prefers_a_still_cover",
+				TGStickerCoverSourceTestSetPrefersAStillCover},
+			{"sticker_cover_source_set_falls_back_to_thumbnails",
+				TGStickerCoverSourceTestSetFallsBackToThumbnails},
 			{"count_after_read_a_failure_does_not_zero_a_count",
 				TGCountAfterReadTestAFailureDoesNotZeroACount},
 			{"password_check_outcome_wrong_versus_not_checked",
