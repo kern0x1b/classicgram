@@ -575,6 +575,16 @@ local function telegram_application(harness)
     add_values("app.frameworks", "libcxx", "tdlib", "TGCallsEngine")
     set_values("charon.entitlements", "src/Resources/entitlements.plist")
     set_values("charon.strip", "-S -x")
+    set_values("charon.waive.weak-imports",
+        "libTGCallsEngine.dylib weakly imports five symbols iOS 6 does not export, and every use " ..
+        "is behind a check: AVAudioSessionMediaServicesWereLostNotification (iOS 7) and " ..
+        "AVAudioSessionSilenceSecondaryAudioHintNotification (iOS 8) are read only inside " ..
+        "if (&symbol != NULL) in patches/tgcalls/audio-session-on-ios-6.patch; " ..
+        "AVAudioSessionSilenceSecondaryAudioHintTypeKey is read only by the handler of that " ..
+        "second notification, which is never registered when the notification is absent; " ..
+        "__darwin_check_fd_set_overflow is called by the SDK's own __darwin_check_fd_set inline, " ..
+        "which compares its address with zero first; and __availability_version_check is reached " ..
+        "only through compiler-rt's os_version_check, which looks the symbol up before calling it")
     on_config(function (target)
         if not os.isfile(path.join(os.projectdir(), "src", "Resources", "Config", "tg_config.h")) then
             raise("src/Resources/Config/tg_config.h is missing: copy src/Resources/Config/tg_config.h.example to it and fill in the API credentials, or run scripts/worktree-prepare.sh in a worktree")
