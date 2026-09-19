@@ -156,7 +156,7 @@ One duplication this pass did fix at the root rather than baseline around it:
 `TGClient.m`'s `TGResultIsError` was the only non-`static`, genuinely pure function in that file, so
 it moved into its own `src/TDLibClient/TGResultIsError.h/.m` — `TGClient.h` now gets the declaration
 by importing it, and `TGFlattenMessages.m` calls the real function instead of carrying its own
-`static` copy. `scripts/lint-layer-imports.py --rule error-check` exists precisely to catch a
+`static` copy. `scripts/lint.py layer-imports --rule error-check` exists precisely to catch a
 `TGXxxIsError` reimplementation like the one this would otherwise have left behind.
 
 - `tests/wallpaper_row_text/` (6 cases) covers `TGWallpaperRowText`, lifted out of

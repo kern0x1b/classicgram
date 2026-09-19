@@ -20,7 +20,7 @@ a particular address, or a particular checkout path.
   reasoning in the commit message or the pull request. If a line needs explaining, rename the
   variable or split the method until it does not. This rule is broken more often than any other; a
   diff that adds a comment is wrong even when the code in it is right.
-  `scripts/lint-source-comments.py` enforces it, and the pre-commit hook runs it.
+  `scripts/lint.py source-comments` enforces it, and the pre-commit hook runs it.
 - **The iOS 6 SDK is the ceiling.** No UICollectionView, Auto Layout, UIAlertController,
   UNUserNotificationCenter, CallKit, PushKit, LocalAuthentication or WKWebView. Every list is a
   `UITableView`, every layout is a computed `CGRect`, every alert is a `UIAlertView` or a
