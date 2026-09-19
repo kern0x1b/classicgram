@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "TGStickersViewController.h"
+#import "TGStickerCoverSource.h"
 #import "TGActionSheet.h"
 #import "TGStickerCatalogService.h"
 
@@ -179,13 +180,12 @@ NSString *TGStickersCacheKey(long long fileId, CGFloat side);
 - (NSUInteger)byteCostOfImage:(UIImage *)image;
 - (void)storeCover:(UIImage *)image forKey:(NSString *)key;
 - (UIImage *)scale:(UIImage *)image toSide:(CGFloat)side;
-- (BOOL)stickerIsStill:(NSDictionary *)sticker;
 - (UIImage *)imageForFileId:(long long)fileId side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
-- (UIImage *)thumbnailForItem:(NSDictionary *)item side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
+- (UIImage *)thumbnailForFileId:(long long)thumbId uniqueId:(NSString *)uniqueId side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
+- (UIImage *)imageForSource:(TGStickerCoverSource *)source side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
 - (void)reloadRowAtIndexPath:(NSIndexPath *)indexPath;
 - (UIImage *)renderOutlinePaths:(NSArray *)paths width:(CGFloat)width height:(CGFloat)height side:(CGFloat)side;
 - (UIImage *)outlineForSticker:(NSDictionary *)sticker side:(CGFloat)side indexPath:(NSIndexPath *)indexPath;
-- (long long)coverFileIdForSet:(NSDictionary *)set;
 - (UIImage *)coverForSet:(NSDictionary *)set atIndexPath:(NSIndexPath *)indexPath;
 - (NSInteger)gridColumns;
 - (NSInteger)gridRowCount;

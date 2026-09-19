@@ -15,6 +15,7 @@
 #import "TGStickerTilesCell.h"
 #import "TGStickerTrendCell.h"
 #import "TGStickerThumbnailCache.h"
+#import "TGStickerCoverSource.h"
 #import "TGHexColour.h"
 
 @implementation TGStickersViewController (Loading)
@@ -567,10 +568,6 @@
 	return result;
 }
 
-- (BOOL)stickerIsStill:(NSDictionary *)sticker {
-	return !([sticker[@"isAnimated"] boolValue] || [sticker[@"isVideo"] boolValue]);
-}
-
 - (void)reloadRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (!indexPath)
 		return;
@@ -617,14 +614,10 @@
 	return nil;
 }
 
-- (UIImage *)thumbnailForItem:(NSDictionary *)item
-							side:(CGFloat)side
-					   indexPath:(NSIndexPath *)indexPath {
-	long long thumbId = [item[@"thumbId"] longLongValue];
-	NSString *uniqueId = item[@"thumbUniqueId"];
-	if (thumbId <= 0 || uniqueId.length == 0)
-		return nil;
-
+- (UIImage *)thumbnailForFileId:(long long)thumbId
+					   uniqueId:(NSString *)uniqueId
+						   side:(CGFloat)side
+					  indexPath:(NSIndexPath *)indexPath {
 	UIImage *cached = [TGStickerThumbnailCache cachedThumbnailForUniqueId:uniqueId side:side];
 	if (cached)
 		return cached;
@@ -647,6 +640,19 @@
 			return;
 		[strongSelf reloadRowAtIndexPath:indexPath];
 	}];
+	return nil;
+}
+
+- (UIImage *)imageForSource:(TGStickerCoverSource *)source
+					   side:(CGFloat)side
+				  indexPath:(NSIndexPath *)indexPath {
+	if (source.kind == TGStickerCoverKindSticker)
+		return [self imageForFileId:source.fileId side:side indexPath:indexPath];
+	if (source.kind == TGStickerCoverKindThumbnail)
+		return [self thumbnailForFileId:source.fileId
+							   uniqueId:source.uniqueId
+								   side:side
+							  indexPath:indexPath];
 	return nil;
 }
 
@@ -739,25 +745,10 @@
 	return nil;
 }
 
-- (long long)coverFileIdForSet:(NSDictionary *)set {
-	NSArray *covers = set[@"covers"];
-	for (NSDictionary *sticker in covers) {
-		if (![self stickerIsStill:sticker])
-			continue;
-		return [sticker[@"fileId"] longLongValue];
-	}
-	return 0;
-}
-
 - (UIImage *)coverForSet:(NSDictionary *)set atIndexPath:(NSIndexPath *)indexPath {
-	long long still = [self coverFileIdForSet:set];
-	if (still != 0)
-		return [self imageForFileId:still side:kCoverSide indexPath:indexPath];
-	UIImage *own = [self thumbnailForItem:set side:kCoverSide indexPath:indexPath];
-	if (own)
-		return own;
-	NSDictionary *first = [set[@"covers"] firstObject];
-	return first ? [self thumbnailForItem:first side:kCoverSide indexPath:indexPath] : nil;
+	return [self imageForSource:[TGStickerCoverSource sourceForSet:set]
+						   side:kCoverSide
+					  indexPath:indexPath];
 }
 
 #pragma mark - grid
@@ -804,12 +795,9 @@
 		[tile addTarget:self action:@selector(tileTapped:)
 			forControlEvents:UIControlEventTouchUpInside];
 
-		UIImage *image = nil;
-		if ([self stickerIsStill:sticker])
-			image = [self imageForFileId:[sticker[@"fileId"] longLongValue] side:kTileSide
-							   indexPath:indexPath];
-		else
-			image = [self thumbnailForItem:sticker side:kTileSide indexPath:indexPath];
+		UIImage *image = [self imageForSource:[TGStickerCoverSource sourceForSticker:sticker]
+										 side:kTileSide
+									indexPath:indexPath];
 		if (!image)
 			image = [self outlineForSticker:sticker side:kTileSide indexPath:indexPath];
 		if (image) {

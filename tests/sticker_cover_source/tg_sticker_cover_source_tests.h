@@ -1,0 +1,11 @@
+#ifndef TG_HOST_TESTS_STICKER_COVER_SOURCE_TESTS_H
+#define TG_HOST_TESTS_STICKER_COVER_SOURCE_TESTS_H
+
+#import "../support/tg_test.h"
+
+TGTestOutcome TGStickerCoverSourceTestStillStickerUsesItsOwnFile(void);
+TGTestOutcome TGStickerCoverSourceTestAnimatedAndVideoUseTheirThumbnail(void);
+TGTestOutcome TGStickerCoverSourceTestSetPrefersAStillCover(void);
+TGTestOutcome TGStickerCoverSourceTestSetFallsBackToThumbnails(void);
+
+#endif

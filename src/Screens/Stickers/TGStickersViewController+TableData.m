@@ -1,6 +1,7 @@
 #import "TGStickersViewController.h"
 #import "TGStringTruncation.h"
 #import "TGStickersViewControllerInternal.h"
+#import "TGStickerCoverSource.h"
 #import "TGTheme.h"
 #import "TGIcons.h"
 #import "TGLocalization.h"
@@ -302,13 +303,9 @@
 		UIImage *image = nil;
 		if (index < (NSInteger)covers.count) {
 			NSDictionary *sticker = covers[index];
-			if ([self stickerIsStill:sticker])
-				image = [self imageForFileId:[sticker[@"fileId"] longLongValue]
-										side:kTrendCoverSide
-								   indexPath:indexPath];
-			else
-				image = [self thumbnailForItem:sticker side:kTrendCoverSide
-										indexPath:indexPath];
+			image = [self imageForSource:[TGStickerCoverSource sourceForSticker:sticker]
+									side:kTrendCoverSide
+							   indexPath:indexPath];
 			if (!image)
 				image = [self outlineForSticker:sticker side:kTrendCoverSide indexPath:indexPath];
 		}
