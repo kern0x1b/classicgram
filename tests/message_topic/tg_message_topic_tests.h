@@ -14,5 +14,7 @@ TGTestOutcome TGTopicDictionaryTestDirectMessagesTopicOutranksSavedTopic(void);
 TGTestOutcome TGTopicDictionaryTestForumThreadFallsBackToMessageTopicForum(void);
 TGTestOutcome TGTopicDictionaryTestNonForumThreadFallsBackToMessageTopicThread(void);
 TGTestOutcome TGTopicDictionaryTestNoTopicAtAllReturnsNil(void);
+TGTestOutcome TGSendTopicDictionaryTestASavedTopicIsNeverSent(void);
+TGTestOutcome TGSendTopicDictionaryTestThreadAndDirectMessagesTopicsStillTravel(void);
 
 #endif

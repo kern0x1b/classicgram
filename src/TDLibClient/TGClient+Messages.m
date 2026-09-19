@@ -211,7 +211,7 @@ static NSArray *TGFlattenedQuickReplyMessageList(NSDictionary *result) {
 			: TGMsgTextContent(text, clearDraft),
 	} mutableCopy];
 
-	NSDictionary *topic = TGTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
+	NSDictionary *topic = TGSendTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
 	NSDictionary *replyTo = TGReplyToDictionary(replyToId, nil, nil, 0);
@@ -270,7 +270,7 @@ static NSArray *TGFlattenedQuickReplyMessageList(NSDictionary *result) {
 		@"reply_to" : TGReplyToDictionary(replyToId, quoteText, quoteEntities, quotePosition),
 	} mutableCopy];
 
-	NSDictionary *topic = TGTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
+	NSDictionary *topic = TGSendTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
 
@@ -1639,7 +1639,7 @@ static NSArray *TGFlattenedQuickReplyMessageList(NSDictionary *result) {
 		},
 	} mutableCopy];
 
-	NSDictionary *topic = TGTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
+	NSDictionary *topic = TGSendTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
 	NSDictionary *replyTo = TGReplyToDictionary(replyToId, nil, nil, 0);
@@ -1755,7 +1755,7 @@ static NSArray *TGFlattenedQuickReplyMessageList(NSDictionary *result) {
 		},
 	} mutableCopy];
 
-	NSDictionary *topic = TGDraftTopic(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
+	NSDictionary *topic = TGSendTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
 	NSDictionary *replyTo = TGReplyToDictionary(replyToId, nil, nil, 0);
@@ -1795,7 +1795,7 @@ static NSArray *TGFlattenedQuickReplyMessageList(NSDictionary *result) {
 		},
 	} mutableCopy];
 
-	NSDictionary *topic = TGDraftTopic(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
+	NSDictionary *topic = TGSendTopicDictionary(threadId, 0, savedTopicId, TGMsgChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
 
