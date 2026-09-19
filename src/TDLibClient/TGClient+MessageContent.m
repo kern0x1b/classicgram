@@ -103,7 +103,7 @@ static BOOL TGMCChatIsForum(TGClient *client, int64_t chatId) {
 		@"input_message_content" : content ?: @{},
 	} mutableCopy];
 
-	NSDictionary *topic = TGTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
+	NSDictionary *topic = TGSendTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
 		TGMCChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
@@ -630,7 +630,7 @@ static void TGMCSendEditCaptionRequest(TGClient *client, int64_t messageId, int6
 			@"options" : TGMsgSendOptions(albumOptions),
 			@"input_message_contents" : contents,
 		} mutableCopy];
-		NSDictionary *topic = TGTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
+		NSDictionary *topic = TGSendTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
 			TGMCChatIsForum(strongSelf, chatId));
 		if (topic)
 			request[@"topic_id"] = topic;

@@ -248,7 +248,7 @@ directMessagesTopic:(int64_t)directMessagesTopicId
 		} mutableCopy];
 	}
 
-	NSDictionary *topic = TGTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
+	NSDictionary *topic = TGSendTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
 		TGGifChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;

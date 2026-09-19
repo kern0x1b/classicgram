@@ -146,3 +146,35 @@ TGTestOutcome TGTopicDictionaryTestNoTopicAtAllReturnsNil(void) {
 
 	return outcome;
 }
+
+TGTestOutcome TGSendTopicDictionaryTestASavedTopicIsNeverSent(void) {
+	TGTestOutcome outcome = TGTestOutcomeZero;
+
+	long long savedTopicId = 161632606LL;
+	TGTestExpectTrue(&outcome, TGSendTopicDictionary(0, 0, savedTopicId, NO) == nil,
+			"TDLib answers \"Messages can\'t be explicitly sent to a Saved Messages topic\" to a "
+			"send that names one, so a send must leave the topic out and let TDLib file the "
+			"message itself");
+	TGTestExpectTrue(&outcome, TGTopicDictionary(0, 0, savedTopicId, NO) != nil,
+			"reading and searching still name the saved topic, which is what they are scoped by");
+
+	return outcome;
+}
+
+TGTestOutcome TGSendTopicDictionaryTestThreadAndDirectMessagesTopicsStillTravel(void) {
+	TGTestOutcome outcome = TGTestOutcomeZero;
+
+	NSDictionary *direct = TGSendTopicDictionary(0, 77, 161632606LL, NO);
+	TGTestExpectTrue(&outcome, [direct[@"@type"] isEqualToString:@"messageTopicDirectMessages"],
+			"a direct-messages topic is still named on a send, and outranks a saved topic");
+
+	NSDictionary *forum = TGSendTopicDictionary(42, 0, 161632606LL, YES);
+	TGTestExpectTrue(&outcome, [forum[@"@type"] isEqualToString:@"messageTopicForum"],
+			"a forum thread is still named on a send");
+
+	NSDictionary *thread = TGSendTopicDictionary(524288000000LL, 0, 0, NO);
+	TGTestExpectEqualLongLong(&outcome, [thread[@"message_thread_id"] longLongValue], 524288000000LL,
+			"and a comment thread keeps its full precision");
+
+	return outcome;
+}

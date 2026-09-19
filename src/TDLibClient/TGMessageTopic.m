@@ -20,3 +20,10 @@ NSDictionary *TGTopicDictionary(int64_t threadId, int64_t directMessagesTopicId,
 			@"saved_messages_topic_id" : @(savedTopicId)};
 	return TGMessageTopicDictionary(threadId, chatIsForum);
 }
+
+NSDictionary *TGSendTopicDictionary(int64_t threadId, int64_t directMessagesTopicId,
+	int64_t __unused savedTopicId, BOOL chatIsForum) {
+	if (directMessagesTopicId != 0)
+		return TGTopicDictionary(0, directMessagesTopicId, 0, chatIsForum);
+	return TGMessageTopicDictionary(threadId, chatIsForum);
+}

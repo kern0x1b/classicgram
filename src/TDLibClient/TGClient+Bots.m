@@ -833,7 +833,7 @@ static NSDictionary *TGBotAdminRightsForRequest(NSDictionary *rights) {
 		@"hide_via_bot" : hideVia ? @YES : @NO,
 	} mutableCopy];
 
-	NSDictionary *topic = TGTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
+	NSDictionary *topic = TGSendTopicDictionary(threadId, directMessagesTopicId, savedTopicId,
 		TGBotsChatIsForum(self, chatId));
 	if (topic)
 		request[@"topic_id"] = topic;
