@@ -23,12 +23,12 @@ review.
 
 **The iOS 6 SDK is the ceiling.** No `UICollectionView`, Auto Layout, `UIAlertController`,
 `WKWebView`, CallKit, PushKit or LocalAuthentication. Every list is a `UITableView`, every layout is
-a computed `CGRect`, every alert is a `UIAlertView` or a `UIActionSheet`. `scripts/lint-sdk-ceiling.py`
+a computed `CGRect`, every alert is a `UIAlertView` or a `UIActionSheet`. `scripts/lint.py sdk-ceiling`
 enforces this.
 
 **No comments in source.** None — not `//`, not `/* */`, not a doc block above a method. Put the
 reasoning in the commit message or the pull request. If a line needs explaining, rename the variable
-or split the method until it does not. `scripts/lint-source-comments.py` enforces this.
+or split the method until it does not. `scripts/lint.py source-comments` enforces this.
 
 **No hard-coded screen width.** Derive widths from the view or the table; the supported devices
 differ in both width and scale.

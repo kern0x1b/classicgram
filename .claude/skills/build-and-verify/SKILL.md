@@ -132,9 +132,21 @@ python3 -c "$(cat above)" src/Screens/Chat/TGChatViewController.m src/Screens/Ch
 Run this after any refactor that moves methods between files — a split, a merge, a category
 extraction — before considering the refactor done.
 
+## Lint checks
+
+Every source check is one module in `scripts/tglint/`, run through one entry point:
+`python3 scripts/lint.py CHECK [ARGS...]`. `scripts/lint.py --list` names them all, and
+`scripts/lint.py --self-test` runs every check's own self-test; the build runs that as the
+`lint-self-tests` check. A check's `main(args)` returns its exit code. `scripts/tglint/tree.py` holds
+what the checks share: walking `src/` in sorted order (skipping `Resources` unless told otherwise),
+reading a file, the line number of an offset, the English string table, baseline files, the
+installed `td_api.tl`, and the usual `path:line reason` report. A new check is a new module there,
+plus one `check(...)` line in `xmake.lua`; it reuses `tree` rather than walking the tree itself.
+`scripts/lint-header-standalone.sh` and `scripts/check-bubble-geometry.py` stay separate tools.
+
 ## Layer linter
 
-`scripts/lint-layer-imports.py` walks `src/` and checks three independent rules, each with its own
+`scripts/lint.py layer-imports` walks `src/` and checks three independent rules, each with its own
 baseline:
 
 - **`rank`** — a rank per top-level package (`Model` < `Layout`/`Theme`/`Utilities` < `Views` <
@@ -152,7 +164,7 @@ baseline:
   size of that problem.
 
 ```
-python3 scripts/lint-layer-imports.py \
+python3 scripts/lint.py layer-imports \
   --baseline-rank scripts/baselines/layer-rank.txt \
   --baseline-screen-wall scripts/baselines/layer-screen-wall.txt \
   --baseline-tdlib-schema scripts/baselines/tdlib-schema.txt
@@ -165,12 +177,12 @@ to hide it.
 
 ## Comment check
 
-`scripts/lint-source-comments.py` is a real tokenizer (it tracks string/char-literal state, so it will
+`scripts/lint.py source-comments` is a real tokenizer (it tracks string/char-literal state, so it will
 not false-positive on a `telegramdev://` URL scheme string or an `http://` literal the way a plain
 `//` grep would):
 
 ```
-python3 scripts/lint-source-comments.py --check src
+python3 scripts/lint.py source-comments --check src
 ```
 
 Exits `1` and prints every offending file if any `.m`/`.h`/`.c`/`.mm` file under the given path
