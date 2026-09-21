@@ -8,7 +8,7 @@ What lives here, what loads when, and how to add to it without turning it back i
 |---|---|---|
 | `.claude/skills/<name>/SKILL.md` | **Yes** | Description loads every session (cheap); full body loads only when Claude decides the task matches the description, or the skill is invoked by name. |
 | `.claude/README.md` (this file) | **Yes** | Never loaded automatically — read by a human, or by an agent asked to work on `.claude` itself. |
-| `../CLAUDE.md` (repo root) | **No** — deliberately untracked (`ed6f6dd`) | Every session, in full, regardless of task. |
+| `../AGENTS.md` (repo root) | **No** — deliberately untracked (`ed6f6dd`) | Every session, in full, regardless of task. |
 | `../iTgLegacy-notes/` | No — gitignored | Never automatically. Planning docs, design-reference screenshots, scratch material — opened by name when a task calls for that specific document. |
 | `.claude/screenshots/` | No — gitignored | Never automatically. Temporary device screenshots; safe to delete any time, `clean.sh` does. |
 | `.claude/AUDIT-LOG.md` | No — gitignored | Never automatically. One machine's running audit journal: round-by-round notes, local paths, device specifics. Local to whoever ran those rounds; it is not shared history. |
@@ -23,9 +23,9 @@ meaning `skills/` and this README, is tracked and travels with the repo. If you 
 disposable or machine-local material, ignore that specific new path; do not widen the ignore back
 to all of `.claude/`.
 
-## Why a skill and not a CLAUDE.md line
+## Why a skill and not a AGENTS.md line
 
-CLAUDE.md content loads in full, every session, regardless of what the task is — it is the right
+AGENTS.md content loads in full, every session, regardless of what the task is — it is the right
 place only for facts and rules that are relevant to essentially every task (the platform ceiling,
 the no-comments rule, the settled design decisions, the highest-stakes "never act outward on the
 user's account" rule). A skill's description loads every session but its body loads only when the
@@ -35,7 +35,7 @@ build, writing Objective-C against this SDK, a shell/macOS gotcha).
 
 The test before adding a new rule anywhere in `.claude/`: would a wrong guess here cost a real
 incident (a respring, a logged-out user, a reverted design decision)? If yes, and it applies to
-*every* task, it belongs in CLAUDE.md. If yes, but only to a specific *kind* of task, it belongs in
+*every* task, it belongs in AGENTS.md. If yes, but only to a specific *kind* of task, it belongs in
 a skill. If a rule must hold with zero exceptions no matter what Claude decides, prose in either
 place is a request, not a guarantee — see `code.claude.com/docs/en/hooks` and consider a
 `PreToolUse`/`PostToolUse` hook in `.claude/settings.json` instead, the way `guard-device.py`
@@ -84,4 +84,4 @@ ceiling, and jailbroken-device SSH deploy has no existing off-the-shelf skill).
 4. Verify the facts against the current repo before writing them down — a command, a file path, an
    incident detail. A skill that's fluently wrong is worse than a skill that's honestly silent.
 5. If the new material is a hard rule with no legitimate exception rather than a sometimes-needed
-   procedure, it may belong in `../CLAUDE.md` instead — see the test above.
+   procedure, it may belong in `../AGENTS.md` instead — see the test above.

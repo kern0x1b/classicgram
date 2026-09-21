@@ -387,7 +387,7 @@ message, so `git log -p` and `git blame` on the line you are puzzled by are the 
 
 Two shorter forms sit next to the code itself:
 
-- `CLAUDE.md` — the house rules that bind every change: the SDK ceiling, no comments, the settled
+- `AGENTS.md` — the house rules that bind every change: the SDK ceiling, no comments, the settled
   product decisions, and what must never be done to a signed-in account.
 - `.claude/skills/` — task guides for building and verifying, deploying to a device, judging a
   screenshot, working within the iOS 6 SDK, and the shell traps that produce wrong results which
